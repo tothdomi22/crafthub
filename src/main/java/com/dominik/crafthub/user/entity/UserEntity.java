@@ -6,11 +6,10 @@ import com.dominik.crafthub.message.entity.MessageEntity;
 import com.dominik.crafthub.profile.entity.ProfileEntity;
 import com.dominik.crafthub.review.entity.ReviewEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -32,7 +31,8 @@ public class UserEntity {
     private String password;
 
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @OneToMany(mappedBy = "userEntity1")
     private Set<ConversationEntity> conversationsOne = new LinkedHashSet<>();
