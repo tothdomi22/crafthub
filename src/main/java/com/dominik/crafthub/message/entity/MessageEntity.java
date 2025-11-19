@@ -1,5 +1,7 @@
-package com.dominik.crafthub.entities;
+package com.dominik.crafthub.message.entity;
 
+import com.dominik.crafthub.conversation.entity.ConversationEntity;
+import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

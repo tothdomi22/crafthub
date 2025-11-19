@@ -1,5 +1,7 @@
-package com.dominik.crafthub.entities;
+package com.dominik.crafthub.review.entity;
 
+import com.dominik.crafthub.listing.entity.ListingEntity;
+import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
