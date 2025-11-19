@@ -6,6 +6,7 @@ import com.dominik.crafthub.message.entity.MessageEntity;
 import com.dominik.crafthub.profile.entity.ProfileEntity;
 import com.dominik.crafthub.review.entity.ReviewEntity;
 import jakarta.persistence.*;
+import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import lombok.Getter;
@@ -16,40 +17,48 @@ import lombok.Setter;
 @Entity
 @Table(name = "\"user\"")
 public class UserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Long id;
 
-    @Column(name = "name")
-    private String name;
+  @Column(name = "name")
+  private String name;
 
-    @Column(name = "email")
-    private String email;
+  @Column(name = "email")
+  private String email;
 
-    @Column(name = "password")
-    private String password;
+  @Column(name = "password")
+  private String password;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+  @Column(name = "role")
+  @Enumerated(EnumType.STRING)
+  private UserRole role;
 
-    @OneToMany(mappedBy = "userEntity1")
-    private Set<ConversationEntity> conversationsOne = new LinkedHashSet<>();
+  @Column(name = "is_deleted")
+  private Boolean isDeleted;
 
-    @OneToMany(mappedBy = "userEntity2")
-    private Set<ConversationEntity> conversationsTwo = new LinkedHashSet<>();
+  @Column(name = "created_at")
+  private OffsetDateTime createdAt;
 
-    @OneToMany(mappedBy = "userEntity")
-    private Set<ListingEntity> listingEntities = new LinkedHashSet<>();
+  @Column(name = "deleted_at")
+  private OffsetDateTime deletedAt;
 
-    @OneToMany(mappedBy = "sender")
-    private Set<MessageEntity> messageEntities = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "userEntity1")
+  private Set<ConversationEntity> conversationsOne = new LinkedHashSet<>();
 
-    @OneToOne(mappedBy = "userEntity")
-    private ProfileEntity profiles;
+  @OneToMany(mappedBy = "userEntity2")
+  private Set<ConversationEntity> conversationsTwo = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "reviewerUserEntity")
-    private Set<ReviewEntity> reviews = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "userEntity")
+  private Set<ListingEntity> listingEntities = new LinkedHashSet<>();
 
+  @OneToMany(mappedBy = "sender")
+  private Set<MessageEntity> messageEntities = new LinkedHashSet<>();
+
+  @OneToOne(mappedBy = "userEntity")
+  private ProfileEntity profiles;
+
+  @OneToMany(mappedBy = "reviewerUserEntity")
+  private Set<ReviewEntity> reviews = new LinkedHashSet<>();
 }
