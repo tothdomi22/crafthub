@@ -2,10 +2,9 @@ package com.dominik.crafthub.profile.entity;
 
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -22,9 +21,6 @@ public class ProfileEntity {
 
     @Column(name = "bio")
     private String bio;
-
-    @Column(name = "created_at")
-    private LocalDate createdAt;
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
