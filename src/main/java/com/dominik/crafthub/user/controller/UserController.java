@@ -1,21 +1,21 @@
 package com.dominik.crafthub.user.controller;
 
-import com.dominik.crafthub.jwt.dto.JwtResponse;
+import com.dominik.crafthub.jwt.config.JwtConfig;
 import com.dominik.crafthub.jwt.service.JwtService;
 import com.dominik.crafthub.user.dto.UserDto;
-import com.dominik.crafthub.user.dto.UserLoginRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
+import com.dominik.crafthub.user.dto.UserUpdateRequest;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
+import com.dominik.crafthub.user.exceptions.UserNotFoundException;
+import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
 import com.dominik.crafthub.user.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -26,26 +26,35 @@ public class UserController {
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final JwtService jwtService;
+  private final JwtConfig jwtConfig;
+  private final UserMapper userMapper;
 
-  @PostMapping
-  public ResponseEntity<UserDto> register(@RequestBody @Valid UserRegisterRequest request) {
-    var userDto = userService.registerUser(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+  @GetMapping("/me")
+  public ResponseEntity<?> me() {
+    var userDto = userService.getMe();
+    return ResponseEntity.status(HttpStatus.OK).body(userDto);
   }
 
-  @PostMapping("/login")
-  public ResponseEntity<JwtResponse> login(
-      @RequestBody @Valid UserLoginRequest request, HttpServletResponse response) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.email(), request.password()));
-    var user = userRepository.findByEmail(request.email()).orElseThrow();
-    var accessToken = jwtService.generateAccessToken(user);
-    return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(accessToken.toString()));
+  @PutMapping
+  public ResponseEntity<?> update(@Valid @RequestBody UserUpdateRequest request) {
+    var userDto = userService.updateUser(request);
+    return ResponseEntity.status(HttpStatus.OK).body(userDto);
+  }
+
+  @DeleteMapping
+  public ResponseEntity<?> delete() {
+    userService.deleteUser();
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> handleUserAlreadyExists() {
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(Map.of("message:", "User with this email already exists"));
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<Map<String, String>> handleUserNotFound() {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message:", "User not found"));
   }
 }
