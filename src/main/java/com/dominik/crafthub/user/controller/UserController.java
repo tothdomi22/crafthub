@@ -1,5 +1,6 @@
 package com.dominik.crafthub.user.controller;
 
+import com.dominik.crafthub.jwt.config.JwtConfig;
 import com.dominik.crafthub.jwt.dto.JwtResponse;
 import com.dominik.crafthub.jwt.service.JwtService;
 import com.dominik.crafthub.user.dto.UserDto;
@@ -8,6 +9,7 @@ import com.dominik.crafthub.user.dto.UserRegisterRequest;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
 import com.dominik.crafthub.user.repository.UserRepository;
 import com.dominik.crafthub.user.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
@@ -26,6 +28,7 @@ public class UserController {
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final JwtService jwtService;
+  private final JwtConfig jwtConfig;
 
   @PostMapping
   public ResponseEntity<UserDto> register(@RequestBody @Valid UserRegisterRequest request) {
@@ -40,7 +43,12 @@ public class UserController {
         new UsernamePasswordAuthenticationToken(request.email(), request.password()));
     var user = userRepository.findByEmail(request.email()).orElseThrow();
     var accessToken = jwtService.generateAccessToken(user);
-    return ResponseEntity.status(HttpStatus.OK).body(new JwtResponse(accessToken.toString()));
+    var cookie = new Cookie("accessToken", accessToken.toString());
+    cookie.setMaxAge(jwtConfig.getAccessTokenExpiration());
+    cookie.setSecure(true);
+    cookie.setHttpOnly(true);
+    response.addCookie(cookie);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
