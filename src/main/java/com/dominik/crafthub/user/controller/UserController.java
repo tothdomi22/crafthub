@@ -13,7 +13,9 @@ import com.dominik.crafthub.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,11 +61,31 @@ public class UserController {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     var userId = (Long) authentication.getPrincipal();
     var user = userRepository.findById(userId).orElse(null);
-    if (user == null) {
+    if (user == null || user.getIsDeleted()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     var userDto = userMapper.toDto(user);
     return ResponseEntity.status(HttpStatus.OK).body(userDto);
+  }
+
+  //  public ResponseEntity<?> update(@RequestBody UpdateUserRequest request) {}
+
+  @DeleteMapping
+  public ResponseEntity<?> delete() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    var userId = (Long) authentication.getPrincipal();
+    var user = userRepository.findById(userId).orElse(null);
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    var email = UUID.randomUUID() + "@deleted.com";
+    var name = UUID.randomUUID().toString();
+    user.setIsDeleted(true);
+    user.setEmail(email);
+    user.setName(name);
+    user.setDeletedAt(OffsetDateTime.now());
+    userRepository.save(user);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
