@@ -6,6 +6,7 @@ import com.dominik.crafthub.jwt.service.JwtService;
 import com.dominik.crafthub.user.dto.UserDto;
 import com.dominik.crafthub.user.dto.UserLoginRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
+import com.dominik.crafthub.user.dto.UserUpdateRequest;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
 import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
@@ -68,7 +69,28 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(userDto);
   }
 
-  //  public ResponseEntity<?> update(@RequestBody UpdateUserRequest request) {}
+  @PutMapping
+  public ResponseEntity<?> update(@Valid @RequestBody UserUpdateRequest request) {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    var userId = (Long) authentication.getPrincipal();
+    var user = userRepository.findById(userId).orElse(null);
+    if (user == null || user.getIsDeleted()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+    if (request.email() != null) {
+      var emailExist = userRepository.existsByEmail(request.email());
+      if (emailExist) {
+        throw new UserAlreadyExistsException();
+      }
+      user.setEmail(request.email());
+    }
+    if (request.name() != null) {
+      user.setName(request.name());
+    }
+    userRepository.save(user);
+    var userDto = userMapper.toDto(user);
+    return ResponseEntity.status(HttpStatus.OK).body(userDto);
+  }
 
   @DeleteMapping
   public ResponseEntity<?> delete() {
