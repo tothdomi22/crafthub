@@ -12,7 +12,11 @@ import org.springframework.context.annotation.Configuration;
 public class JwtConfig {
   private String secret;
   private int accessTokenExpiration;
-  private int refreshTokenExpiraion;
+  private int refreshTokenExpiration;
+
+  public int getRefreshTokenExpiration() {
+    return refreshTokenExpiration;
+  }
 
   public SecretKey getSecretKey() {
     return Keys.hmacShaKeyFor(secret.getBytes());

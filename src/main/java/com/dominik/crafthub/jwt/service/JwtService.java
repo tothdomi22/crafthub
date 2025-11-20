@@ -20,17 +20,17 @@ public class JwtService {
   }
 
   public JwtEntity generateRefreshToken(UserEntity user) {
-    return generateToken(user, jwtConfig.getRefreshTokenExpiraion());
+    return generateToken(user, jwtConfig.getRefreshTokenExpiration());
   }
 
-  private JwtEntity generateToken(UserEntity user, long tokenExpriation) {
+  private JwtEntity generateToken(UserEntity user, long tokenExpiration) {
     var claims =
         Jwts.claims()
             .subject(user.getId().toString())
             .add("email", user.getEmail())
             .add("role", user.getRole())
             .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpriation))
+            .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration))
             .build();
     return new JwtEntity(claims, jwtConfig.getSecretKey());
   }
