@@ -1,28 +1,21 @@
 package com.dominik.crafthub.user.controller;
 
 import com.dominik.crafthub.jwt.config.JwtConfig;
-import com.dominik.crafthub.jwt.dto.JwtResponse;
 import com.dominik.crafthub.jwt.service.JwtService;
 import com.dominik.crafthub.user.dto.UserDto;
-import com.dominik.crafthub.user.dto.UserLoginRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
 import com.dominik.crafthub.user.dto.UserUpdateRequest;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
+import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
 import com.dominik.crafthub.user.service.UserService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.time.OffsetDateTime;
 import java.util.Map;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -36,77 +29,21 @@ public class UserController {
   private final JwtConfig jwtConfig;
   private final UserMapper userMapper;
 
-  @PostMapping
-  public ResponseEntity<UserDto> register(@RequestBody @Valid UserRegisterRequest request) {
-    var userDto = userService.registerUser(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
-  }
-
-  @PostMapping("/login")
-  public ResponseEntity<JwtResponse> login(
-      @RequestBody @Valid UserLoginRequest request, HttpServletResponse response) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.email(), request.password()));
-    var user = userRepository.findByEmail(request.email()).orElseThrow();
-    var accessToken = jwtService.generateAccessToken(user);
-    var cookie = new Cookie("accessToken", accessToken.toString());
-    cookie.setMaxAge(jwtConfig.getAccessTokenExpiration());
-    cookie.setSecure(true);
-    cookie.setHttpOnly(true);
-    response.addCookie(cookie);
-    return ResponseEntity.status(HttpStatus.OK).build();
-  }
-
   @GetMapping("/me")
   public ResponseEntity<?> me() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
-    var user = userRepository.findById(userId).orElse(null);
-    if (user == null || user.getIsDeleted()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    var userDto = userMapper.toDto(user);
+    var userDto = userService.getMe();
     return ResponseEntity.status(HttpStatus.OK).body(userDto);
   }
 
   @PutMapping
   public ResponseEntity<?> update(@Valid @RequestBody UserUpdateRequest request) {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
-    var user = userRepository.findById(userId).orElse(null);
-    if (user == null || user.getIsDeleted()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    if (request.email() != null) {
-      var emailExist = userRepository.existsByEmail(request.email());
-      if (emailExist) {
-        throw new UserAlreadyExistsException();
-      }
-      user.setEmail(request.email());
-    }
-    if (request.name() != null) {
-      user.setName(request.name());
-    }
-    userRepository.save(user);
-    var userDto = userMapper.toDto(user);
+    var userDto = userService.updateUser(request);
     return ResponseEntity.status(HttpStatus.OK).body(userDto);
   }
 
   @DeleteMapping
   public ResponseEntity<?> delete() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
-    var user = userRepository.findById(userId).orElse(null);
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    var email = UUID.randomUUID() + "@deleted.com";
-    var name = UUID.randomUUID().toString();
-    user.setIsDeleted(true);
-    user.setEmail(email);
-    user.setName(name);
-    user.setDeletedAt(OffsetDateTime.now());
-    userRepository.save(user);
+    userService.deleteUser();
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -114,5 +51,10 @@ public class UserController {
   public ResponseEntity<Map<String, String>> handleUserAlreadyExists() {
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(Map.of("message:", "User with this email already exists"));
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<Map<String, String>> handleUserNotFound() {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message:", "User not found"));
   }
 }
