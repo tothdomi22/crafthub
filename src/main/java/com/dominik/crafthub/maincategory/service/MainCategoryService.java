@@ -18,16 +18,24 @@ public class MainCategoryService {
   private MainCategoryMapper mainCategoryMapper;
   private MainCategoryRepository mainCategoryRepository;
 
+  private static String normalizeUniqueName(String uniqueName) {
+    return uniqueName.toLowerCase().replace(" ", "_");
+  }
+
   public MainCategoryDto createMainCategory(MainCategoryCreateRequest request) {
-    String normalizedUniqueName = request.uniqueName().toLowerCase().replace(" ", "_");
+    var uniqueName = normalizeUniqueName(request.uniqueName());
+    checkIfUniqueNameExists(uniqueName);
+    var mainCategory = mainCategoryMapper.toEntity(request);
+    mainCategory.setUniqueName(uniqueName);
+    mainCategoryRepository.save(mainCategory);
+    return mainCategoryMapper.toDto(mainCategory);
+  }
+
+  private void checkIfUniqueNameExists(String normalizedUniqueName) {
     var mainCategoryExists = mainCategoryRepository.existsByUniqueName(normalizedUniqueName);
     if (mainCategoryExists) {
       throw new MainCategoryAlreadyExistsException();
     }
-    var mainCategory = mainCategoryMapper.toEntity(request);
-    mainCategory.setUniqueName(normalizedUniqueName);
-    mainCategoryRepository.save(mainCategory);
-    return mainCategoryMapper.toDto(mainCategory);
   }
 
   public MainCategoryDto getMainCategory(Integer id) {
@@ -42,6 +50,8 @@ public class MainCategoryService {
 
   public MainCategoryDto updateMainCategory(Integer id, MainCategoryUpdateRequest request) {
     var mainCategory = findMainCategoryById(id);
+    var uniqueName = normalizeUniqueName(request.uniqueName());
+    checkIfUniqueNameExists(uniqueName);
     mainCategoryMapper.update(request, mainCategory);
     mainCategoryRepository.save(mainCategory);
     return mainCategoryMapper.toDto(mainCategory);

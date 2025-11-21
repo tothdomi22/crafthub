@@ -60,7 +60,7 @@ public class MainCategoryController {
 
   @ExceptionHandler(MainCategoryNotFoundException.class)
   public ResponseEntity<Map<String, String>> mainCategoryNotFound() {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(Map.of("message:", "Main category not found"));
   }
 }
