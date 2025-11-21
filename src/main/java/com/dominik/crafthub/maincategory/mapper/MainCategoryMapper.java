@@ -16,5 +16,6 @@ public interface MainCategoryMapper {
 
   MainCategoryEntity toEntity(MainCategoryCreateRequest request);
 
-  void update(MainCategoryUpdateRequest request, @MappingTarget MainCategoryEntity mainCategoryEntity)
+  void update(
+      MainCategoryUpdateRequest request, @MappingTarget MainCategoryEntity mainCategoryEntity);
 }

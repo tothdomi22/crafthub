@@ -46,6 +46,11 @@ public class MainCategoryService {
     return mainCategoryMapper.toDto(mainCategory);
   }
 
+  public void deleteMainCategory(Integer id) {
+    var mainCategory = findMainCategoryById(id);
+    mainCategoryRepository.delete(mainCategory);
+  }
+
   private MainCategoryEntity findMainCategoryById(Integer id) {
     var mainCategory = mainCategoryRepository.findById(id).orElse(null);
     if (mainCategory == null) {

@@ -46,6 +46,12 @@ public class MainCategoryController {
     return ResponseEntity.status(HttpStatus.OK).body(mainCategoryDto);
   }
 
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteMainCategory(@PathVariable Integer id) {
+    mainCategoryService.deleteMainCategory(id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
   @ExceptionHandler(MainCategoryAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> mainCategoryAlreadyExists() {
     return ResponseEntity.status(HttpStatus.CONFLICT)
