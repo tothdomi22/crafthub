@@ -2,6 +2,7 @@ package com.dominik.crafthub.maincategory.controller;
 
 import com.dominik.crafthub.maincategory.dto.MainCategoryCreateRequest;
 import com.dominik.crafthub.maincategory.dto.MainCategoryDto;
+import com.dominik.crafthub.maincategory.dto.MainCategoryUpdateRequest;
 import com.dominik.crafthub.maincategory.exceptions.MainCategoryAlreadyExistsException;
 import com.dominik.crafthub.maincategory.exceptions.MainCategoryNotFoundException;
 import com.dominik.crafthub.maincategory.service.MainCategoryService;
@@ -36,6 +37,13 @@ public class MainCategoryController {
   public ResponseEntity<?> listMainCategories() {
     List<MainCategoryDto> mainCategoryDtoList = mainCategoryService.listMainCategories();
     return ResponseEntity.status(HttpStatus.OK).body(mainCategoryDtoList);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateMainCategory(
+      @PathVariable Integer id, @Valid @RequestBody MainCategoryUpdateRequest request) {
+    var mainCategoryDto = mainCategoryService.updateMainCategory(id, request);
+    return ResponseEntity.status(HttpStatus.OK).body(mainCategoryDto);
   }
 
   @ExceptionHandler(MainCategoryAlreadyExistsException.class)
