@@ -19,12 +19,13 @@ public class MainCategoryService {
   private MainCategoryRepository mainCategoryRepository;
 
   public MainCategoryDto createMainCategory(MainCategoryCreateRequest request) {
-    var mainCategoryExists = mainCategoryRepository.existsByName(request.name().toLowerCase());
+    String normalizedUniqueName = request.uniqueName().toLowerCase().replace(" ", "_");
+    var mainCategoryExists = mainCategoryRepository.existsByUniqueName(normalizedUniqueName);
     if (mainCategoryExists) {
       throw new MainCategoryAlreadyExistsException();
     }
     var mainCategory = mainCategoryMapper.toEntity(request);
-    mainCategory.setName(request.name().toLowerCase());
+    mainCategory.setUniqueName(normalizedUniqueName);
     mainCategoryRepository.save(mainCategory);
     return mainCategoryMapper.toDto(mainCategory);
   }
