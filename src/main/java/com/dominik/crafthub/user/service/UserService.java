@@ -1,40 +1,33 @@
 package com.dominik.crafthub.user.service;
 
+import com.dominik.crafthub.auth.service.AuthService;
+import com.dominik.crafthub.profile.repository.ProfileRepository;
 import com.dominik.crafthub.user.dto.UserDto;
 import com.dominik.crafthub.user.dto.UserUpdateRequest;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
-import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class UserService {
+  private final ProfileRepository profileRepository;
+  private final AuthService authService;
   private UserRepository userRepository;
   private UserMapper userMapper;
 
   public UserDto getMe() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
-    var user = userRepository.findById(userId).orElse(null);
-    if (user == null || user.getIsDeleted()) {
-      throw new UserNotFoundException();
-    }
+    var user = authService.getCurrentUser();
     return userMapper.toDto(user);
   }
 
   public UserDto updateUser(UserUpdateRequest request) {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
-    var user = userRepository.findById(userId).orElse(null);
-    if (user == null || user.getIsDeleted()) {
-      throw new UserNotFoundException();
-    }
+    var user = authService.getCurrentUser();
     if (request.email() != null) {
       var emailExist = userRepository.existsByEmail(request.email());
       if (emailExist) {
@@ -50,11 +43,13 @@ public class UserService {
   }
 
   public void deleteUser() {
-    var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
-    var user = userRepository.findById(userId).orElse(null);
-    if (user == null) {
-      throw new UserNotFoundException();
+   var user = authService.getCurrentUser();
+    var profile = profileRepository.findByUserEntity_Id(user.getId()).orElse(null);
+    if (profile != null) {
+      profile.setBio(null);
+      profile.setBirthDate(LocalDate.of(1900, 1, 1));
+      profile.setCity("city_hidden");
+      profileRepository.save(profile);
     }
     var email = UUID.randomUUID() + "@deleted.com";
     var name = UUID.randomUUID().toString();

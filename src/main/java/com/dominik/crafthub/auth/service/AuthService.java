@@ -5,8 +5,10 @@ import com.dominik.crafthub.jwt.service.JwtService;
 import com.dominik.crafthub.user.dto.UserDto;
 import com.dominik.crafthub.user.dto.UserLoginRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
+import com.dominik.crafthub.user.entity.UserEntity;
 import com.dominik.crafthub.user.entity.UserRole;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
+import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -14,6 +16,7 @@ import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +54,15 @@ public class AuthService {
     cookie.setSecure(true);
     cookie.setHttpOnly(true);
     return cookie;
+  }
+
+  public UserEntity getCurrentUser() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    var userId = (Long) authentication.getPrincipal();
+    var user = userRepository.findById(userId).orElse(null);
+    if (user == null || user.getIsDeleted()) {
+      throw new UserNotFoundException();
+    }
+    return user;
   }
 }
