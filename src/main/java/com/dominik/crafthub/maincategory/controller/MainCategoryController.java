@@ -1,10 +1,12 @@
 package com.dominik.crafthub.maincategory.controller;
 
 import com.dominik.crafthub.maincategory.dto.MainCategoryCreateRequest;
+import com.dominik.crafthub.maincategory.dto.MainCategoryDto;
 import com.dominik.crafthub.maincategory.exceptions.MainCategoryAlreadyExistsException;
 import com.dominik.crafthub.maincategory.exceptions.MainCategoryNotFoundException;
 import com.dominik.crafthub.maincategory.service.MainCategoryService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,12 @@ public class MainCategoryController {
   public ResponseEntity<?> getMainCategory(@PathVariable Integer id) {
     var mainCategoryDto = mainCategoryService.getMainCategory(id);
     return ResponseEntity.status(HttpStatus.OK).body(mainCategoryDto);
+  }
+
+  @GetMapping("/list")
+  public ResponseEntity<?> listMainCategories() {
+    List<MainCategoryDto> mainCategoryDtoList = mainCategoryService.listMainCategories();
+    return ResponseEntity.status(HttpStatus.OK).body(mainCategoryDtoList);
   }
 
   @ExceptionHandler(MainCategoryAlreadyExistsException.class)

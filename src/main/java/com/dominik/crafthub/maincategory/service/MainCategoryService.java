@@ -6,6 +6,7 @@ import com.dominik.crafthub.maincategory.exceptions.MainCategoryAlreadyExistsExc
 import com.dominik.crafthub.maincategory.exceptions.MainCategoryNotFoundException;
 import com.dominik.crafthub.maincategory.mapper.MainCategoryMapper;
 import com.dominik.crafthub.maincategory.repository.MainCategoryRepository;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +33,10 @@ public class MainCategoryService {
       throw new MainCategoryNotFoundException();
     }
     return mainCategoryMapper.toDto(mainCategory);
+  }
+
+  public List<MainCategoryDto> listMainCategories() {
+    var mainCategories = mainCategoryRepository.findAll();
+    return mainCategories.stream().map(mainCategoryMapper::toDto).toList();
   }
 }
