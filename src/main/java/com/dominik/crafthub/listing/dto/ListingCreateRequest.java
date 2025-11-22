@@ -6,6 +6,6 @@ import jakarta.validation.constraints.NotNull;
 public record ListingCreateRequest(
     @NotBlank(message = "You must provide a name") String name,
     @NotNull(message = "You must provide a price") Integer price,
-    @NotNull(message = "You must device if you can ship or not") boolean canShip,
+    @NotNull(message = "You must device if you can ship or not") Boolean canShip,
     @NotBlank(message = "You must provide a city") String city,
     @NotNull(message = "You must provide a subcategory") Integer subCategoryId) {}
