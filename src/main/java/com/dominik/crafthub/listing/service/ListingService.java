@@ -4,9 +4,11 @@ import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.listing.controller.ListingMapper;
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingDto;
+import com.dominik.crafthub.listing.dto.ListingUpdateRequest;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
+import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
 import java.time.OffsetDateTime;
@@ -42,6 +44,20 @@ public class ListingService {
 
   public ListingDto getListing(Long id) {
     var listing = findListingById(id);
+    return listingMapper.toDto(listing);
+  }
+
+  public ListingDto updateListing(Long id, ListingUpdateRequest request) {
+    var user = authService.getCurrentUser();
+    var listing = findListingById(id);
+    if (!listing.getUserEntity().getId().equals(user.getId())) {
+      throw new NotTheOwnerOfListingException();
+    }
+    if (request.subCategoryId() != null) {
+      var subCategory = subCategoryService.findSubCategoryById(request.subCategoryId());
+      listing.setSubCategoryEntity(subCategory);
+    }
+    listingMapper.update(request, listing);
     return listingMapper.toDto(listing);
   }
 
