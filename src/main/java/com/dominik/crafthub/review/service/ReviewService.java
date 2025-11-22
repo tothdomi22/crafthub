@@ -4,6 +4,7 @@ import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.review.dto.ReviewCreateRequest;
 import com.dominik.crafthub.review.dto.ReviewDto;
+import com.dominik.crafthub.review.exception.ReviewAlreadyExistsException;
 import com.dominik.crafthub.review.mapper.ReviewMapper;
 import com.dominik.crafthub.review.repository.ReviewRepository;
 import java.time.OffsetDateTime;
@@ -20,13 +21,15 @@ public class ReviewService {
 
   public ReviewDto createReview(Long listingId, ReviewCreateRequest request) {
     var user = authService.getCurrentUser();
+    var reviewExists = reviewRepository.existsByListingEntity_Id(listingId);
+    if (reviewExists) {
+      throw new ReviewAlreadyExistsException();
+    }
     var listing = listingService.findListingById(listingId);
     var review = reviewMapper.toEntity(request);
     review.setReviewerUserEntity(user);
     review.setListingEntity(listing);
     review.setCreatedAt(OffsetDateTime.now());
-    System.out.println(request.stars());
-    System.out.println(review.getStars());
     reviewRepository.save(review);
     return reviewMapper.toDto(review);
   }
