@@ -61,7 +61,7 @@ public class ListingService {
     return listingMapper.toDto(listing);
   }
 
-  private ListingEntity findListingById(Long id) {
+  public ListingEntity findListingById(Long id) {
     var listing = listingRepository.findById(id).orElse(null);
     if (listing == null) {
       throw new ListingNotFoundException();
