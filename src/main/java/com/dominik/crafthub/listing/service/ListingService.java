@@ -4,7 +4,9 @@ import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.listing.controller.ListingMapper;
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingDto;
+import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
+import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
 import java.util.List;
@@ -34,5 +36,18 @@ public class ListingService {
     var user = authService.getCurrentUser();
     var listings = listingRepository.findAllByUserEntityId(user.getId());
     return listings.stream().map(listingMapper::toDto).toList();
+  }
+
+  public ListingDto getListing(Long id) {
+    var listing = findListingById(id);
+    return listingMapper.toDto(listing);
+  }
+
+  private ListingEntity findListingById(Long id) {
+    var listing = listingRepository.findById(id).orElse(null);
+    if (listing == null) {
+      throw new ListingNotFoundException();
+    }
+    return listing;
   }
 }

@@ -25,4 +25,10 @@ public class ListingController {
     var listings = listingService.listListings();
     return ResponseEntity.status(HttpStatus.OK).body(listings);
   }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getListing(@PathVariable Long id) {
+    var listing = listingService.getListing(id);
+    return ResponseEntity.status(HttpStatus.OK).body(listing);
+  }
 }
