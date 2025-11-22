@@ -4,11 +4,10 @@ import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.subcategory.entity.SubCategoryEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -33,7 +32,8 @@ public class ListingEntity {
     private String city;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ListingStatusEnum status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
