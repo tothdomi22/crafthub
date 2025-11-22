@@ -33,7 +33,7 @@ public class ProfileController {
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleUserNotFound() {
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message:", "User not found"));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message:", "User not found"));
   }
 
   @ExceptionHandler(ProfileAlreadyExistsException.class)
@@ -44,6 +44,7 @@ public class ProfileController {
 
   @ExceptionHandler(ProfileNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleProfileNotFound() {
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message:", "Profile not found"));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("message:", "Profile not found"));
   }
 }

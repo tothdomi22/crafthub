@@ -2,8 +2,6 @@ package com.dominik.crafthub.user.controller;
 
 import com.dominik.crafthub.jwt.config.JwtConfig;
 import com.dominik.crafthub.jwt.service.JwtService;
-import com.dominik.crafthub.user.dto.UserDto;
-import com.dominik.crafthub.user.dto.UserRegisterRequest;
 import com.dominik.crafthub.user.dto.UserUpdateRequest;
 import com.dominik.crafthub.user.exceptions.UserAlreadyExistsException;
 import com.dominik.crafthub.user.exceptions.UserNotFoundException;
@@ -55,6 +53,6 @@ public class UserController {
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleUserNotFound() {
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message:", "User not found"));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message:", "User not found"));
   }
 }
