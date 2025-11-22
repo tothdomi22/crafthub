@@ -62,7 +62,7 @@ public class MainCategoryService {
     mainCategoryRepository.delete(mainCategory);
   }
 
-  private MainCategoryEntity findMainCategoryById(Integer id) {
+  public MainCategoryEntity findMainCategoryById(Integer id) {
     var mainCategory = mainCategoryRepository.findById(id).orElse(null);
     if (mainCategory == null) {
       throw new MainCategoryNotFoundException();

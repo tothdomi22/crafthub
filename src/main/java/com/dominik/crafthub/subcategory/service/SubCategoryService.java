@@ -1,8 +1,7 @@
 package com.dominik.crafthub.subcategory.service;
 
-import com.dominik.crafthub.maincategory.entity.MainCategoryEntity;
-import com.dominik.crafthub.maincategory.exceptions.MainCategoryNotFoundException;
 import com.dominik.crafthub.maincategory.repository.MainCategoryRepository;
+import com.dominik.crafthub.maincategory.service.MainCategoryService;
 import com.dominik.crafthub.subcategory.dto.SubCategoryCreateRequest;
 import com.dominik.crafthub.subcategory.dto.SubCategoryDto;
 import com.dominik.crafthub.subcategory.dto.SubCategoryUpdateRequest;
@@ -22,6 +21,7 @@ public class SubCategoryService {
   private final MainCategoryRepository mainCategoryRepository;
   private final SubCategoryRepository subCategoryRepository;
   private final SubCategoryMapper subCategoryMapper;
+  private MainCategoryService mainCategoryService;
 
   private static String normalizeUniqueName(String uniqueName) {
     return uniqueName.toLowerCase().replace(" ", "_");
@@ -30,7 +30,7 @@ public class SubCategoryService {
   public SubCategoryDto createSubCategory(SubCategoryCreateRequest request) {
     var uniqueName = normalizeUniqueName(request.uniqueName());
     checkIfUniqueNameExists(uniqueName);
-    var mainCategory = findMainCategoryById(request.mainCategoryId());
+    var mainCategory = mainCategoryService.findMainCategoryById(request.mainCategoryId());
     var subCategory = subCategoryMapper.toEntity(request);
 
     subCategory.setUniqueName(uniqueName);
@@ -54,7 +54,7 @@ public class SubCategoryService {
     System.out.println(request.mainCategoryId());
     if (request.mainCategoryId() != null) {
       System.out.println("finding maincategory");
-      var mainCategory = findMainCategoryById(request.mainCategoryId());
+      var mainCategory = mainCategoryService.findMainCategoryById(request.mainCategoryId());
       System.out.println(mainCategory);
       subCategory.setMainCategoryEntity(mainCategory);
     }
@@ -72,20 +72,12 @@ public class SubCategoryService {
     subCategoryRepository.delete(subCategory);
   }
 
-  private SubCategoryEntity findSubCategoryById(Integer id) {
+  public SubCategoryEntity findSubCategoryById(Integer id) {
     var subCategory = subCategoryRepository.findById(id).orElse(null);
     if (subCategory == null) {
       throw new SubCategoryNotFoundException();
     }
     return subCategory;
-  }
-
-  private MainCategoryEntity findMainCategoryById(Integer id) {
-    var mainCategory = mainCategoryRepository.findById(id).orElse(null);
-    if (mainCategory == null) {
-      throw new MainCategoryNotFoundException();
-    }
-    return mainCategory;
   }
 
   private void checkIfUniqueNameExists(String normalizedUniqueName) {
