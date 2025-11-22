@@ -9,6 +9,7 @@ import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class ListingService {
     listing.setUserEntity(user);
     listing.setSubCategoryEntity(subCategory);
     listing.setStatus(ListingStatusEnum.ACTIVE);
+    listing.setCreatedAt(OffsetDateTime.now());
     listingRepository.save(listing);
     return listingMapper.toDto(listing);
   }

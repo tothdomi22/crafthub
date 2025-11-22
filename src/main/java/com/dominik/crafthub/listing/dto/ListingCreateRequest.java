@@ -8,4 +8,5 @@ public record ListingCreateRequest(
     @NotNull(message = "You must provide a price") Integer price,
     @NotNull(message = "You must device if you can ship or not") Boolean canShip,
     @NotBlank(message = "You must provide a city") String city,
+    @NotBlank(message = "You must provide a description") String description,
     @NotNull(message = "You must provide a subcategory") Integer subCategoryId) {}
