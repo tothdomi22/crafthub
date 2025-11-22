@@ -7,6 +7,7 @@ import com.dominik.crafthub.listing.dto.ListingDto;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,5 +28,11 @@ public class ListingService {
     listing.setStatus(ListingStatusEnum.ACTIVE);
     listingRepository.save(listing);
     return listingMapper.toDto(listing);
+  }
+
+  public List<ListingDto> listListings() {
+    var user = authService.getCurrentUser();
+    var listings = listingRepository.findAllByUserEntityId(user.getId());
+    return listings.stream().map(listingMapper::toDto).toList();
   }
 }
