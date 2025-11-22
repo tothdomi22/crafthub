@@ -1,5 +1,6 @@
 package com.dominik.crafthub.listing.entity;
 
+import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.subcategory.entity.SubCategoryEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
@@ -49,6 +50,9 @@ public class ListingEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "sub_category_id")
   private SubCategoryEntity subCategoryEntity;
+
+  @OneToMany(mappedBy = "listingEntity")
+  private Set<ConversationEntity> conversationEntities = new LinkedHashSet<>();
 
   @OneToMany(mappedBy = "listingEntity")
   private Set<ReviewEntity> reviewEntities = new LinkedHashSet<>();
