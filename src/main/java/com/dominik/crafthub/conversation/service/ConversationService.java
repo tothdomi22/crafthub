@@ -5,6 +5,7 @@ import com.dominik.crafthub.conversation.dto.ConversationCreateRequest;
 import com.dominik.crafthub.conversation.dto.ConversationDto;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.conversation.exception.ConversationAlreadyExistsException;
+import com.dominik.crafthub.conversation.exception.ConversationNotFoundException;
 import com.dominik.crafthub.conversation.mapper.ConversationMapper;
 import com.dominik.crafthub.conversation.repository.ConversationRepository;
 import com.dominik.crafthub.listing.service.ListingService;
@@ -38,5 +39,13 @@ public class ConversationService {
     conversation.setUserEntity2(listing.getUserEntity());
     conversationRepository.save(conversation);
     return conversationMapper.toDto(conversation);
+  }
+
+  public ConversationEntity getConversationById(Long id) {
+    var conversation = conversationRepository.findById(id).orElse(null);
+    if (conversation == null) {
+      throw new ConversationNotFoundException();
+    }
+    return conversation;
   }
 }
