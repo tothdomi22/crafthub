@@ -3,11 +3,10 @@ package com.dominik.crafthub.review.entity;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -25,8 +24,7 @@ public class ReviewEntity {
 
     @Column(name = "review_text")
     private String reviewText;
-
-    @ColumnDefault("now()")
+    
     @Column(name = "created_at")
     private OffsetDateTime createdAt;
 

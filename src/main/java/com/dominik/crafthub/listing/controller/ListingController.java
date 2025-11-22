@@ -2,6 +2,7 @@ package com.dominik.crafthub.listing.controller;
 
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingUpdateRequest;
+import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.subcategory.exception.SubCategoryNotFoundException;
@@ -53,5 +54,11 @@ public class ListingController {
   public ResponseEntity<Map<String, String>> notTheOwnerOfListing() {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(Map.of("message:", "You are not the owner of the listing"));
+  }
+
+  @ExceptionHandler(ListingNotFoundException.class)
+  public ResponseEntity<Map<String, String>> listingNotFound() {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("message:", "Listing not found"));
   }
 }
