@@ -1,7 +1,6 @@
 package com.dominik.crafthub.auth.controller;
 
 import com.dominik.crafthub.auth.service.AuthService;
-import com.dominik.crafthub.jwt.dto.JwtResponse;
 import com.dominik.crafthub.user.dto.UserDto;
 import com.dominik.crafthub.user.dto.UserLoginRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,11 +28,12 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<JwtResponse> login(
+  public ResponseEntity<?> login(
       @RequestBody @Valid UserLoginRequest request, HttpServletResponse response) {
     var cookie = authService.loginUser(request);
-    response.addCookie(cookie);
-    return ResponseEntity.status(HttpStatus.OK).build();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        .body(Map.of("message:", "Login success"));
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
