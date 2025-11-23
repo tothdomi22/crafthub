@@ -2,7 +2,9 @@ package com.dominik.crafthub.security.config;
 
 import com.dominik.crafthub.jwt.filters.JwtAuthenticationFilter;
 import com.dominik.crafthub.user.entity.UserRole;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -26,10 +27,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @AllArgsConstructor
 public class SecurityConfig {
+  private static final ObjectMapper mapper = new ObjectMapper();
   private JwtAuthenticationFilter jwtAuthenticationFilter;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
     http
         // Stateless session management for JWT
         .sessionManagement(
@@ -52,10 +55,28 @@ public class SecurityConfig {
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling(
             ex ->
-                ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                ex.authenticationEntryPoint(
+                        (request, response, authException) -> {
+                          response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                          response.setContentType("application/json");
+                          response
+                              .getWriter()
+                              .write(
+                                  mapper.writeValueAsString(
+                                      Map.of("message", "Invalid or missing token")));
+                        })
                     .accessDeniedHandler(
-                        (request, response, accessDeniedException) ->
-                            response.setStatus(HttpStatus.FORBIDDEN.value())));
+                        (request, response, accessDeniedException) -> {
+                          response.setStatus(HttpStatus.FORBIDDEN.value());
+                          response.setContentType("application/json");
+                          response
+                              .getWriter()
+                              .write(
+                                  mapper.writeValueAsString(
+                                      Map.of(
+                                          "message",
+                                          "You do not have permission to access this resource")));
+                        }));
 
     return http.build();
   }
