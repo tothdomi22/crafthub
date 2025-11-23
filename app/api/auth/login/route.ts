@@ -4,7 +4,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.text();
 
-    const response = await fetch(`${process.env.API_BASE_URL}/auth/register`, {
+    const response = await fetch(`${process.env.API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -14,33 +14,14 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
+    // Check if login was successful AND cookies were set
     if (!response.ok) {
       return NextResponse.json(data, {status: response.status});
     }
 
-    const {email, password} = JSON.parse(body);
+    const setCookieHeaders = response.headers.getSetCookie();
 
-    const loginResponse = await fetch(
-      `${process.env.API_BASE_URL}/auth/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({email, password}),
-      },
-    );
-
-    const loginData = await loginResponse.json();
-
-    if (!loginResponse.ok) {
-      return NextResponse.json(loginData, {status: loginResponse.status});
-    }
-
-    // Get cookies from login response
-    const setCookieHeaders = loginResponse.headers.getSetCookie();
-
-    // Verify JWT cookie exists
+    // Verify JWT cookie exists in response
     const hasJwtCookie = setCookieHeaders.some(
       cookie =>
         cookie.startsWith("accessToken=") && !cookie.includes("accessToken=;"),
@@ -54,12 +35,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create response with login data (or registration data, your choice)
-    const nextResponse = NextResponse.json(loginData, {
-      status: 200,
+    // Create Next.js response
+    const nextResponse = NextResponse.json(data, {
+      status: response.status,
     });
 
-    // Forward ALL Set-Cookie headers from login
+    // Forward ALL Set-Cookie headers from FastAPI
     setCookieHeaders.forEach(cookie => {
       nextResponse.headers.append("Set-Cookie", cookie);
     });
