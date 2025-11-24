@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import useListMainCategory from "@/app/hooks/admin/main-category/useListMainCategory";
 import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
 import useListSubCategory from "@/app/hooks/admin/sub-category/useListSubCategory";
+import CreateMainCategoryModal from "@/app/components/admin/modals/CreateMainCategoryModal";
 
 export default function AdminPage() {
+  const [isCreateMainCategoryModalOpen, setIsCreateMainCategoryModalOpen] =
+    useState<boolean>(false);
   const {data: mainCategoriesData} = useQuery<MainCategory[]>({
     queryFn: useListMainCategory,
     queryKey: ["mainCategories"],
@@ -33,6 +36,9 @@ export default function AdminPage() {
               <li key={mainCategory.id}>{mainCategory.displayName}</li>
             ))}
         </ul>
+        <button onClick={() => setIsCreateMainCategoryModalOpen(true)}>
+          Create main category
+        </button>
       </div>
       <div>
         <h1 className="font-bold text-xl">sub categories</h1>
@@ -51,6 +57,11 @@ export default function AdminPage() {
             ))}
         </ul>
       </div>
+      {isCreateMainCategoryModalOpen && (
+        <CreateMainCategoryModal
+          closeModal={() => setIsCreateMainCategoryModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
