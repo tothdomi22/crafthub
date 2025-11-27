@@ -1,0 +1,10 @@
+pre-commit:
+  commands:
+    frontend-eslint:
+      glob: "*.{js,mjs,cjs,ts,jsx,tsx}"
+      run: npm run lint {staged_files}
+      stage_fixed: true
+    frontend-prettier:
+      glob: "*.{js,mjs,cjs,ts,jsx,tsx}"
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
