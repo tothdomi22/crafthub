@@ -10,7 +10,9 @@ import Link from "next/link";
 import FavoriteSVG from "/public/svgs/favorite.svg";
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
+    null,
+  );
   const {data: mainCategoriesData} = useQuery<MainCategory[]>({
     queryFn: useListMainCategory,
     queryKey: ["mainCategories"],
@@ -34,6 +36,21 @@ export default function Home() {
 
     return diffInDays <= 7;
   };
+
+  const handleSetCategory = (category: MainCategory) => {
+    if (activeCategory == category) {
+      setActiveCategory(null);
+    } else {
+      setActiveCategory(category);
+    }
+  };
+
+  const filteredListings = listingData?.filter(listing =>
+    activeCategory
+      ? listing.subCategory.mainCategory.id === activeCategory.id
+      : true,
+  );
+
   return (
     <div className="min-h-screen bg-[#F8F9FE] font-sans text-slate-800">
       {/* --- HEADER --- */}
@@ -82,9 +99,9 @@ export default function Home() {
             mainCategoriesData.map(cat => (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategory(cat.displayName)}
+                onClick={() => handleSetCategory(cat)}
                 className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                  activeCategory === cat.displayName
+                  activeCategory === cat
                     ? "bg-active text-white shadow-md"
                     : "bg-white text-slate-600 border border-slate-200 hover:border-[#6C5CE7] hover:text-[#6C5CE7]"
                 }`}>
@@ -96,7 +113,7 @@ export default function Home() {
         {/* Listings Grid - Vinted Style */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {listingData &&
-            listingData.map(item => (
+            filteredListings.map(item => (
               <div key={item.id} className="group flex flex-col gap-2">
                 {/* Image Card */}
                 <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-slate-200 shadow-sm group-hover:shadow-md transition-all cursor-pointer">
