@@ -1,5 +1,5 @@
 import {useMutation} from "@tanstack/react-query";
-import ListingRequest from "@/app/types/listing";
+import {ListingRequest} from "@/app/types/listing";
 
 export default function useCreateListing() {
   return useMutation({

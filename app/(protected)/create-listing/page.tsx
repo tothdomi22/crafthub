@@ -14,7 +14,7 @@ import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
 import useListMainCategory from "@/app/hooks/admin/main-category/useListMainCategory";
 import useListSubCategory from "@/app/hooks/admin/sub-category/useListSubCategory";
 import useCreateListing from "@/app/hooks/listing/useCreateListing";
-import ListingRequest from "@/app/types/listing";
+import {ListingRequest} from "@/app/types/listing";
 
 export default function CreateListing() {
   const router = useRouter();
