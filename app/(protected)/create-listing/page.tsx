@@ -13,13 +13,19 @@ import {useQuery} from "@tanstack/react-query";
 import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
 import useListMainCategory from "@/app/hooks/admin/main-category/useListMainCategory";
 import useListSubCategory from "@/app/hooks/admin/sub-category/useListSubCategory";
+import useCreateListing from "@/app/hooks/listing/useCreateListing";
+import ListingRequest from "@/app/types/listing";
 
 export default function CreateListing() {
   const router = useRouter();
-  const [images, setImages] = useState([]);
+  const [images] = useState([]);
   const [canShip, setCanShip] = useState(true);
   const [selectedMainCategory, setSelectedMainCategory] =
     useState<MainCategory | null>(null);
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [price, setPrice] = useState<number>(0);
+  const [city, setCity] = useState<string>("");
   const [selectedSubCategory, setSelectedSubCategory] =
     useState<SubCategory | null>(null);
 
@@ -31,55 +37,61 @@ export default function CreateListing() {
     queryFn: useListSubCategory,
     queryKey: ["subCategories"],
   });
+  const {
+    mutate: createListingMutation,
+    isPending: isCreateListingMutationPending,
+  } = useCreateListing();
 
-  // Helper to simulate "deleting" an image
   const removeImage = (index: number) => {
     console.log(index);
   };
 
   const handleMainCategoryChange = (value: string) => {
-    console.log("Selected Value (String):", value); // Debug log
-
-    // 1. Handle Reset
     if (value === "") {
       setSelectedMainCategory(null);
       setSelectedSubCategory(null);
       return;
     }
-
     if (!mainCategoriesData) return;
-
-    // 2. ROBUST FIND: Compare both as strings to avoid "1" vs 1 mismatch
     const category = mainCategoriesData.find(
       cat => String(cat.id) === String(value),
     );
-
-    console.log("Found Category Object:", category); // Debug log
-
-    // 3. Update State
     if (category) {
       setSelectedMainCategory(category);
-      setSelectedSubCategory(null); // Clear subcategory on main change
+      setSelectedSubCategory(null);
     }
   };
 
-  // --- ADDED SUB CATEGORY HANDLER ---
   const handleSubCategoryChange = (value: string) => {
-    // 1. Handle Reset
     if (value === "") {
       setSelectedSubCategory(null);
       return;
     }
-
     if (!subCategoriesData) return;
-
-    // 2. Safe Find (Compare IDs as Strings)
     const subCategory = subCategoriesData.find(sub => String(sub.id) === value);
-
-    // 3. Update State
     if (subCategory) {
       setSelectedSubCategory(subCategory);
     }
+  };
+
+  const handleCreateListing = () => {
+    if (!selectedSubCategory?.id) {
+      return;
+    }
+    const request: ListingRequest = {
+      canShip: canShip,
+      subCategoryId: selectedSubCategory.id,
+      name: name,
+      price: price,
+      city: city,
+      description: description,
+    };
+
+    createListingMutation(request, {
+      onSuccess() {
+        router.push("/");
+      },
+    });
   };
 
   return (
@@ -165,6 +177,8 @@ export default function CreateListing() {
               </label>
               <input
                 type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
                 placeholder="pl. Kézzel faragott diófa kanál"
                 className="w-full px-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
               />
@@ -177,6 +191,8 @@ export default function CreateListing() {
               </label>
               <textarea
                 rows={5}
+                value={description}
+                onChange={e => setDescription(e.target.value)}
                 placeholder="Írd le az anyagokat, a méretet és a készítési folyamatot..."
                 className="w-full px-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none resize-none"></textarea>
             </div>
@@ -258,6 +274,8 @@ export default function CreateListing() {
               </label>
               <div className="relative">
                 <input
+                  value={price}
+                  onChange={e => setPrice(Number(e.target.value))}
                   type="number"
                   placeholder="0"
                   min={0}
@@ -281,8 +299,9 @@ export default function CreateListing() {
                   <LocationSVG />
                 </div>
                 <input
+                  value={city}
+                  onChange={e => setCity(e.target.value)}
                   type="text"
-                  defaultValue="Győr, Hungary" // Mock default from user profile
                   className="w-full pl-11 pr-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
                 />
               </div>
@@ -327,7 +346,10 @@ export default function CreateListing() {
           {/*<button className="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">*/}
           {/*  Előnézet*/}
           {/*</button>*/}
-          <button className="flex-[2] bg-primary hover:bg-primary-hover active:bg-active text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200 transition-transform active:scale-95">
+          <button
+            onClick={handleCreateListing}
+            disabled={isCreateListingMutationPending}
+            className="flex-[2] bg-primary hover:bg-primary-hover active:bg-active text-white font-bold py-3 rounded-xl shadow-lg disabled:bg-secondary shadow-indigo-200 transition-transform active:scale-95">
             Hirdetés létrehozása
           </button>
         </div>
