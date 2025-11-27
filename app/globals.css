@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+@theme {
+    --color-primary: #9f98ff;
+    --color-primary-hover: #887ef5;
+    --color-active: #7266e3;
+    --color-secondary: #f5f4ff;
+    --color-border: #dcd9ff
+}
+
+@layer components {
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+}
+
