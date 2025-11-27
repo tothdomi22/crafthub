@@ -8,28 +8,100 @@ import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
 import LocationSVG from "/public/svgs/location.svg";
 import TruckSVG from "/public/svgs/truck.svg";
 import CheckSVG from "/public/svgs/check.svg";
+import {useRouter} from "next/navigation";
+import {useQuery} from "@tanstack/react-query";
+import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
+import useListMainCategory from "@/app/hooks/admin/main-category/useListMainCategory";
+import useListSubCategory from "@/app/hooks/admin/sub-category/useListSubCategory";
 
-const CreateListing = () => {
-  // --- MOCK STATE ---
+export default function CreateListing() {
+  const router = useRouter();
   const [images, setImages] = useState([]);
   const [canShip, setCanShip] = useState(true);
+  const [selectedMainCategory, setSelectedMainCategory] =
+    useState<MainCategory | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] =
+    useState<SubCategory | null>(null);
+
+  const {data: mainCategoriesData} = useQuery<MainCategory[]>({
+    queryFn: useListMainCategory,
+    queryKey: ["mainCategories"],
+  });
+  const {data: subCategoriesData} = useQuery<SubCategory[]>({
+    queryFn: useListSubCategory,
+    queryKey: ["subCategories"],
+  });
 
   // Helper to simulate "deleting" an image
   const removeImage = (index: number) => {
     console.log(index);
   };
 
+  const handleMainCategoryChange = (value: string) => {
+    console.log("Selected Value (String):", value); // Debug log
+
+    // 1. Handle Reset
+    if (value === "") {
+      setSelectedMainCategory(null);
+      setSelectedSubCategory(null);
+      return;
+    }
+
+    if (!mainCategoriesData) return;
+
+    // 2. ROBUST FIND: Compare both as strings to avoid "1" vs 1 mismatch
+    const category = mainCategoriesData.find(
+      cat => String(cat.id) === String(value),
+    );
+
+    console.log("Found Category Object:", category); // Debug log
+
+    // 3. Update State
+    if (category) {
+      setSelectedMainCategory(category);
+      setSelectedSubCategory(null); // Clear subcategory on main change
+    }
+  };
+
+  // --- ADDED SUB CATEGORY HANDLER ---
+  const handleSubCategoryChange = (value: string) => {
+    // 1. Handle Reset
+    if (value === "") {
+      setSelectedSubCategory(null);
+      return;
+    }
+
+    if (!subCategoriesData) return;
+
+    // 2. Safe Find (Compare IDs as Strings)
+    const subCategory = subCategoriesData.find(sub => String(sub.id) === value);
+
+    // 3. Update State
+    if (subCategory) {
+      setSelectedSubCategory(subCategory);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F9FE] font-sans text-slate-800 pb-24">
       {/* --- HEADER --- */}
       <nav className="bg-white border-b border-slate-100 px-4 py-4 sticky top-0 z-50">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <button className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors">
+        <div className="max-w-3xl mx-auto flex items-center justify-between relative">
+          {/* Left button */}
+          <button
+            onClick={router.back}
+            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 transition-colors">
             <ArrowBackSVG />
             <span className="hidden sm:inline font-medium">Vissza</span>
           </button>
-          <div className="font-bold text-lg text-slate-900">Új hirdetés</div>
-          <button className="text-primary font-bold text-sm hover:underline"></button>
+
+          {/* Center title */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-lg text-slate-900 text-center">
+            Új hirdetés
+          </div>
+
+          {/* Optional placeholder for right side to maintain spacing */}
+          <div className="w-12" />
         </div>
       </nav>
 
@@ -111,15 +183,24 @@ const CreateListing = () => {
 
             {/* Categories (Grid) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* MAIN CATEGORY SELECT */}
               <div className="relative">
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                   Kategória
                 </label>
                 <div className="relative">
-                  <select className="w-full px-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none appearance-none cursor-pointer">
-                    <option>Woodwork</option>
-                    <option>Ceramics</option>
-                    <option>Textiles</option>
+                  <select
+                    value={selectedMainCategory?.id || ""}
+                    onChange={e => handleMainCategoryChange(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none appearance-none cursor-pointer">
+                    <option value="">Válassz kategóriát</option>
+                    {mainCategoriesData?.map(mainCategory => (
+                      <option
+                        key={mainCategory.uniqueName}
+                        value={mainCategory.id}>
+                        {mainCategory.displayName}
+                      </option>
+                    ))}
                   </select>
                   <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
                     <KeyBoardArrowDownSVG />
@@ -127,15 +208,36 @@ const CreateListing = () => {
                 </div>
               </div>
 
+              {/* SUB CATEGORY SELECT */}
               <div className="relative">
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                   Alkategória
                 </label>
                 <div className="relative">
-                  <select className="w-full px-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none appearance-none cursor-pointer">
-                    <option>Kitchenware</option>
-                    <option>Decor</option>
-                    <option>Furniture</option>
+                  <select
+                    disabled={!selectedMainCategory} // Disable if no main category selected
+                    value={selectedSubCategory?.id || ""}
+                    onChange={e => handleSubCategoryChange(e.target.value)}
+                    className="w-full px-4 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                    <option value="">
+                      {selectedMainCategory
+                        ? "Válassz alkategóriát"
+                        : "Előbb válassz főkategóriát"}
+                    </option>
+                    {subCategoriesData &&
+                      subCategoriesData
+                        .filter(
+                          subCategory =>
+                            subCategory.mainCategory.id ==
+                            selectedMainCategory?.id,
+                        )
+                        .map(subCategory => (
+                          <option
+                            key={subCategory.uniqueName}
+                            value={subCategory.id}>
+                            {subCategory.displayName}
+                          </option>
+                        ))}
                   </select>
                   <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400">
                     <KeyBoardArrowDownSVG />
@@ -158,6 +260,7 @@ const CreateListing = () => {
                 <input
                   type="number"
                   placeholder="0"
+                  min={0}
                   className="w-full pl-4 pr-12 py-3 bg-[#F8F9FE] border border-transparent rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-lg font-bold"
                 />
                 <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 font-bold">
@@ -231,6 +334,4 @@ const CreateListing = () => {
       </div>
     </div>
   );
-};
-
-export default CreateListing;
+}
