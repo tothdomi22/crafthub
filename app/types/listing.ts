@@ -1,4 +1,5 @@
 import {SubCategory} from "@/app/types/admin/category/category";
+import {User} from "@/app/types/user";
 
 export interface ListingRequest {
   name: string;
@@ -25,4 +26,5 @@ export interface Listing {
   createdAt: string;
   status: ListingStatusEnum;
   subCategory: SubCategory;
+  user: User;
 }
