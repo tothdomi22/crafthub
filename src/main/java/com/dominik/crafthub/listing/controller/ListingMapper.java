@@ -22,7 +22,7 @@ public interface ListingMapper {
 
   @Mapping(source = "subCategoryEntity", target = "subCategory")
   @Mapping(target = "canShip", source = "shippable")
-  @Mapping(source = "userEntity", target = "userDto")
+  @Mapping(source = "userEntity", target = "user")
   ListingDto toDto(ListingEntity listingEntity);
 
   @Mapping(target = "subCategoryEntity.id", source = "subCategoryId")

@@ -58,6 +58,7 @@ public class ListingService {
       listing.setSubCategoryEntity(subCategory);
     }
     listingMapper.update(request, listing);
+    listingRepository.save(listing);
     return listingMapper.toDto(listing);
   }
 

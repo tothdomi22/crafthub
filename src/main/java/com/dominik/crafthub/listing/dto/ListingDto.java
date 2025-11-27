@@ -15,5 +15,4 @@ public record ListingDto(
     OffsetDateTime createdAt,
     ListingStatusEnum status,
     SubCategoryDto subCategory,
-    UserDto userDto
-    ) {}
+    UserDto user) {}
