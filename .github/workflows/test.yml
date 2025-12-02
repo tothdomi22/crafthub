@@ -2,9 +2,9 @@ name: Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   ENVIRONMENT: "TESTING"
@@ -16,8 +16,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
-        node-version: [ 22 ]
+        os: [ubuntu-latest]
+        node-version: [22]
 
     env:
       ENVIRONMENT: "TEST-E2E"
