@@ -1,6 +1,9 @@
 "use client";
 
-import React, {use, useState} from "react"; // --- TYPES & INTERFACES ---
+import React, {use, useState} from "react";
+import {useQuery} from "@tanstack/react-query";
+import useListListingById from "@/app/hooks/listing/useListListingById";
+import {Listing} from "@/app/types/listing";
 
 // --- TYPES & INTERFACES ---
 
@@ -29,15 +32,6 @@ interface Review {
   itemName: string;
   itemImage: string;
   itemPrice: string;
-}
-
-interface Listing {
-  id: string;
-  title: string;
-  price: string;
-  image: string;
-  likes: number;
-  isNew?: boolean;
 }
 
 // --- ICON HELPER (Inlined for portability) ---
@@ -109,8 +103,20 @@ export default function UserProfilePage({
 }) {
   const {id} = use(params);
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
-  console.log(id);
+  if (!id) {
+    return null;
+  }
 
+  const {data: listingData} = useQuery<Listing[]>({
+    queryFn: () => useListListingById(id),
+    queryKey: ["listings" + id],
+  });
+
+  const isNew = (itemCreatedDate: string) => {
+    const createdDate = new Date(itemCreatedDate).getTime();
+    const diffInDays = (Date.now() - createdDate) / (1000 * 60 * 60 * 24);
+    return diffInDays <= 7;
+  };
   // --- MOCK DATA ---
   const user: UserProfile = {
     id: "u1",
@@ -127,42 +133,6 @@ export default function UserProfilePage({
     responseRate: "1 óra",
     shippingTime: "1-2 nap",
   };
-
-  const activeListings: Listing[] = [
-    {
-      id: "l1",
-      title: "Speckled Mug",
-      price: "8 500 Ft",
-      likes: 12,
-      image:
-        "https://images.unsplash.com/photo-1610701596007-11502861dcfa?q=80&w=400&auto=format&fit=crop",
-      isNew: true,
-    },
-    {
-      id: "l2",
-      title: "Serving Bowl",
-      price: "14 000 Ft",
-      likes: 45,
-      image:
-        "https://images.unsplash.com/photo-1610701596061-2ecf227e85b2?q=80&w=400&auto=format&fit=crop",
-    },
-    {
-      id: "l3",
-      title: "Tiny Vase",
-      price: "5 500 Ft",
-      likes: 8,
-      image:
-        "https://images.unsplash.com/photo-1581783342308-f792ca11df53?q=80&w=400&auto=format&fit=crop",
-    },
-    {
-      id: "l4",
-      title: "Ceramic Plate Set",
-      price: "22 000 Ft",
-      likes: 32,
-      image:
-        "https://images.unsplash.com/photo-1606760596649-65044c352936?q=80&w=400&auto=format&fit=crop",
-    },
-  ];
 
   const reviews: Review[] = [
     {
@@ -319,7 +289,7 @@ export default function UserProfilePage({
                 ? "text-primary"
                 : "text-slate-500 hover:text-slate-800"
             }`}>
-            Hirdetései ({activeListings.length})
+            Hirdetései ({listingData && listingData.length})
             {activeTab === "shop" && (
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></span>
             )}
@@ -343,36 +313,37 @@ export default function UserProfilePage({
         {activeTab === "shop" ? (
           /* ACTIVE LISTINGS GRID (Unified with Home Page) */
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {activeListings.map(item => (
-              <div
-                key={item.id}
-                className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col cursor-pointer hover:-translate-y-1">
-                <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  {item.isNew && (
-                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
-                      Új
-                    </span>
-                  )}
-                  <button className="absolute top-3 right-3 p-2 bg-white/60 backdrop-blur-md rounded-full text-slate-600 hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-sm">
-                    <Icon path={icons.heart} size={18} />
-                  </button>
-                </div>
+            {listingData &&
+              listingData.map(item => (
+                <div
+                  key={item.id}
+                  className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col cursor-pointer hover:-translate-y-1">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
+                    <img
+                      src={"/images/placeholder.jpg"}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    {isNew(item.createdAt) && (
+                      <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
+                        Új
+                      </span>
+                    )}
+                    <button className="absolute top-3 right-3 p-2 bg-white/60 backdrop-blur-md rounded-full text-slate-600 hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-sm">
+                      <Icon path={icons.heart} size={18} />
+                    </button>
+                  </div>
 
-                <div className="p-4">
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">
-                    {item.price}
-                  </h3>
-                  <p className="text-sm text-slate-500 line-clamp-1 group-hover:text-primary transition-colors">
-                    {item.title}
-                  </p>
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">
+                      {item.price}
+                    </h3>
+                    <p className="text-sm text-slate-500 line-clamp-1 group-hover:text-primary transition-colors">
+                      {item.name}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         ) : (
           /* REVIEWS LIST (Unified Card Style) */
