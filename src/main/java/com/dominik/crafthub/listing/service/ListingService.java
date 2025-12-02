@@ -36,10 +36,11 @@ public class ListingService {
     return listingMapper.toDto(listing);
   }
 
-  public List<ListingDto> listListings() {
-    var user = authService.getCurrentUser();
-    var listings = listingRepository.findAllByUserEntityId(user.getId());
-    return listings.stream().map(listingMapper::toDto).toList();
+  public List<ListingDto> listListings(Long id) {
+    Long userId = (id != null) ? id : authService.getCurrentUser().getId();
+    return listingRepository.findAllByUserEntityId(userId).stream()
+        .map(listingMapper::toDto)
+        .toList();
   }
 
   public ListingDto getListing(Long id) {

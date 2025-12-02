@@ -3,11 +3,15 @@ package com.dominik.crafthub.profile.service;
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.profile.dto.ProfileCreateRequest;
 import com.dominik.crafthub.profile.dto.ProfileDto;
+import com.dominik.crafthub.profile.dto.ProfilePageDto;
 import com.dominik.crafthub.profile.dto.ProfileUpdateRequest;
 import com.dominik.crafthub.profile.exception.ProfileAlreadyExistsException;
 import com.dominik.crafthub.profile.exception.ProfileNotFoundException;
 import com.dominik.crafthub.profile.mapper.ProfileMapper;
 import com.dominik.crafthub.profile.repository.ProfileRepository;
+import com.dominik.crafthub.review.entity.ReviewEntity;
+import com.dominik.crafthub.review.repository.ReviewRepository;
+import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +20,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProfileService {
   private final AuthService authService;
-  private UserRepository userRepository;
+  private final ReviewRepository reviewRepository;
+  private final UserRepository userRepository;
   private ProfileRepository profileRepository;
   private ProfileMapper profileMapper;
 
@@ -41,5 +46,21 @@ public class ProfileService {
     profileMapper.update(request, profile);
     profileRepository.save(profile);
     return profileMapper.toDto(profile);
+  }
+
+  public ProfilePageDto getProfile(Long id) {
+    var profile = profileRepository.findByUserEntity_Id(id).orElse(null);
+    if (profile == null) {
+      throw new ProfileNotFoundException();
+    }
+    var user = userRepository.findById(id).orElse(null);
+    if (user == null) {
+      throw new UserNotFoundException();
+    }
+    profile.setUserEntity(user);
+    var reviews = reviewRepository.findAllByListingEntity_UserEntity_Id(id);
+    var reviewCount = reviews.size();
+    var reviewAverage = reviews.stream().mapToInt(ReviewEntity::getStars).average().orElse(0);
+    return profileMapper.toProfilePageDto(profile, reviewAverage, reviewCount);
   }
 }

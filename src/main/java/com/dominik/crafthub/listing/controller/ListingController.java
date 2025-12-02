@@ -25,10 +25,10 @@ public class ListingController {
     return ResponseEntity.status(HttpStatus.CREATED).body(listingDto);
   }
 
-  @GetMapping("/list")
-  public ResponseEntity<?> listListings() {
-    var listings = listingService.listListings();
-    return ResponseEntity.status(HttpStatus.OK).body(listings);
+  @GetMapping({"/list", "/list/{id}"})
+  public ResponseEntity<?> listListings(@PathVariable(required = false) Long id) {
+    var listings = listingService.listListings(id);
+    return ResponseEntity.ok(listings);
   }
 
   @GetMapping("/{id}")
