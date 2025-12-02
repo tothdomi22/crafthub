@@ -1,0 +1,43 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  ENVIRONMENT: "TESTING"
+
+jobs:
+  #  test-be:
+  test-e2e:
+    if: github.event.pull_request.draft == false
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        node-version: [ 22 ]
+
+    env:
+      ENVIRONMENT: "TEST-E2E"
+
+    steps:
+      - uses: "actions/checkout@v4"
+
+      - name: Install Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: package.json
+
+      - name: Install node dependencies
+        run: |
+          npm install
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier
+        run: npx prettier --check .
