@@ -9,6 +9,7 @@ import ShareSVG from "/public/svgs/share.svg";
 import LocationSVG from "/public/svgs/location.svg";
 import {useRouter} from "next/navigation";
 import ChatSVG from "/public/svgs/chat.svg";
+import Link from "next/link";
 
 export default function ListingDetails({
   params,
@@ -174,9 +175,12 @@ export default function ListingDetails({
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors">
-                    {listingData.user.name}
-                  </h3>
+                  <Link href={`/user/${listingData.user.id}`}>
+                    <h3 className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors">
+                      {listingData.user.name}
+                    </h3>
+                  </Link>
+
                   <div className="flex items-center gap-1.5 text-sm text-slate-500">
                     <span className="font-bold text-[#00B894]">4.9</span>
                     <span>•</span>
