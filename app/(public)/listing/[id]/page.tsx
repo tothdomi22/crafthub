@@ -11,6 +11,7 @@ import {formatDate} from "@/app/components/utils";
 import SubHeader from "@/app/components/global/SubHeader";
 import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
+import SendMessageModal from "@/app/components/message/SendMessageModal";
 
 export default function ListingDetails({
   params,
@@ -19,6 +20,7 @@ export default function ListingDetails({
 }) {
   const {id} = use(params);
   const [isSaved, setIsSaved] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
   const {data: listingData} = useQuery<Listing>({
     queryFn: () => useGetListing(id),
@@ -40,6 +42,12 @@ export default function ListingDetails({
       </div>
     );
   }
+
+  // TODO: implement logic
+  const handleSendMessage = (message: string) => {
+    console.log("Sending message:", message);
+    setIsMessageModalOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FE] text-slate-800 font-sans pb-20">
@@ -181,7 +189,9 @@ export default function ListingDetails({
             {/* Action Bar (Sticky on Desktop too for ease) */}
             <div className="sticky bottom-4 z-40 pt-2">
               {listingData.status === ListingStatusEnum.ACTIVE ? (
-                <button className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+                <button
+                  onClick={() => setIsMessageModalOpen(true)}
+                  className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
                   <ChatSVG className="w-6 h-6" />
                   Üzenj az eladónak
                 </button>
@@ -198,6 +208,15 @@ export default function ListingDetails({
                 A fizetés és a szállítás közvetlenül az eladóval történik.
               </p>
             </div>
+            {listingData && (
+              <SendMessageModal
+                isOpen={isMessageModalOpen}
+                onCloseAction={() => setIsMessageModalOpen(false)}
+                listing={listingData}
+                sellerName={listingData.user.name}
+                onSubmitAction={handleSendMessage}
+              />
+            )}
           </div>
         </div>
       </main>
