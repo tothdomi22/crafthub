@@ -31,6 +31,12 @@ public class ProfileController {
     return ResponseEntity.status(HttpStatus.OK).body(profileDto);
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getProfile(@PathVariable Long id) {
+    var profileDto = profileService.getProfile(id);
+    return ResponseEntity.status(HttpStatus.OK).body(profileDto);
+  }
+
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleUserNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message:", "User not found"));
