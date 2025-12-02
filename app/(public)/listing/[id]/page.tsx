@@ -10,6 +10,7 @@ import LocationSVG from "/public/svgs/location.svg";
 import {useRouter} from "next/navigation";
 import ChatSVG from "/public/svgs/chat.svg";
 import Link from "next/link";
+import {formatDate} from "@/app/components/utils";
 
 export default function ListingDetails({
   params,
@@ -35,15 +36,6 @@ export default function ListingDetails({
       </div>
     );
   }
-
-  const formatDate = (isoDate: string) => {
-    const date = new Date(isoDate);
-    return date.toLocaleDateString("hu-HU", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FE] text-slate-800 font-sans pb-20">

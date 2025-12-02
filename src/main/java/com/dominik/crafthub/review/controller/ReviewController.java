@@ -25,7 +25,7 @@ public class ReviewController {
     return ResponseEntity.status(HttpStatus.CREATED).body(reviewDto);
   }
 
-  @GetMapping("/{userId}")
+  @GetMapping("/list/{userId}")
   public ResponseEntity<?> getUserReviews(@PathVariable Long userId) {
     var reviews = reviewService.listReviewsByUser(userId);
     return ResponseEntity.status(HttpStatus.OK).body(reviews);

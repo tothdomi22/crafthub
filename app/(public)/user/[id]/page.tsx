@@ -4,6 +4,10 @@ import React, {use, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import useListListingById from "@/app/hooks/listing/useListListingById";
 import {Listing} from "@/app/types/listing";
+import useListReviewsById from "@/app/hooks/review/useListReviewsById";
+import {Review} from "@/app/types/review";
+import {formatDate} from "@/app/components/utils";
+import Link from "next/link";
 
 // --- TYPES & INTERFACES ---
 
@@ -20,18 +24,6 @@ interface UserProfile {
   reviewCount: number;
   responseRate: string;
   shippingTime: string;
-}
-
-interface Review {
-  id: string;
-  buyerName: string;
-  buyerAvatar: string;
-  rating: number; // 1-5
-  comment: string;
-  date: string;
-  itemName: string;
-  itemImage: string;
-  itemPrice: string;
 }
 
 // --- ICON HELPER (Inlined for portability) ---
@@ -111,6 +103,10 @@ export default function UserProfilePage({
     queryFn: () => useListListingById(id),
     queryKey: ["listings" + id],
   });
+  const {data: reviewData} = useQuery<Review[]>({
+    queryFn: () => useListReviewsById(id),
+    queryKey: ["reviews" + id],
+  });
 
   const isNew = (itemCreatedDate: string) => {
     const createdDate = new Date(itemCreatedDate).getTime();
@@ -133,37 +129,6 @@ export default function UserProfilePage({
     responseRate: "1 óra",
     shippingTime: "1-2 nap",
   };
-
-  const reviews: Review[] = [
-    {
-      id: "r1",
-      buyerName: "Alex B.",
-      buyerAvatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop",
-      rating: 5,
-      comment:
-        "Absolutely beautiful craftsmanship! The mug arrived safely packed and is even better in person. Highly recommend Sarah!",
-      date: "2 days ago",
-      itemName: "Hand-thrown Speckled Mug",
-      itemImage:
-        "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?q=80&w=200&auto=format&fit=crop",
-      itemPrice: "8 500 Ft",
-    },
-    {
-      id: "r2",
-      buyerName: "Daniel K.",
-      buyerAvatar:
-        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop",
-      rating: 5,
-      comment:
-        "Great communication and fast shipping. My wife loves it, a perfect anniversary gift.",
-      date: "1 week ago",
-      itemName: "Macramé Wall Hanging",
-      itemImage:
-        "https://images.unsplash.com/photo-1519962551779-51facbf73d56?q=80&w=200&auto=format&fit=crop",
-      itemPrice: "15 000 Ft",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-[#F8F9FE] font-sans text-slate-800 pb-20">
@@ -245,12 +210,12 @@ export default function UserProfilePage({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 w-full md:w-auto">
-                  <button className="flex-1 md:flex-none bg-primary hover:bg-[#5b4cc4] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                    <Icon path={icons.message} size={18} />
-                    Üzenet
-                  </button>
-                </div>
+                {/*<div className="flex gap-3 w-full md:w-auto">*/}
+                {/*  <button className="flex-1 md:flex-none bg-primary hover:bg-[#5b4cc4] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2">*/}
+                {/*    <Icon path={icons.message} size={18} />*/}
+                {/*    Üzenet*/}
+                {/*  </button>*/}
+                {/*</div>*/}
               </div>
 
               {/* Bio & Stats */}
@@ -302,7 +267,7 @@ export default function UserProfilePage({
                 ? "text-primary"
                 : "text-slate-500 hover:text-slate-800"
             }`}>
-            Értékelések ({user.reviewCount})
+            Értékelések ({reviewData && reviewData.length})
             {activeTab === "reviews" && (
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></span>
             )}
@@ -315,112 +280,113 @@ export default function UserProfilePage({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {listingData &&
               listingData.map(item => (
-                <div
-                  key={item.id}
-                  className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col cursor-pointer hover:-translate-y-1">
-                  <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
-                    <img
-                      src={"/images/placeholder.jpg"}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    {isNew(item.createdAt) && (
-                      <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
-                        Új
-                      </span>
-                    )}
-                    <button className="absolute top-3 right-3 p-2 bg-white/60 backdrop-blur-md rounded-full text-slate-600 hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-sm">
-                      <Icon path={icons.heart} size={18} />
-                    </button>
-                  </div>
+                <Link key={item.id} href={`/listing/${item.id}`}>
+                  <div className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col cursor-pointer hover:-translate-y-1">
+                    <div className="relative aspect-[4/5] overflow-hidden bg-slate-100">
+                      <img
+                        src={"/images/placeholder.jpg"}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      {isNew(item.createdAt) && (
+                        <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
+                          Új
+                        </span>
+                      )}
+                      <button className="absolute top-3 right-3 p-2 bg-white/60 backdrop-blur-md rounded-full text-slate-600 hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-sm">
+                        <Icon path={icons.heart} size={18} />
+                      </button>
+                    </div>
 
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">
-                      {item.price}
-                    </h3>
-                    <p className="text-sm text-slate-500 line-clamp-1 group-hover:text-primary transition-colors">
-                      {item.name}
-                    </p>
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold text-slate-900 mb-1">
+                        {item.price} Ft
+                      </h3>
+                      <p className="text-sm text-slate-500 line-clamp-1 group-hover:text-primary transition-colors">
+                        {item.name}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
           </div>
         ) : (
           /* REVIEWS LIST (Unified Card Style) */
           <div className="flex flex-col gap-4 max-w-4xl">
-            {reviews.map(review => (
-              <div
-                key={review.id}
-                className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-6 transition-colors hover:border-primary/30">
-                {/* 1. THE SOLD ITEM (Visual Context) */}
-                <div className="w-full sm:w-28 flex-shrink-0">
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
-                    <img
-                      src={review.itemImage}
-                      alt={review.itemName}
-                      className="w-full h-full object-cover opacity-90 grayscale-[20%]"
-                    />
-                    <div className="absolute inset-0 bg-slate-900/20 flex items-center justify-center backdrop-blur-[1px]">
-                      <span className="bg-slate-800/90 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
-                        Eladva
+            {reviewData &&
+              reviewData.map(review => (
+                <div
+                  key={review.id}
+                  className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-6 transition-colors hover:border-primary/30">
+                  {/* 1. THE SOLD ITEM (Visual Context) */}
+                  <div className="w-full sm:w-28 flex-shrink-0">
+                    <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                      <img
+                        src={"/images/placeholder.jpg"}
+                        alt={review.listing.name}
+                        className="w-full h-full object-cover opacity-90 grayscale-[20%]"
+                      />
+                      <div className="absolute inset-0 bg-slate-900/20 flex items-center justify-center backdrop-blur-[1px]">
+                        <span className="bg-slate-800/90 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
+                          Eladva
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. THE REVIEW CONTENT */}
+                  <div className="flex-1 flex flex-col justify-center">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-sm font-bold text-slate-900 hover:text-primary cursor-pointer truncate pr-4">
+                        {review.listing.name}
+                      </h3>
+                      <span className="text-xs text-slate-400 whitespace-nowrap">
+                        {formatDate(review.createdAt)}
                       </span>
                     </div>
-                  </div>
-                </div>
 
-                {/* 2. THE REVIEW CONTENT */}
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-sm font-bold text-slate-900 hover:text-primary cursor-pointer truncate pr-4">
-                      {review.itemName}
-                    </h3>
-                    <span className="text-xs text-slate-400 whitespace-nowrap">
-                      {review.date}
-                    </span>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex text-[#00B894]">
-                      {[1, 2, 3, 4, 5].map(i => (
-                        <Icon
-                          key={i}
-                          path={icons.star}
-                          size={14}
-                          className={
-                            i <= review.rating
-                              ? "fill-current"
-                              : "text-slate-200"
-                          }
-                        />
-                      ))}
+                    {/* Rating */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="flex text-[#00B894]">
+                        {[1, 2, 3, 4, 5].map(i => (
+                          <Icon
+                            key={i}
+                            path={icons.star}
+                            size={14}
+                            className={
+                              i <= review.stars
+                                ? "fill-current"
+                                : "text-slate-200"
+                            }
+                          />
+                        ))}
+                      </div>
                     </div>
+
+                    {/* Comment */}
+                    <p className="text-sm text-slate-600 italic leading-relaxed">
+                      &#34;{review.reviewText}&#34;
+                    </p>
                   </div>
 
-                  {/* Comment */}
-                  <p className="text-sm text-slate-600 italic leading-relaxed">
-                    &#34;{review.comment}&#34;
-                  </p>
-                </div>
-
-                {/* 3. THE BUYER (Social Proof) */}
-                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-50 sm:pl-6 sm:w-32 gap-3 min-w-max">
-                  <div className="flex items-center gap-3 sm:flex-col sm:text-right">
-                    <img
-                      src={review.buyerAvatar}
-                      alt={review.buyerName}
-                      className="w-8 h-8 rounded-full object-cover border border-white shadow-sm"
-                    />
-                    <div className="text-xs">
-                      <span className="block font-bold text-slate-900">
-                        {review.buyerName}
-                      </span>
-                      <span className="text-slate-400">Vásárló</span>
+                  {/* 3. THE BUYER (Social Proof) */}
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-50 sm:pl-6 sm:w-32 gap-3 min-w-max">
+                    <div className="flex items-center gap-3 sm:flex-col sm:text-right">
+                      <img
+                        src={"/images/placeholder.jpg"}
+                        alt={review.reviewerUser.name}
+                        className="w-8 h-8 rounded-full object-cover border border-white shadow-sm"
+                      />
+                      <div className="text-xs">
+                        <span className="block font-bold text-slate-900">
+                          {review.reviewerUser.name}
+                        </span>
+                        <span className="text-slate-400">Vásárló</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </main>
