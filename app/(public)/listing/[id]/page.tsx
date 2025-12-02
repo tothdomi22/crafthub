@@ -4,13 +4,11 @@ import {Listing, ListingStatusEnum} from "@/app/types/listing";
 import {useQuery} from "@tanstack/react-query";
 import useGetListing from "@/app/hooks/listing/useGetListing";
 import FavoriteSVG from "/public/svgs/favorite.svg";
-import ArrowBackSVG from "/public/svgs/arrow-back.svg";
-import ShareSVG from "/public/svgs/share.svg";
 import LocationSVG from "/public/svgs/location.svg";
-import {useRouter} from "next/navigation";
 import ChatSVG from "/public/svgs/chat.svg";
 import Link from "next/link";
 import {formatDate} from "@/app/components/utils";
+import SubHeader from "@/app/components/global/SubHeader";
 
 export default function ListingDetails({
   params,
@@ -19,7 +17,6 @@ export default function ListingDetails({
 }) {
   const {id} = use(params);
   const [isSaved, setIsSaved] = useState(false);
-  const router = useRouter();
 
   const {data: listingData} = useQuery<Listing>({
     queryFn: () => useGetListing(id),
@@ -39,32 +36,7 @@ export default function ListingDetails({
 
   return (
     <div className="min-h-screen bg-[#F8F9FE] text-slate-800 font-sans pb-20">
-      {/* --- UNIFIED HEADER STYLE (Matching Home) --- */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 h-16 transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="group flex items-center gap-2 text-slate-500 hover:text-primary transition-colors px-3 py-2 rounded-xl hover:bg-slate-50">
-            <ArrowBackSVG className="transition-transform group-hover:-translate-x-1" />
-            <span className="hidden sm:inline font-semibold text-sm">
-              Vissza
-            </span>
-          </button>
-
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-white font-serif font-bold text-lg">A</span>
-            </div>
-            <span className="font-serif font-bold text-xl text-slate-900 hidden sm:block">
-              ArtisanSpace
-            </span>
-          </div>
-
-          <button className="text-slate-400 hover:text-primary p-2 rounded-xl hover:bg-slate-50 transition-colors">
-            <ShareSVG />
-          </button>
-        </div>
-      </nav>
+      <SubHeader />
 
       {/* --- CONTENT WRAPPER (Matching Home Width) --- */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

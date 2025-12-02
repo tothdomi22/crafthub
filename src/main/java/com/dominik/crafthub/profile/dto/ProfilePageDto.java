@@ -4,7 +4,7 @@ import com.dominik.crafthub.user.dto.UserDto;
 import java.time.LocalDate;
 
 public record ProfilePageDto(
-    String id,
+    Long id,
     String city,
     String bio,
     LocalDate birthDate,
