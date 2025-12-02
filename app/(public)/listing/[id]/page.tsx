@@ -9,6 +9,8 @@ import ChatSVG from "/public/svgs/chat.svg";
 import Link from "next/link";
 import {formatDate} from "@/app/components/utils";
 import SubHeader from "@/app/components/global/SubHeader";
+import {Profile} from "@/app/types/profile";
+import useGetProfile from "@/app/hooks/profile/useGetProfile";
 
 export default function ListingDetails({
   params,
@@ -22,8 +24,13 @@ export default function ListingDetails({
     queryFn: () => useGetListing(id),
     queryKey: ["listing" + id],
   });
+  const {data: profileData} = useQuery<Profile>({
+    queryFn: () => useGetProfile(String(listingData?.user.id)),
+    queryKey: ["profile" + id],
+    enabled: !!listingData,
+  });
 
-  if (!listingData) {
+  if (!listingData || !profileData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
         <div className="animate-pulse flex flex-col items-center">
@@ -146,9 +153,11 @@ export default function ListingDetails({
                   </Link>
 
                   <div className="flex items-center gap-1.5 text-sm text-slate-500">
-                    <span className="font-bold text-[#00B894]">4.9</span>
+                    <span className="font-bold text-[#00B894]">
+                      {profileData.review}
+                    </span>
                     <span>•</span>
-                    <span>10 értékelés</span>
+                    <span>{profileData.reviewCount} értékelés</span>
                   </div>
                 </div>
               </div>
