@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import ArrowBackSVG from "/public/svgs/arrow-back.svg";
 import ShareSVG from "/public/svgs/share.svg";
