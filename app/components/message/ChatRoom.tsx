@@ -4,11 +4,11 @@ import {useQuery} from "@tanstack/react-query";
 import {SingleConversation} from "@/app/types/conversation";
 import getConversation from "@/app/hooks/conversation/useGetConversation";
 import Link from "next/link";
-import {Message} from "@/app/types/message";
 import {formatDate} from "@/app/components/utils";
-import {UserRole} from "@/app/types/user";
+import useCreateMessage from "@/app/hooks/message/useCreateMessage";
+import SendSVG from "/public/svgs/send.svg";
 
-export default function ChatRoom({
+export function ChatRoom({
   messageId,
   userId,
 }: {
@@ -20,33 +20,28 @@ export default function ChatRoom({
     queryKey: ["conversation" + messageId],
     enabled: !!messageId,
   });
-  console.log(conversationData);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [localMessages, setLocalMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
 
-  const messages = [...(conversationData?.messages ?? []), ...localMessages];
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const {mutate: createMessage, isPending} = useCreateMessage(
+    messageId,
+    userId,
+  );
+  const messages = conversationData?.messages ?? [];
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || isPending) return;
 
-    const msg: Message = {
-      id: Date.now(),
+    createMessage({
       textContent: newMessage,
-      createdAt: new Date().toLocaleTimeString(),
-      sender: {
-        id: Number(userId),
-        role: UserRole.USER,
-        name: "name",
-        email: "email",
-      },
-    };
+      conversationId: Number(messageId),
+    });
 
-    setLocalMessages(prev => [...prev, msg]);
     setNewMessage("");
   };
 
+  // Auto-scroll when messages change
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -57,6 +52,13 @@ export default function ChatRoom({
       el.scrollTop = el.scrollHeight;
     }
   }, [messages]);
+
+  // Scroll to bottom on initial load
+  useEffect(() => {
+    if (scrollRef.current && messages.length > 0) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [conversationData]);
 
   if (!conversationData) {
     return (
@@ -101,13 +103,6 @@ export default function ChatRoom({
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-auto p-6 space-y-4 bg-white scroll-smooth">
-            {/* Date Separator */}
-            {/*<div className="flex justify-center py-4">*/}
-            {/*  <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-full uppercase tracking-wider border border-slate-100">*/}
-            {/*    Ma*/}
-            {/*  </span>*/}
-            {/*</div>*/}
-
             {messages.map((msg, index) => {
               const isMine = String(msg.sender.id) == userId;
               const isSequence =
@@ -129,7 +124,7 @@ export default function ChatRoom({
                       {msg.textContent}
                     </div>
                     <span
-                      className={`text-[10px] text-slate-400 mt-1 px-1 font-medium select-none ${isSequence ? "hidden hover:block" : "block"}`}>
+                      className={`text-[10px] text-slate-400 mt-1 px-1 font-medium select-none block"}`}>
                       {formatDate(msg.createdAt)}
                     </span>
                   </div>
@@ -147,7 +142,8 @@ export default function ChatRoom({
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                   placeholder="Írj egy üzenetet..."
-                  className="w-full bg-transparent border-none focus:ring-0 py-3 px-4 text-slate-800 placeholder-slate-400 resize-none max-h-32 min-h-[48px] text-base"
+                  disabled={isPending}
+                  className="w-full bg-transparent border-none focus:ring-0 py-3 px-4 text-slate-800 placeholder-slate-400 resize-none max-h-32 min-h-[48px] text-base disabled:opacity-50 focus:outline-none"
                   style={{height: "auto"}}
                   onInput={e => {
                     const target = e.target as HTMLTextAreaElement;
@@ -165,14 +161,15 @@ export default function ChatRoom({
 
               <button
                 type="submit"
-                disabled={!newMessage.trim()}
-                className="h-[48px] w-[48px] flex items-center justify-center bg-primary text-white rounded-xl hover:bg-[#5b4cc4] disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed transition-all shadow-md shadow-primary/20 disabled:shadow-none flex-shrink-0"></button>
+                disabled={!newMessage.trim() || isPending}
+                className="h-[48px] w-[48px] flex items-center justify-center bg-primary text-white rounded-xl hover:bg-[#5b4cc4] disabled:bg-slate-100 disabled:text-slate-300 disabled:cursor-not-allowed transition-all shadow-md shadow-primary/20 disabled:shadow-none flex-shrink-0">
+                <SendSVG />
+              </button>
             </form>
           </div>
         </div>
 
         {/* --- RIGHT COLUMN: SIDEBAR CONTEXT (4/12) --- */}
-        {/* This is hidden on mobile, visible on desktop */}
         <div className="hidden lg:flex lg:col-span-4 flex-col gap-4 overflow-y-auto pr-1">
           {/* 1. Listing Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
@@ -192,13 +189,9 @@ export default function ChatRoom({
                   : "Eladva"}
               </div>
             </div>
-
-            <Link href={`/listing/${conversationData.listing.id}`}>
-              <h2 className="font-bold text-slate-900 text-lg leading-snug hover:text-primary transition-colors mb-2">
-                {conversationData.listing.name}
-              </h2>
-            </Link>
-
+            <h2 className="font-bold text-slate-900 text-lg leading-snug mb-2">
+              {conversationData.listing.name}
+            </h2>
             <div className="text-2xl font-bold text-primary mb-4">
               {conversationData.listing.price} Ft
             </div>
@@ -234,21 +227,6 @@ export default function ChatRoom({
               </div>
             </div>
           </div>
-
-          {/* 3. Helper Links */}
-          {/*<div className="flex flex-wrap gap-2 text-xs font-medium text-slate-400 px-2">*/}
-          {/*  <button className="hover:text-primary transition-colors">*/}
-          {/*    Jelentés*/}
-          {/*  </button>*/}
-          {/*  <span>•</span>*/}
-          {/*  <button className="hover:text-primary transition-colors">*/}
-          {/*    Felhasználó tiltása*/}
-          {/*  </button>*/}
-          {/*  <span>•</span>*/}
-          {/*  <button className="hover:text-primary transition-colors">*/}
-          {/*    Segítség*/}
-          {/*  </button>*/}
-          {/*</div>*/}
         </div>
       </div>
     </main>

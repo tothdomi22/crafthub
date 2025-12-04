@@ -1,7 +1,7 @@
 import React from "react";
 import SubHeader from "@/app/components/global/SubHeader";
 import getCurrentUser from "@/app/utils/getCurrentUser";
-import ChatRoom from "@/app/components/message/ChatRoom";
+import {ChatRoom} from "@/app/components/message/ChatRoom";
 
 export default async function ChatRoomPage({
   params,

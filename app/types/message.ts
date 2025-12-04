@@ -6,3 +6,8 @@ export interface Message {
   textContent: string;
   sender: User;
 }
+
+export interface MessageRequest {
+  textContent: string;
+  conversationId: number;
+}
