@@ -16,20 +16,21 @@ export enum ListingStatusEnum {
   ARCHIVED = "ARCHIVED",
 }
 
-export interface Listing {
+export interface ListingReview {
   id: number;
   name: string;
+}
+
+export interface ListingNoCategoryAndUser extends ListingReview {
   price: number;
   canShip: boolean;
   city: string;
   description: string;
   createdAt: string;
   status: ListingStatusEnum;
-  subCategory: SubCategory;
-  user: User;
 }
 
-export interface ListingReview {
-  id: number;
-  name: string;
+export interface Listing extends ListingNoCategoryAndUser {
+  subCategory: SubCategory;
+  user: User;
 }

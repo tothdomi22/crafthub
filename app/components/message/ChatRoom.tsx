@@ -20,6 +20,7 @@ export default function ChatRoom({
     queryKey: ["conversation" + messageId],
     enabled: !!messageId,
   });
+  console.log(conversationData);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -77,20 +78,16 @@ export default function ChatRoom({
           <div className="flex-shrink-0 px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white z-10">
             <div className="flex items-center gap-3">
               <Link
-                // href={`/user/${conversationData.otherUser.id}`}
-                href={`/user/}`}
+                href={`/user/${conversationData.recipient.id}`}
                 className="relative group">
                 <div className="w-10 h-10 bg-indigo-50 text-primary rounded-full flex items-center justify-center font-bold text-lg border border-indigo-100 group-hover:scale-105 transition-transform">
-                  {/*{conversationData.otherUser.name.charAt(0)}*/}
+                  {conversationData.recipient.name.charAt(0)}
                 </div>
               </Link>
               <div>
                 <h1 className="font-bold text-slate-900 text-base leading-tight">
-                  {/*{conversationData.otherUser.name}*/}
+                  {conversationData.recipient.name}
                 </h1>
-                <p className="text-xs text-slate-400">
-                  {/*{conversationData.otherUser.lastActive}*/}
-                </p>
               </div>
             </div>
 
@@ -190,20 +187,20 @@ export default function ChatRoom({
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded-md text-xs font-bold text-slate-800 shadow-sm">
-                {/*{conversationData.listing.status === "ACTIVE"*/}
-                {/*  ? "Aktív"*/}
-                {/*  : "Eladva"}*/}
+                {conversationData.listing.status === "ACTIVE"
+                  ? "Aktív"
+                  : "Eladva"}
               </div>
             </div>
 
-            {/*<Link href={`/listing/${conversationData.listing.id}`}>*/}
-            {/*  <h2 className="font-bold text-slate-900 text-lg leading-snug hover:text-primary transition-colors mb-2">*/}
-            {/*    {conversationData.listing.name}*/}
-            {/*  </h2>*/}
-            {/*</Link>*/}
+            <Link href={`/listing/${conversationData.listing.id}`}>
+              <h2 className="font-bold text-slate-900 text-lg leading-snug hover:text-primary transition-colors mb-2">
+                {conversationData.listing.name}
+              </h2>
+            </Link>
 
             <div className="text-2xl font-bold text-primary mb-4">
-              {/*{conversationData.listing.price} Ft*/}
+              {conversationData.listing.price} Ft
             </div>
 
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
@@ -212,14 +209,14 @@ export default function ChatRoom({
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                 </svg>
               </div>
-              {/*{conversationData.listing.location}*/}
+              {conversationData.listing.city}
             </div>
 
-            {/*<Link*/}
-            {/*  href={`/listing/${conversationData.listing.id}`}*/}
-            {/*  className="block w-full text-center py-3 rounded-xl border border-slate-200 font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all">*/}
-            {/*  Hirdetés megtekintése*/}
-            {/*</Link>*/}
+            <Link
+              href={`/listing/${conversationData.listing.id}`}
+              className="block w-full text-center py-3 rounded-xl border border-slate-200 font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all">
+              Hirdetés megtekintése
+            </Link>
           </div>
 
           {/* 2. Safety / Tips Card */}
@@ -239,19 +236,19 @@ export default function ChatRoom({
           </div>
 
           {/* 3. Helper Links */}
-          <div className="flex flex-wrap gap-2 text-xs font-medium text-slate-400 px-2">
-            <button className="hover:text-primary transition-colors">
-              Jelentés
-            </button>
-            <span>•</span>
-            <button className="hover:text-primary transition-colors">
-              Felhasználó tiltása
-            </button>
-            <span>•</span>
-            <button className="hover:text-primary transition-colors">
-              Segítség
-            </button>
-          </div>
+          {/*<div className="flex flex-wrap gap-2 text-xs font-medium text-slate-400 px-2">*/}
+          {/*  <button className="hover:text-primary transition-colors">*/}
+          {/*    Jelentés*/}
+          {/*  </button>*/}
+          {/*  <span>•</span>*/}
+          {/*  <button className="hover:text-primary transition-colors">*/}
+          {/*    Felhasználó tiltása*/}
+          {/*  </button>*/}
+          {/*  <span>•</span>*/}
+          {/*  <button className="hover:text-primary transition-colors">*/}
+          {/*    Segítség*/}
+          {/*  </button>*/}
+          {/*</div>*/}
         </div>
       </div>
     </main>
