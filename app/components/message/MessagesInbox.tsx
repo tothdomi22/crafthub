@@ -37,9 +37,9 @@ export default function MessagesInbox({userId}: {userId: string | null}) {
           {/* Header */}
           <div className="flex-shrink-0 px-6 py-5 border-b border-slate-100 flex items-center justify-between">
             <h1 className="text-xl font-bold text-slate-900">Üzenetek</h1>
-            <div className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-              {conversationsData.length} aktív beszélgetés
-            </div>
+            {/*<div className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">*/}
+            {/*  {conversationsData.length} aktív beszélgetés*/}
+            {/*</div>*/}
           </div>
 
           {/* List */}
