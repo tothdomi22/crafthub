@@ -37,10 +37,13 @@ public class ListingService {
   }
 
   public List<ListingDto> listListings(Long id) {
-    Long userId = (id != null) ? id : authService.getCurrentUser().getId();
-    return listingRepository.findAllByUserEntityId(userId).stream()
-        .map(listingMapper::toDto)
-        .toList();
+    if (id != null) {
+      return listingRepository.findAllByUserEntityId(id).stream()
+          .map(listingMapper::toDto)
+          .toList();
+    } else {
+      return listingRepository.findAll().stream().map(listingMapper::toDto).toList();
+    }
   }
 
   public ListingDto getListing(Long id) {
