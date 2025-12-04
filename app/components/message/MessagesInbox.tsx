@@ -100,13 +100,13 @@ export default function MessagesInbox({userId}: {userId: string | null}) {
 
                         {/* Listing Pill */}
                         <div className="hidden sm:flex items-center gap-2 bg-white px-2 py-1 rounded-lg border border-slate-100 shadow-sm flex-shrink-0 max-w-[150px]">
-                          {/*<img*/}
-                          {/*  src={conv.listing.image}*/}
-                          {/*  alt=""*/}
-                          {/*  className="w-4 h-4 rounded object-cover"*/}
-                          {/*/>*/}
+                          <img
+                            src={"/images/placeholder.jpg"}
+                            alt=""
+                            className="w-4 h-4 rounded object-cover"
+                          />
                           <span className="text-[10px] font-bold text-slate-600 truncate">
-                            {/*{conv.listing.name}*/}
+                            {conv.listing.name}
                           </span>
                         </div>
                       </div>

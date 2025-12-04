@@ -28,3 +28,8 @@ export interface Listing {
   subCategory: SubCategory;
   user: User;
 }
+
+export interface ListingReview {
+  id: number;
+  name: string;
+}
