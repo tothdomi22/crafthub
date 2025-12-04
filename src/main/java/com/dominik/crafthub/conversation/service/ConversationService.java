@@ -15,7 +15,6 @@ import com.dominik.crafthub.conversation.repository.ConversationRepository;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.message.mapper.MessageMapper;
 import com.dominik.crafthub.message.repository.MessageRepository;
-import com.dominik.crafthub.user.service.UserService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -32,7 +31,6 @@ public class ConversationService {
   private final ConversationMapper conversationMapper;
   private final MessageMapper messageMapper;
   private final MessageRepository messageRepository;
-  private final UserService userService;
 
   public ConversationDto createConversation(ConversationCreateRequest request) {
     var listing = listingService.findListingById(request.listingId());
