@@ -98,13 +98,16 @@ export default function UserProfile({id}: {id: string}) {
             </p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-slate-50 text-sm text-slate-500 font-medium">
-              <div className="flex items-center gap-2">
-                <LocationSVG />
-                {profileData.city}
-              </div>
+              {profileData.city && (
+                <div className="flex items-center gap-2">
+                  <LocationSVG />
+                  {profileData.city}
+                </div>
+              )}
+
               <div className="flex items-center gap-2">
                 <CalendarSvg />
-                Regisztrált:
+                Regisztrált: {formatDate(profileData.user.createdAt)}
               </div>
             </div>
           </div>

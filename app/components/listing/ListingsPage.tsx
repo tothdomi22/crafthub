@@ -8,8 +8,12 @@ import {Listing} from "@/app/types/listing";
 import useListListings from "@/app/hooks/listing/useListListing";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
+import {Profile} from "@/app/types/profile";
+import useGetProfile from "@/app/hooks/profile/useGetProfile";
+import {User} from "@/app/types/user";
+import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 
-export default function ListingsPage() {
+export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
     null,
   );
@@ -22,6 +26,11 @@ export default function ListingsPage() {
   const {data: listingData} = useQuery<Listing[]>({
     queryFn: useListListings,
     queryKey: ["listings"],
+  });
+  const {data: profileData} = useQuery<Profile>({
+    queryFn: () => useGetProfile(String(user?.id)),
+    queryKey: ["profile" + user?.id],
+    enabled: !!user,
   });
 
   const handleSetCategory = (category: MainCategory) => {
@@ -44,6 +53,12 @@ export default function ListingsPage() {
       ? listing.subCategory.mainCategory.id === activeCategory.id
       : true,
   );
+
+  let shouldShowOnboarding = false;
+  if (profileData) {
+    shouldShowOnboarding =
+      !profileData.bio && !profileData.city && !profileData.birthDate;
+  }
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -76,6 +91,13 @@ export default function ListingsPage() {
           </Link>
         ))}
       </div>
+      {user && (
+        <ProfileOnboardingModal
+          isOpen={shouldShowOnboarding}
+          // onCloseAction={}
+          user={user}
+        />
+      )}
     </main>
   );
 }
