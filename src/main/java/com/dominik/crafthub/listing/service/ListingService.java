@@ -51,6 +51,13 @@ public class ListingService {
     }
   }
 
+  public List<ListingDto> listMyListings() {
+    var user = authService.getCurrentUser();
+    return listingRepository.findAllByUserEntityId(user.getId()).stream()
+        .map(listingMapper::toDto)
+        .toList();
+  }
+
   public ListingSingleViewDto getListing(Long id) {
     var user = authService.getCurrentUser();
     var listing = findListingById(id);

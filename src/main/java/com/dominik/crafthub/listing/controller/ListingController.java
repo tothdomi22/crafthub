@@ -31,6 +31,12 @@ public class ListingController {
     return ResponseEntity.ok(listings);
   }
 
+  @GetMapping({"/list/me"})
+  public ResponseEntity<?> listMyListings() {
+    var listings = listingService.listMyListings();
+    return ResponseEntity.ok(listings);
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<?> getListing(@PathVariable Long id) {
     var listing = listingService.getListing(id);
