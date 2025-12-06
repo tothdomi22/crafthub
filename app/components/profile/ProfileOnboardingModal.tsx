@@ -1,61 +1,38 @@
 "use client";
 
 import React, {useState} from "react";
-import {useRouter} from "next/navigation";
-import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
-import {User} from "@/app/types/user";
+import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
 
 export default function ProfileOnboardingModal({
   isOpen,
   onCloseAction,
-  user,
 }: {
   isOpen: boolean;
   onCloseAction?: () => void;
-  user: User;
 }) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const {mutate: createProfileMutation, isPending: isMutationPending} =
+    useUpdateProfile();
 
   // Schema fields based on your diagram
   const [formData, setFormData] = useState({
     city: "",
     bio: "",
-    date_of_birth: "",
+    birthDate: "",
   });
-
-  // Mock Hook call - replace with your actual React Query mutation
-  // const { mutateAsync: updateProfile } = useUpdateProfile();
-  const updateProfile = async (data: string) => {
-    console.log(data);
-    console.log(user);
-    /* mock implementation */ return true;
-  };
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    if (!formData.city || !formData.date_of_birth) {
-      notifyError("A város és a születési dátum megadása kötelező.");
-      setIsLoading(false);
+    if (!formData.city || !formData.birthDate || !formData.bio) {
       return;
     }
-
-    try {
-      await updateProfile("mock data");
-
-      notifySuccess("Profil sikeresen frissítve!");
-      router.refresh();
-      // onCloseAction();
-    } catch (error) {
-      console.error(error);
-      notifyError("Hiba történt a mentés során.");
-    } finally {
-      setIsLoading(false);
-    }
+    createProfileMutation({
+      bio: formData.bio,
+      city: formData.city,
+      birthDate: formData.birthDate,
+    });
   };
 
   return (
@@ -108,9 +85,9 @@ export default function ProfileOnboardingModal({
             </label>
             <input
               type="date"
-              value={formData.date_of_birth}
+              value={formData.birthDate}
               onChange={e =>
-                setFormData({...formData, date_of_birth: e.target.value})
+                setFormData({...formData, birthDate: e.target.value})
               }
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium text-slate-600"
             />
@@ -129,9 +106,9 @@ export default function ProfileOnboardingModal({
             </button>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isMutationPending}
               className="flex-[2] bg-primary hover:bg-[#5b4cc4] text-white py-3.5 rounded-xl shadow-lg shadow-primary/20 font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-              {isLoading ? "Mentés..." : "Profil létrehozása"}
+              {isMutationPending ? "Mentés..." : "Profil létrehozása"}
             </button>
           </div>
         </form>

@@ -9,3 +9,9 @@ export interface Profile {
   reviewCount: number;
   user: User;
 }
+
+export interface ProfileCreationRequest {
+  birthDate: string;
+  city: string;
+  bio: string;
+}

@@ -95,7 +95,6 @@ export default function ListingsPage({user}: {user: User | null}) {
         <ProfileOnboardingModal
           isOpen={shouldShowOnboarding}
           // onCloseAction={}
-          user={user}
         />
       )}
     </main>
