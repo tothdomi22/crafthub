@@ -15,6 +15,7 @@ import useCreateListing from "@/app/hooks/listing/useCreateListing";
 import {ListingRequest} from "@/app/types/listing";
 import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
 import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
+import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 
 export default function CreateListing() {
   const router = useRouter();
@@ -89,7 +90,12 @@ export default function CreateListing() {
 
     createListingMutation(request, {
       onSuccess() {
+        notifySuccess("Hirdetés sikeresen létrehozva!");
         router.push("/");
+      },
+      onError(e) {
+        console.error(e);
+        notifyError("Hiba történt, Kérem próbálkozzon később!");
       },
     });
   };

@@ -7,6 +7,7 @@ import Link from "next/link";
 import {formatDate} from "@/app/components/utils";
 import useCreateMessage from "@/app/hooks/message/useCreateMessage";
 import SendSVG from "/public/svgs/send.svg";
+import {notifyError} from "@/app/utils/toastHelper";
 
 export function ChatRoom({
   messageId,
@@ -32,12 +33,18 @@ export function ChatRoom({
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || isPending) return;
-
-    createMessage({
-      textContent: newMessage,
-      conversationId: Number(messageId),
-    });
-
+    createMessage(
+      {
+        textContent: newMessage,
+        conversationId: Number(messageId),
+      },
+      {
+        onError(e) {
+          console.error(e);
+          notifyError("Hiba történt, Kérem próbálkozzon később!");
+        },
+      },
+    );
     setNewMessage("");
   };
 
@@ -45,9 +52,7 @@ export function ChatRoom({
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-
     const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
-
     if (isAtBottom) {
       el.scrollTop = el.scrollHeight;
     }
