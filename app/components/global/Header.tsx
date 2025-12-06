@@ -68,7 +68,7 @@ export default async function Header() {
                 </button>
               </Link>
               <Link href="/register">
-                <button className="hidden sm:block px-4 py-2.5 text-sm font-bold bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors shadow-sm">
+                <button className="hidden sm:block px-4 py-2.5 text-sm font-bold bg-primary hover:bg-[#5b4cc4] text-white rounded-xl transition-colors shadow-sm">
                   Regisztráció
                 </button>
               </Link>
