@@ -2,6 +2,8 @@ package com.dominik.crafthub.auth.service;
 
 import com.dominik.crafthub.jwt.config.JwtConfig;
 import com.dominik.crafthub.jwt.service.JwtService;
+import com.dominik.crafthub.profile.mapper.ProfileMapper;
+import com.dominik.crafthub.profile.repository.ProfileRepository;
 import com.dominik.crafthub.user.dto.UserDto;
 import com.dominik.crafthub.user.dto.UserLoginRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
@@ -24,12 +26,14 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AuthService {
   private final JwtConfig jwtConfig;
+  private final ProfileMapper profileMapper;
+  private final ProfileRepository profileRepository;
   private UserRepository userRepository;
   private UserMapper userMapper;
   private PasswordEncoder passwordEncoder;
   private AuthenticationManager authenticationManager;
   private JwtService jwtService;
-
+  
   public UserDto registerUser(UserRegisterRequest request) {
     var userExists = userRepository.existsByEmail(request.email());
     if (userExists) {
@@ -41,6 +45,8 @@ public class AuthService {
     user.setCreatedAt(OffsetDateTime.now());
     user.setPassword(passwordEncoder.encode(request.password()));
     var userEntity = userRepository.save(user);
+    var profileEntity = profileMapper.toNewProfileEntity(userEntity.getId());
+    profileRepository.save(profileEntity);
     return userMapper.toDto(userEntity);
   }
 
