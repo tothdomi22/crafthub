@@ -9,6 +9,15 @@ export interface ListingRequest {
   description: string;
   subCategoryId: number;
 }
+export interface ListingUpdateRequest {
+  name?: string;
+  price?: number;
+  canShip?: boolean;
+  city?: string;
+  description?: string;
+  subCategoryId?: number;
+  status: ListingStatusEnum;
+}
 
 export enum ListingStatusEnum {
   ACTIVE = "ACTIVE",
