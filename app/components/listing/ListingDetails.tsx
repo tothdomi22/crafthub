@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useState} from "react";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {Listing, ListingStatusEnum} from "@/app/types/listing";
 import useGetListing from "@/app/hooks/listing/useGetListing";
 import {Profile} from "@/app/types/profile";
@@ -13,6 +13,8 @@ import LocationSVG from "/public/svgs/location.svg";
 import ChatSVG from "/public/svgs/chat.svg";
 import SendMessageModal from "@/app/components/message/SendMessageModal";
 import {useRouter} from "next/navigation";
+import useCreateConversation from "@/app/hooks/conversation/useCreateConversation";
+import useCreateFirstMessage from "@/app/hooks/message/useCreateFirstMessage";
 
 export default function ListingDetails({
   listingId,
@@ -22,8 +24,10 @@ export default function ListingDetails({
   userId: string;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isSaved, setIsSaved] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isMessagePending, setIsMessagePending] = useState(false);
 
   const {data: listingData} = useQuery<Listing>({
     queryFn: () => useGetListing(listingId),
@@ -35,10 +39,39 @@ export default function ListingDetails({
     queryKey: ["profile" + listingId],
     enabled: !!listingData,
   });
-  // TODO: implement logic
-  const handleSendMessage = (message: string) => {
-    console.log("Sending message:", message);
-    setIsMessageModalOpen(false);
+  const {mutateAsync: createConversation} = useCreateConversation();
+  const {mutateAsync: createMessage} = useCreateFirstMessage();
+
+  const handleSendMessage = async (message: string) => {
+    setIsMessagePending(true);
+    if (!message.trim()) {
+      setIsMessagePending(false);
+      return;
+    }
+    try {
+      const createConversationResponse: Listing = await createConversation({
+        listingId: Number(listingId),
+      });
+      const queryKey = ["listing" + listingId];
+
+      await createMessage({
+        textContent: message,
+        conversationId: createConversationResponse.id,
+      });
+      await queryClient.cancelQueries({queryKey});
+      const previousData = queryClient.getQueryData<Listing>(queryKey);
+      if (previousData) {
+        queryClient.setQueryData<Listing>(queryKey, {
+          ...previousData,
+          conversationId: createConversationResponse.id,
+        });
+      }
+      setIsMessageModalOpen(false);
+    } catch (e) {
+      console.error(e);
+      setIsMessageModalOpen(false);
+    }
+    setIsMessagePending(false);
   };
 
   if (!listingData || !profileData) {
@@ -225,6 +258,7 @@ export default function ListingDetails({
               listing={listingData}
               sellerName={listingData.user.name}
               onSubmitAction={handleSendMessage}
+              isSending={isMessagePending}
             />
           )}
         </div>

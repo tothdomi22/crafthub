@@ -17,3 +17,7 @@ export interface SingleConversation {
   listing: ListingNoCategoryAndUser;
   recipient: User;
 }
+
+export interface ConversationRequest {
+  listingId: number;
+}
