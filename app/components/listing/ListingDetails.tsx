@@ -12,6 +12,7 @@ import Link from "next/link";
 import LocationSVG from "/public/svgs/location.svg";
 import ChatSVG from "/public/svgs/chat.svg";
 import SendMessageModal from "@/app/components/message/SendMessageModal";
+import {useRouter} from "next/navigation";
 
 export default function ListingDetails({
   listingId,
@@ -20,6 +21,7 @@ export default function ListingDetails({
   listingId: string;
   userId: string;
 }) {
+  const router = useRouter();
   const [isSaved, setIsSaved] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
@@ -27,6 +29,7 @@ export default function ListingDetails({
     queryFn: () => useGetListing(listingId),
     queryKey: ["listing" + listingId],
   });
+
   const {data: profileData} = useQuery<Profile>({
     queryFn: () => useGetProfile(String(listingData?.user.id)),
     queryKey: ["profile" + listingId],
@@ -48,6 +51,13 @@ export default function ListingDetails({
       </div>
     );
   }
+  const handleSendMessageButton = () => {
+    if (listingData.conversationId) {
+      router.push(`/messages/${listingData.conversationId}`);
+    } else {
+      setIsMessageModalOpen(true);
+    }
+  };
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumbs */}
@@ -187,10 +197,12 @@ export default function ListingDetails({
             <div className="sticky bottom-4 z-40 pt-2">
               {listingData.status === ListingStatusEnum.ACTIVE ? (
                 <button
-                  onClick={() => setIsMessageModalOpen(true)}
+                  onClick={handleSendMessageButton}
                   className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
                   <ChatSVG className="w-6 h-6" />
-                  Üzenj az eladónak
+                  {listingData.conversationId
+                    ? "Üzenetek az eladóval"
+                    : "Üzenj az eladónak"}
                 </button>
               ) : (
                 <button

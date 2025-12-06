@@ -45,7 +45,7 @@ export default function Header() {
             <button className="relative p-2.5 text-slate-500 hover:text-primary hover:bg-slate-50 rounded-xl transition-all">
               <ChatSVG className="w-6 h-6" />
               {/* Optional: Unread Dot */}
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+              {/*<span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>*/}
             </button>
           </Link>
 
