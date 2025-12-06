@@ -19,6 +19,7 @@ public interface ConversationMapper {
   @Mapping(source = "listingEntity", target = "listing")
   ConversationDto toDto(ConversationEntity conversationEntity);
 
+  @Mapping(target = "listing", source = "listingEntity")
   @Mapping(source = "userEntity1", target = "userOne")
   @Mapping(source = "userEntity2", target = "userTwo")
   ConversationListDto toListDto(ConversationEntity conversationEntity);

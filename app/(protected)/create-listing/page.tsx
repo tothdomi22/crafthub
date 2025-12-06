@@ -11,10 +11,10 @@ import CheckSVG from "/public/svgs/check.svg";
 import {useRouter} from "next/navigation";
 import {useQuery} from "@tanstack/react-query";
 import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
-import useListMainCategory from "@/app/hooks/admin/main-category/useListMainCategory";
-import useListSubCategory from "@/app/hooks/admin/sub-category/useListSubCategory";
 import useCreateListing from "@/app/hooks/listing/useCreateListing";
 import {ListingRequest} from "@/app/types/listing";
+import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
+import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
 
 export default function CreateListing() {
   const router = useRouter();

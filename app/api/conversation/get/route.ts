@@ -2,7 +2,15 @@ import {NextResponse} from "next/server";
 
 export async function GET(request: Request) {
   try {
-    const backendUrl = `${process.env.API_BASE_URL}/admin/main-category/list`;
+    const {searchParams} = new URL(request.url);
+    const id = Number(searchParams.get("id"));
+    if (!id) {
+      return NextResponse.json(
+        {message: "Missing required query parameter"},
+        {status: 400},
+      );
+    }
+    const backendUrl = `${process.env.API_BASE_URL}/conversation/${id}`;
     const response = await fetch(backendUrl, {
       method: "GET",
       headers: {
@@ -14,14 +22,14 @@ export async function GET(request: Request) {
     if (!response.ok) {
       const errorData = await response.json();
       return NextResponse.json(
-        {message: errorData.message || "Failed to get main categories"},
+        {message: errorData.message || "Failed to get conversation"},
         {status: response.status},
       );
     }
     const data = await response.json();
     return NextResponse.json(data, {status: response.status});
   } catch (error) {
-    console.error("Error getting main categories:", error);
+    console.error("Error getting conversation:", error);
     return NextResponse.json({message: "Internal server error"}, {status: 500});
   }
 }

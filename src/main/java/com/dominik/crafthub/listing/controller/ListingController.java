@@ -47,18 +47,17 @@ public class ListingController {
   @ExceptionHandler(SubCategoryNotFoundException.class)
   public ResponseEntity<Map<String, String>> subCategoryNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(Map.of("message:", "Sub category not found"));
+        .body(Map.of("message", "Sub category not found"));
   }
 
   @ExceptionHandler(NotTheOwnerOfListingException.class)
   public ResponseEntity<Map<String, String>> notTheOwnerOfListing() {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-        .body(Map.of("message:", "You are not the owner of the listing"));
+        .body(Map.of("message", "You are not the owner of the listing"));
   }
 
   @ExceptionHandler(ListingNotFoundException.class)
   public ResponseEntity<Map<String, String>> listingNotFound() {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(Map.of("message:", "Listing not found"));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Listing not found"));
   }
 }

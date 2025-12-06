@@ -1,7 +1,6 @@
 "use client";
 
 import React, {useState} from "react";
-import useListMainCategory from "@/app/hooks/admin/main-category/useListMainCategory";
 import {useQuery} from "@tanstack/react-query";
 import {MainCategory} from "@/app/types/admin/category/category";
 import useListListings from "@/app/hooks/listing/useListListing";
@@ -9,6 +8,7 @@ import {Listing} from "@/app/types/listing";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
 import Header from "@/app/components/global/Header";
+import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
