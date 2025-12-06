@@ -9,16 +9,16 @@ export default async function ListingDetailsPage({
   params: Promise<{id: string}>;
 }) {
   const {id} = await params;
-  const userId = await getCurrentUser();
+  const user = await getCurrentUser();
 
-  if (!id || !userId) {
+  if (!id || !user) {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-[#F8F9FE] text-slate-800 font-sans pb-20">
-      <SubHeader />
-      <ListingDetails listingId={id} userId={userId} />
+      <SubHeader user={user} />
+      <ListingDetails listingId={id} user={user} />
     </div>
   );
 }

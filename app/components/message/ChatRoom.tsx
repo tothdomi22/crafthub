@@ -8,14 +8,9 @@ import {formatDate} from "@/app/components/utils";
 import useCreateMessage from "@/app/hooks/message/useCreateMessage";
 import SendSVG from "/public/svgs/send.svg";
 import {notifyError} from "@/app/utils/toastHelper";
+import {User} from "@/app/types/user";
 
-export function ChatRoom({
-  messageId,
-  userId,
-}: {
-  messageId: string;
-  userId: string;
-}) {
+export function ChatRoom({messageId, user}: {messageId: string; user: User}) {
   const {data: conversationData} = useQuery<SingleConversation>({
     queryFn: () => getConversation(messageId),
     queryKey: ["conversation" + messageId],
@@ -26,7 +21,7 @@ export function ChatRoom({
   const [newMessage, setNewMessage] = useState("");
   const {mutate: createMessage, isPending} = useCreateMessage(
     messageId,
-    userId,
+    String(user.id),
   );
   const messages = conversationData?.messages ?? [];
 
@@ -109,10 +104,10 @@ export function ChatRoom({
             ref={scrollRef}
             className="flex-1 overflow-y-auto p-6 space-y-4 bg-white scroll-smooth">
             {messages.map((msg, index) => {
-              const isMine = String(msg.sender.id) == userId;
+              const isMine = msg.sender.id == user.id;
               const isSequence =
                 index > 0 &&
-                (String(messages[index - 1].sender.id) == userId) === isMine;
+                (messages[index - 1].sender.id == user.id) === isMine;
 
               return (
                 <div

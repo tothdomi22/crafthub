@@ -9,16 +9,16 @@ export default async function ChatRoomPage({
   params: Promise<{id: string}>;
 }) {
   const {id} = await params;
-  const userId = await getCurrentUser();
+  const user = await getCurrentUser();
 
-  if (!userId) {
+  if (!user) {
     return null;
   }
 
   return (
     <div className="h-screen bg-[#F8F9FE] font-sans text-slate-800 flex flex-col overflow-hidden">
-      <SubHeader />
-      <ChatRoom messageId={id} userId={userId} />
+      <SubHeader user={user} />
+      <ChatRoom messageId={id} user={user} />
     </div>
   );
 }

@@ -5,10 +5,9 @@ import React from "react";
 import {useQuery} from "@tanstack/react-query";
 import {Conversation} from "@/app/types/conversation";
 import useListConversation from "@/app/hooks/conversation/useListConversation";
-import {useRouter} from "next/navigation";
+import {User} from "@/app/types/user";
 
-export default function MessagesInbox({userId}: {userId: string | null}) {
-  const router = useRouter();
+export default function MessagesInbox({user}: {user: User}) {
   const {data: conversationsData} = useQuery<Conversation[]>({
     queryFn: useListConversation,
     queryKey: ["conversations"],
@@ -23,10 +22,6 @@ export default function MessagesInbox({userId}: {userId: string | null}) {
         </div>
       </div>
     );
-  }
-  if (!userId) {
-    // If token is malformed or missing, redirect to log in
-    router.push("/login");
   }
 
   return (
@@ -50,9 +45,7 @@ export default function MessagesInbox({userId}: {userId: string | null}) {
                 //   !conv.lastMessage.isRead && !conv.lastMessage.isMine;
                 const isUnread = false;
                 const otherUser =
-                  String(conv.userOne.id) == userId
-                    ? conv.userTwo
-                    : conv.userOne;
+                  conv.userOne.id == user.id ? conv.userTwo : conv.userOne;
 
                 return (
                   <Link
