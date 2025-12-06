@@ -2,16 +2,20 @@
 
 import React, {useState} from "react";
 import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
+import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
+import {User} from "@/app/types/user";
 
 export default function ProfileOnboardingModal({
   isOpen,
   onCloseAction,
+  user,
 }: {
   isOpen: boolean;
-  onCloseAction?: () => void;
+  onCloseAction: () => void;
+  user: User;
 }) {
   const {mutate: createProfileMutation, isPending: isMutationPending} =
-    useUpdateProfile();
+    useUpdateProfile({userId: String(user.id)});
 
   // Schema fields based on your diagram
   const [formData, setFormData] = useState({
@@ -28,11 +32,23 @@ export default function ProfileOnboardingModal({
     if (!formData.city || !formData.birthDate || !formData.bio) {
       return;
     }
-    createProfileMutation({
-      bio: formData.bio,
-      city: formData.city,
-      birthDate: formData.birthDate,
-    });
+    createProfileMutation(
+      {
+        bio: formData.bio,
+        city: formData.city,
+        birthDate: formData.birthDate,
+      },
+      {
+        onSuccess() {
+          notifySuccess("Profil sikeresen elmentve!");
+          onCloseAction();
+        },
+        onError(e) {
+          console.log(e);
+          notifyError("Hiba a profile létrehozáskor. Próbálkozzon később!");
+        },
+      },
+    );
   };
 
   return (
@@ -99,16 +115,10 @@ export default function ProfileOnboardingModal({
 
           <div className="pt-4 flex gap-3">
             <button
-              type="button"
-              onClick={onCloseAction} // Allow skipping if you want, or remove this button to force it
-              className="flex-1 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-colors">
-              Később
-            </button>
-            <button
               type="submit"
               disabled={isMutationPending}
               className="flex-[2] bg-primary hover:bg-[#5b4cc4] text-white py-3.5 rounded-xl shadow-lg shadow-primary/20 font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-              {isMutationPending ? "Mentés..." : "Profil létrehozása"}
+              {isMutationPending ? "Mentés..." : "Profil mentése"}
             </button>
           </div>
         </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {MainCategory} from "@/app/types/admin/category/category";
 import {useQuery} from "@tanstack/react-query";
 import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
@@ -17,6 +17,7 @@ export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
     null,
   );
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
 
   const {data: mainCategoriesData} = useQuery<MainCategory[]>({
     queryFn: useListMainCategory,
@@ -37,6 +38,14 @@ export default function ListingsPage({user}: {user: User | null}) {
     setActiveCategory(activeCategory === category ? null : category);
   };
 
+  useEffect(() => {
+    if (profileData) {
+      setIsOnboardingOpen(
+        !profileData.bio && !profileData.city && !profileData.birthDate,
+      );
+    }
+  }, [profileData]);
+
   if (!listingData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
@@ -53,12 +62,6 @@ export default function ListingsPage({user}: {user: User | null}) {
       ? listing.subCategory.mainCategory.id === activeCategory.id
       : true,
   );
-
-  let shouldShowOnboarding = false;
-  if (profileData) {
-    shouldShowOnboarding =
-      !profileData.bio && !profileData.city && !profileData.birthDate;
-  }
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -93,8 +96,9 @@ export default function ListingsPage({user}: {user: User | null}) {
       </div>
       {user && (
         <ProfileOnboardingModal
-          isOpen={shouldShowOnboarding}
-          // onCloseAction={}
+          isOpen={isOnboardingOpen}
+          onCloseAction={() => setIsOnboardingOpen(false)}
+          user={user}
         />
       )}
     </main>
