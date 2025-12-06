@@ -48,6 +48,7 @@ export default function useCreateMessage(
             role: previousData.messages[0]?.sender.role || "USER",
             name: previousData.messages[0]?.sender.name || "You",
             email: previousData.messages[0]?.sender.email || "",
+            createdAt: Date.now().toLocaleString(),
           },
         };
 

@@ -26,5 +26,8 @@ public interface ProfileMapper {
 
   ProfileEntity toEntity(ProfileCreateRequest request);
 
+  @Mapping(source = "userId", target = "userEntity.id")
+  ProfileEntity toNewProfileEntity(Long userId);
+
   void update(ProfileUpdateRequest request, @MappingTarget ProfileEntity profileEntity);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {MainCategory} from "@/app/types/admin/category/category";
 import {useQuery} from "@tanstack/react-query";
 import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
@@ -8,11 +8,16 @@ import {Listing} from "@/app/types/listing";
 import useListListings from "@/app/hooks/listing/useListListing";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
+import {Profile} from "@/app/types/profile";
+import useGetProfile from "@/app/hooks/profile/useGetProfile";
+import {User} from "@/app/types/user";
+import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 
-export default function ListingsPage() {
+export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
     null,
   );
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
 
   const {data: mainCategoriesData} = useQuery<MainCategory[]>({
     queryFn: useListMainCategory,
@@ -23,10 +28,23 @@ export default function ListingsPage() {
     queryFn: useListListings,
     queryKey: ["listings"],
   });
+  const {data: profileData} = useQuery<Profile>({
+    queryFn: () => useGetProfile(String(user?.id)),
+    queryKey: ["profile" + user?.id],
+    enabled: !!user,
+  });
 
   const handleSetCategory = (category: MainCategory) => {
     setActiveCategory(activeCategory === category ? null : category);
   };
+
+  useEffect(() => {
+    if (profileData) {
+      setIsOnboardingOpen(
+        !profileData.bio && !profileData.city && !profileData.birthDate,
+      );
+    }
+  }, [profileData]);
 
   if (!listingData) {
     return (
@@ -76,6 +94,13 @@ export default function ListingsPage() {
           </Link>
         ))}
       </div>
+      {user && (
+        <ProfileOnboardingModal
+          isOpen={isOnboardingOpen}
+          onCloseAction={() => setIsOnboardingOpen(false)}
+          user={user}
+        />
+      )}
     </main>
   );
 }
