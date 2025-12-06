@@ -58,6 +58,16 @@ public class AuthService {
         .build();
   }
 
+  public ResponseCookie logoutUser() {
+    return ResponseCookie.from("accessToken", "")
+        .httpOnly(true)
+        .secure(false) // set true for prod
+        .path("/")
+        .maxAge(0) // delete cookie
+        .sameSite("Lax")
+        .build();
+  }
+
   public UserEntity getCurrentUser() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     var userId = (Long) authentication.getPrincipal();

@@ -36,6 +36,14 @@ public class AuthController {
         .body(Map.of("message", "Login success"));
   }
 
+  @PostMapping("/logout")
+  public ResponseEntity<?> logout(HttpServletResponse response) {
+    var cookie = authService.logoutUser();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        .body(Map.of("message", "Logout success"));
+  }
+
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> handleUserAlreadyExists() {
     return ResponseEntity.status(HttpStatus.CONFLICT)
