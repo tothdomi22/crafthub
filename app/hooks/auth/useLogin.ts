@@ -15,10 +15,10 @@ const useLogin = () => {
       const responseJson = await response.json();
 
       if (!response.ok) {
-        throw new Error(responseJson.detail || "Login failed");
+        throw new Error(responseJson.message || "Login failed");
       }
 
-      return data;
+      return responseJson;
     },
   });
 };
