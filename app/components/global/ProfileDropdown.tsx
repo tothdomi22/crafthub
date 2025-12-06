@@ -2,13 +2,15 @@
 
 import React, {useEffect, useRef, useState} from "react";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
 import {User} from "@/app/types/user";
+import useLogout from "@/app/hooks/auth/useLogout";
+import {notifyError} from "@/app/utils/toastHelper";
 
 export default function ProfileDropdown({user}: {user: User}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+
+  const {mutate: logoutMutation} = useLogout();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -25,8 +27,12 @@ export default function ProfileDropdown({user}: {user: User}) {
   }, []);
 
   const handleLogout = () => {
-    console.log("Logging out...");
-    router.push("/login");
+    logoutMutation(undefined, {
+      onError(e) {
+        console.error(e);
+        notifyError("Hiba a kijelentkezés során!");
+      },
+    });
   };
 
   return (

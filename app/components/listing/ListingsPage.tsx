@@ -28,6 +28,17 @@ export default function ListingsPage() {
     setActiveCategory(activeCategory === category ? null : category);
   };
 
+  if (!listingData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-12 bg-slate-200 rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-slate-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
   const filteredListings = listingData?.filter(listing =>
     activeCategory
       ? listing.subCategory.mainCategory.id === activeCategory.id
@@ -59,12 +70,11 @@ export default function ListingsPage() {
 
       {/* Listings Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredListings &&
-          filteredListings.map(item => (
-            <Link key={item.id} href={`/listing/${item.id}`}>
-              <ListingCard listing={item} />
-            </Link>
-          ))}
+        {filteredListings.map(item => (
+          <Link key={item.id} href={`/listing/${item.id}`}>
+            <ListingCard listing={item} />
+          </Link>
+        ))}
       </div>
     </main>
   );

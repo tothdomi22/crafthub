@@ -30,7 +30,14 @@ export default function UserProfile({id}: {id: string}) {
   });
 
   if (!profileData) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-12 bg-slate-200 rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-slate-200 rounded"></div>
+        </div>
+      </div>
+    );
   }
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
