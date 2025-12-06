@@ -15,6 +15,7 @@ import SendMessageModal from "@/app/components/message/SendMessageModal";
 import {useRouter} from "next/navigation";
 import useCreateConversation from "@/app/hooks/conversation/useCreateConversation";
 import useCreateFirstMessage from "@/app/hooks/message/useCreateFirstMessage";
+import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 
 export default function ListingDetails({
   listingId,
@@ -65,10 +66,11 @@ export default function ListingDetails({
           ...previousData,
           conversationId: createConversationResponse.id,
         });
+        notifySuccess("Üzenet sikeresen elküldve!");
       }
-      setIsMessageModalOpen(false);
     } catch (e) {
       console.error(e);
+      notifyError("Hiba történt, Kérem próbálkozzon később!");
       setIsMessageModalOpen(false);
     }
     setIsMessagePending(false);
@@ -200,9 +202,9 @@ export default function ListingDetails({
 
                 <div className="flex items-center gap-1.5 text-sm text-slate-500">
                   <span className="font-bold text-[#00B894]">
-                    {profileData.review}
+                    {profileData.review != 0 && profileData.review}
                   </span>
-                  <span>•</span>
+                  {profileData.review != 0 && <span>•</span>}
                   <span>{profileData.reviewCount} értékelés</span>
                 </div>
               </div>
