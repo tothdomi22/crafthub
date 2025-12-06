@@ -49,7 +49,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
   });
 
   const {mutate: updateListingMutation, isPending: isUpdating} =
-    useUpdateListing(id);
+    useUpdateListing();
 
   useEffect(() => {
     if (existingListing && mainCategoriesData && subCategoriesData) {
@@ -119,7 +119,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
     };
 
     updateListingMutation(
-      {data: request},
+      {id: id, data: request},
       {
         onSuccess() {
           notifySuccess("Hirdetés sikeresen frissítve!");

@@ -3,16 +3,19 @@
 import React, {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import Link from "next/link";
-import {Listing, ListingStatusEnum} from "@/app/types/listing";
+import {
+  Listing,
+  ListingStatusEnum,
+  ListingUpdateRequest,
+} from "@/app/types/listing";
 import useListMyListings from "@/app/hooks/listing/useListMyListings";
 import {formatDate} from "@/app/components/utils";
-
-// SVGs (Matching ListingDetails)
+import ListingStatusDropdown from "@/app/components/listing/ListingStatusDropdown";
 import LocationSVG from "/public/svgs/location.svg";
 import ShowCredentialsSVG from "/public/svgs/show-credentials.svg";
-import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
 import FavoriteSVG from "/public/svgs/favorite.svg";
 import EditSVG from "/public/svgs/edit.svg";
+import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
 
 export default function MyListings() {
   const [activeTab, setActiveTab] = useState<ListingStatusEnum | "ALL">("ALL");
@@ -20,32 +23,25 @@ export default function MyListings() {
   const {data: listings, isLoading} = useQuery<Listing[]>({
     queryFn: useListMyListings,
     queryKey: ["my-listings"],
+    select: data =>
+      [...data].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
   });
 
-  // Mock handler for status change
-  const handleStatusChange = (id: number, newStatus: ListingStatusEnum) => {
+  const {mutate: updateListingMutation} = useUpdateListing();
+
+  const handleStatusChange = (id: string, newStatus: ListingStatusEnum) => {
     console.log("Change status to", newStatus);
-    // updateStatus({ id, status: newStatus }, ...);
+    const data: ListingUpdateRequest = {status: newStatus};
+    updateListingMutation({id, data});
   };
 
   const filteredListings = listings?.filter(item => {
     if (activeTab === "ALL") return true;
     return item.status === activeTab;
   });
-
-  // UI Helpers
-  const getStatusLabel = (status: ListingStatusEnum) => {
-    switch (status) {
-      case ListingStatusEnum.ACTIVE:
-        return "Aktív";
-      case ListingStatusEnum.FROZEN:
-        return "Foglalt (Jegelve)";
-      case ListingStatusEnum.ARCHIVED:
-        return "Eladva (Archivált)";
-      default:
-        return status;
-    }
-  };
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -74,7 +70,7 @@ export default function MyListings() {
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
+            onClick={() => setActiveTab(tab.id as ListingStatusEnum)}
             className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${
               activeTab === tab.id
                 ? "bg-slate-900 text-white border-slate-900 shadow-md"
@@ -142,7 +138,7 @@ export default function MyListings() {
                   </div>
                 </div>
 
-                {/* Price (Exact style match) */}
+                {/* Price */}
                 <div className="text-2xl font-bold text-primary mb-4">
                   {listing.price} Ft
                 </div>
@@ -160,14 +156,14 @@ export default function MyListings() {
                     </div>
                   </div>
 
-                  {/* Views (Styled like the Seller Review count) */}
+                  {/* Views */}
                   <div>
                     <span className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
                       Megtekintés
                     </span>
                     <div className="flex items-center gap-1.5 font-bold text-slate-700 text-sm">
                       <ShowCredentialsSVG className="w-4 h-4 text-slate-400" />
-                      <span>0</span> {/* listing.viewCount */}
+                      <span>0</span>
                     </div>
                   </div>
 
@@ -183,55 +179,24 @@ export default function MyListings() {
                   </div>
                 </div>
 
-                {/* 3. ACTIONS BAR (Divider + Buttons) */}
-                <div className="mt-auto pt-4 border-t border-slate-50 flex flex-col sm:flex-row gap-3 items-center">
-                  {/* Status Select */}
-                  <div className="relative w-full sm:w-auto min-w-[180px]">
-                    <div className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 flex items-center justify-between cursor-pointer transition-colors group/select">
-                      <div className="flex items-col gap-1">
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                          Státusz
-                        </span>
-                        <span
-                          className={`text-sm font-bold ${
-                            listing.status === ListingStatusEnum.ACTIVE
-                              ? "text-green-600"
-                              : listing.status === ListingStatusEnum.FROZEN
-                                ? "text-yellow-600"
-                                : "text-slate-500"
-                          }`}>
-                          {getStatusLabel(listing.status)}
-                        </span>
-                      </div>
-                      <KeyBoardArrowDownSVG className="w-4 h-4 text-slate-400" />
-                    </div>
-                    <select
-                      value={listing.status}
-                      onChange={e =>
-                        handleStatusChange(
-                          listing.id,
-                          e.target.value as ListingStatusEnum,
-                        )
-                      }
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                      <option value={ListingStatusEnum.ACTIVE}>Aktív</option>
-                      <option value={ListingStatusEnum.FROZEN}>
-                        Foglalt (Jegelve)
-                      </option>
-                      <option value={ListingStatusEnum.ARCHIVED}>
-                        Eladva (Archivált)
-                      </option>
-                    </select>
-                  </div>
+                {/* 3. ACTIONS BAR */}
+                <div className="mt-auto pt-4 border-t border-slate-50 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                  {/* Custom Dropdown (Inline & Opens Down) */}
+                  <ListingStatusDropdown
+                    currentStatus={listing.status}
+                    onStatusChange={newStatus =>
+                      handleStatusChange(String(listing.id), newStatus)
+                    }
+                  />
 
                   {/* Spacer */}
                   <div className="flex-1 hidden sm:block"></div>
 
-                  {/* Edit Button  */}
+                  {/* Edit Button */}
                   <Link
                     href={`/my-listings/edit/${listing.id}`}
                     className="w-full sm:w-auto">
-                    <button className="w-full bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2">
+                    <button className="w-full bg-primary hover:bg-[#5b4cc4] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 h-full">
                       <EditSVG className="w-4 h-4" />
                       Szerkesztés
                     </button>
