@@ -100,9 +100,9 @@ export default function RegisterPage() {
         router.refresh();
         router.push("/");
       },
-      onError: (error: any) => {
+      onError: error => {
         console.error("Register failed:", error);
-        const backendMessage = error?.response?.data?.message || error?.message;
+        const backendMessage = error?.message;
 
         if (backendMessage) {
           // Handle specific backend errors (e.g. "Email already exists")

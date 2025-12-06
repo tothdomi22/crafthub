@@ -1,15 +1,13 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import ChatSVG from "/public/svgs/chat.svg";
 import SearchSVG from "/public/svgs/search.svg";
-import ProfileDropdown from "@/app/components/global/ProfileDropdown"; // Import the new component
+import ProfileDropdown from "@/app/components/global/ProfileDropdown";
+import getCurrentUser from "@/app/utils/getCurrentUser";
+import {User} from "@/app/types/user"; // Import the new component
 
-export default function Header() {
-  // TODO: Replace with your actual auth hook
-  // const { isLoggedIn } = useAuth();
-  const isLoggedIn = true;
+export default async function Header() {
+  const user: User | null = await getCurrentUser();
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 transition-all">
@@ -42,7 +40,7 @@ export default function Header() {
 
         {/* --- RIGHT: ACTIONS --- */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          {isLoggedIn ? (
+          {user ? (
             <>
               {/* Create Listing CTA (Desktop) */}
               <Link href={"/create-listing"} className="hidden sm:block">
@@ -59,7 +57,7 @@ export default function Header() {
               </Link>
 
               {/* Profile Dropdown */}
-              <ProfileDropdown />
+              <ProfileDropdown user={user} />
             </>
           ) : (
             /* Logged Out State */

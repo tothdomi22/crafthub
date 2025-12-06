@@ -1,20 +1,14 @@
 "use client";
 
-import React, {useState, useRef, useEffect} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
+import {User} from "@/app/types/user";
 
-export default function ProfileDropdown() {
+export default function ProfileDropdown({user}: {user: User}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
-  // Mock User Data (Replace with your actual Auth Context/Hook)
-  const user = {
-    name: "Kiss János",
-    id: "123",
-    avatar: null, // or a URL string
-  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -47,17 +41,9 @@ export default function ProfileDropdown() {
         }`}>
         {/* Avatar */}
         <div className="flex-shrink-0">
-          {user.avatar ? (
-            <img
-              src={user.avatar}
-              alt="Profile"
-              className="w-9 h-9 rounded-full object-cover border border-slate-200"
-            />
-          ) : (
-            <div className="w-9 h-9 bg-indigo-50 text-primary rounded-full flex items-center justify-center font-bold text-sm border border-indigo-100">
-              {user.name.charAt(0)}
-            </div>
-          )}
+          <div className="w-9 h-9 bg-indigo-50 text-primary rounded-full flex items-center justify-center font-bold text-sm border border-indigo-100">
+            {user.name.charAt(0)}
+          </div>
         </div>
 
         {/* Dropdown Arrow (Animated) */}
