@@ -5,6 +5,7 @@ import Link from "next/link";
 import {User} from "@/app/types/user";
 import useLogout from "@/app/hooks/auth/useLogout";
 import {notifyError} from "@/app/utils/toastHelper";
+import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
 
 export default function ProfileDropdown({user}: {user: User}) {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,21 +54,7 @@ export default function ProfileDropdown({user}: {user: User}) {
         </div>
 
         {/* Dropdown Arrow (Animated) */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2.5}
-          stroke="currentColor"
-          className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}>
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-          />
-        </svg>
+        <KeyBoardArrowDownSVG />
       </button>
 
       {/* --- DROPDOWN MENU --- */}
