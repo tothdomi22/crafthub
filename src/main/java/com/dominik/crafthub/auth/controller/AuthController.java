@@ -33,12 +33,12 @@ public class AuthController {
     var cookie = authService.loginUser(request);
     return ResponseEntity.status(HttpStatus.OK)
         .header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(Map.of("message:", "Login success"));
+        .body(Map.of("message", "Login success"));
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> handleUserAlreadyExists() {
     return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(Map.of("message:", "User with this email already exists"));
+        .body(Map.of("message", "User with this email already exists"));
   }
 }

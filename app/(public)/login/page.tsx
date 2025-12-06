@@ -1,144 +1,253 @@
 "use client";
 
 import React, {FormEvent, useState} from "react";
+import Link from "next/link";
 import {useRouter} from "next/navigation";
+import Image from "next/image";
 import useLogin from "@/app/hooks/auth/useLogin";
+import HideCredentialsSVG from "/public/svgs/hide-credentials.svg";
+import ShowCredentialsSVG from "/public/svgs/show-credentials.svg";
 
-export default function Login() {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [emailError, setEmailError] = useState<string>("");
-  const [passwordError, setPasswordError] = useState<string>("");
+export default function LoginPage() {
   const router = useRouter();
 
-  const {mutate: loginMutation, isPending, error} = useLogin();
+  // Form States
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Error States
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [generalError, setGeneralError] = useState<string>("");
+
+  const {mutate: loginMutation, isPending} = useLogin();
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      return "Email is required";
+      return "Az email cím megadása kötelező.";
     } else if (!emailRegex.test(email)) {
-      return "Enter a valid email address";
+      return "Érvénytelen email formátum.";
     }
     return "";
   };
 
   const validatePassword = (password: string) => {
     if (!password) {
-      return "Password is required";
+      return "A jelszó megadása kötelező.";
     }
     return "";
+  };
+
+  const handleInputChange = (
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    value: string,
+    errorSetter: React.Dispatch<React.SetStateAction<string>>,
+  ) => {
+    setter(value);
+    if (errorSetter) errorSetter("");
+    if (generalError) setGeneralError("");
   };
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Validate fields
+    // 1. Reset Errors
+    setEmailError("");
+    setPasswordError("");
+    setGeneralError("");
+
+    // 2. Client-side Validation
     const emailValidationError = validateEmail(email);
     const passwordValidationError = validatePassword(password);
 
-    setEmailError(emailValidationError);
-    setPasswordError(passwordValidationError);
-
-    // If there are validation errors, don't submit
     if (emailValidationError || passwordValidationError) {
+      setEmailError(emailValidationError);
+      setPasswordError(passwordValidationError);
       return;
     }
+
+    // 3. API Call
     const data = {email, password};
 
     loginMutation(data, {
       onSuccess: async () => {
         // Give browser time to process Set-Cookie header
-        await new Promise(resolve => setTimeout(resolve, 100));
-        // Refresh to update auth state
+        await new Promise(resolve => setTimeout(resolve, 50));
         router.refresh();
-        // Then redirect
         router.push("/");
+      },
+      onError: error => {
+        console.error("Login failed:", error);
+        const backendMessage = error?.message;
+        if (backendMessage) {
+          setGeneralError("Hibás email cím vagy jelszó.");
+        } else {
+          setGeneralError("Váratlan hiba történt. Kérjük próbálja újra.");
+        }
       },
     });
   };
 
   return (
-    <section className="relative w-screen min-h-screen bg-brandWhite flex justify-evenly gap-10 items-center text-informedMainGray p-10">
-      <div className="w-[374px]">
-        <form className="flex flex-col gap-6" onSubmit={handleLogin}>
-          <div className="space-y-[10px]">
-            <div>
-              <div
-                className={`h-[50px] w-full flex flex-col justify-between rounded-[9px] p-2 border ${
-                  emailError || error
-                    ? "border-informedNegative bg-[#FFF5F3]"
-                    : "bg-informedDarkerBackground"
-                }`}>
-                <input
-                  id="email-input"
-                  className={`h-full w-full ${
-                    emailError || error
-                      ? "bg-[#FFF5F3]"
-                      : "bg-informedDarkerBackground"
-                  } focus:outline-none px-2 text-informedMainGray placeholder:text-informedMainGray`}
-                  type="text"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={e => {
-                    setEmail(e.target.value);
-                    if (emailError) setEmailError("");
-                  }}
+    <div className="min-h-screen flex bg-white">
+      {/* --- LEFT SIDE: IMAGE / BRANDING --- */}
+      <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
+        <Image
+          src="/images/auth-image.webp"
+          alt={"Register image"}
+          fill
+          priority
+          unoptimized
+          className="object-cover opacity-60"
+        />
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full text-white">
+          <div className="font-bold text-2xl tracking-wider">ARTISAN</div>
+          <div className="mb-12">
+            <h2 className="text-4xl font-bold mb-4 leading-tight">
+              Találd meg az egyedi
+              <br /> kézműves kincseket.
+            </h2>
+            <p className="text-slate-300 text-lg max-w-md">
+              Csatlakozz a közösségünkhöz és támogasd a hazai alkotókat
+              közvetlen vásárlással.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* --- RIGHT SIDE: FORM --- */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-[#F8F9FE] lg:bg-white">
+        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
+          <div className="text-center lg:text-left mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              Üdv újra!
+            </h1>
+            <p className="text-slate-500">
+              Jelentkezz be a fiókodba a folytatáshoz.
+            </p>
+          </div>
+
+          {/* --- GENERAL ERROR ALERT --- */}
+          {generalError && (
+            <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5 flex-shrink-0">
+                <path
+                  fillRule="evenodd"
+                  d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                  clipRule="evenodd"
                 />
-              </div>
+              </svg>
+              <span className="font-medium">{generalError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-5" noValidate>
+            {/* Email Field */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-bold text-slate-700 ml-1">
+                Email cím
+              </label>
+              <input
+                type="email" // Keep this! It ensures mobile keyboards show the "@" symbol
+                name="email"
+                placeholder="pelda@email.hu"
+                value={email}
+                onChange={e =>
+                  handleInputChange(setEmail, e.target.value, setEmailError)
+                }
+                // Removed 'required' attribute just to be safe, though noValidate overrides it
+                className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium ${
+                  emailError || generalError
+                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                }`}
+              />
               {emailError && (
-                <p className="text-informedNegative text-[13px] mt-1">
+                <p className="text-red-500 text-[13px] font-medium ml-1">
                   {emailError}
                 </p>
               )}
             </div>
 
-            <div>
-              <div
-                className={`h-[50px] w-full flex flex-col justify-between rounded-[9px] p-2 border ${
-                  passwordError || error
-                    ? "border-informedNegative bg-[#FFF5F3]"
-                    : "bg-informedDarkerBackground"
-                }`}>
+            {/* Password Field */}
+            <div className="space-y-1.5 relative">
+              <div className="flex justify-between items-center ml-1">
+                <label className="text-sm font-bold text-slate-700">
+                  Jelszó
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-bold text-primary hover:text-[#5b4cc4] transition-colors">
+                  Elfelejtetted?
+                </Link>
+              </div>
+              <div className="relative">
                 <input
-                  className={`h-full w-full ${
-                    passwordError || error
-                      ? "bg-[#FFF5F3]"
-                      : "bg-informedDarkerBackground"
-                  } focus:outline-none px-2 text-informedMainGray placeholder:text-informedMainGray`}
-                  type="password"
-                  id="password-input"
-                  placeholder="Enter your password"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
                   value={password}
-                  onChange={e => {
-                    setPassword(e.target.value);
-                    if (passwordError) setPasswordError("");
-                  }}
+                  onChange={e =>
+                    handleInputChange(
+                      setPassword,
+                      e.target.value,
+                      setPasswordError,
+                    )
+                  }
+                  className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium pr-12 ${
+                    passwordError || generalError
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
+                      : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                  }`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                  {showPassword ? (
+                    <HideCredentialsSVG />
+                  ) : (
+                    <ShowCredentialsSVG />
+                  )}
+                </button>
               </div>
               {passwordError && (
-                <p className="text-informedNegative text-[13px] mt-1">
+                <p className="text-red-500 text-[13px] font-medium ml-1">
                   {passwordError}
                 </p>
               )}
             </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
+              {isPending ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                "Bejelentkezés"
+              )}
+            </button>
+          </form>
+
+          {/* Footer / Register Link */}
+          <div className="mt-8 text-center text-sm text-slate-500 font-medium">
+            Nincs még fiókod?{" "}
+            <Link
+              href="/register"
+              className="text-primary font-bold hover:underline">
+              Regisztrálj ingyen
+            </Link>
           </div>
-
-          <button
-            id="sign-in-button"
-            className="h-[55px] w-full flex items-center justify-center hover:underline bg-[#5271FF] text-[17px] font-bold text-brandWhite rounded-[10px] disabled:opacity-50"
-            disabled={isPending}
-            type="submit">
-            {isPending ? "Loading..." : "Sign in"}
-          </button>
-
-          {error?.message && (
-            <p className="text-informedNegative -mt-3 text-center font-medium">
-              {error.message}
-            </p>
-          )}
-        </form>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
