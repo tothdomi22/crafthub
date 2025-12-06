@@ -5,9 +5,10 @@ import ArrowBackSVG from "/public/svgs/arrow-back.svg";
 import ShareSVG from "/public/svgs/share.svg";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
-import ProfileDropdown from "@/app/components/global/ProfileDropdown"; // Import here too
+import ProfileDropdown from "@/app/components/global/ProfileDropdown";
+import {User} from "@/app/types/user";
 
-export default function SubHeader() {
+export default function SubHeader({user}: {user: User}) {
   const router = useRouter();
   // TODO: Replace with auth hook
   const isLoggedIn = true;
@@ -58,7 +59,7 @@ export default function SubHeader() {
           <div className="h-6 w-px bg-slate-200 mx-1"></div>
 
           {isLoggedIn ? (
-            <ProfileDropdown />
+            <ProfileDropdown user={user} />
           ) : (
             <Link href="/login" className="text-sm font-bold text-primary">
               Belépés

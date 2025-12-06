@@ -16,13 +16,14 @@ import {useRouter} from "next/navigation";
 import useCreateConversation from "@/app/hooks/conversation/useCreateConversation";
 import useCreateFirstMessage from "@/app/hooks/message/useCreateFirstMessage";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
+import {User} from "@/app/types/user";
 
 export default function ListingDetails({
   listingId,
-  userId,
+  user,
 }: {
   listingId: string;
-  userId: string;
+  user: User;
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -228,7 +229,7 @@ export default function ListingDetails({
 
           {/* Action Bar (Sticky on Desktop too for ease) */}
 
-          {String(listingData.user.id) != userId && (
+          {listingData.user.id != user.id && (
             <div className="sticky bottom-4 z-40 pt-2">
               {listingData.status === ListingStatusEnum.ACTIVE ? (
                 <button

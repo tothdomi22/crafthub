@@ -4,12 +4,16 @@ import getCurrentUser from "@/app/utils/getCurrentUser";
 import MessagesInbox from "@/app/components/message/MessagesInbox";
 
 export default async function MessagesInboxPage() {
-  const userId = await getCurrentUser();
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="h-screen bg-[#F8F9FE] font-sans text-slate-800 flex flex-col overflow-hidden">
-      <SubHeader />
-      <MessagesInbox userId={userId} />
+      <SubHeader user={user} />
+      <MessagesInbox user={user} />
     </div>
   );
 }
