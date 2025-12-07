@@ -11,6 +11,7 @@ import {formatDate} from "@/app/components/utils";
 import Link from "next/link";
 import LocationSVG from "/public/svgs/location.svg";
 import ChatSVG from "/public/svgs/chat.svg";
+import EditSVG from "/public/svgs/edit.svg"; // Import Edit Icon
 import SendMessageModal from "@/app/components/message/SendMessageModal";
 import {useRouter} from "next/navigation";
 import useCreateConversation from "@/app/hooks/conversation/useCreateConversation";
@@ -87,6 +88,7 @@ export default function ListingDetails({
       </div>
     );
   }
+
   const handleSendMessageButton = () => {
     if (listingData.conversationId) {
       router.push(`/messages/${listingData.conversationId}`);
@@ -94,6 +96,9 @@ export default function ListingDetails({
       setIsMessageModalOpen(true);
     }
   };
+
+  const isOwner = listingData.user.id === user.id;
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumbs */}
@@ -228,10 +233,10 @@ export default function ListingDetails({
           </div>
 
           {/* Action Bar (Sticky on Desktop too for ease) */}
-
-          {listingData.user.id != user.id && (
-            <div className="sticky bottom-4 z-40 pt-2">
-              {listingData.status === ListingStatusEnum.ACTIVE ? (
+          <div className="sticky bottom-4 z-40 pt-2">
+            {!isOwner ? (
+              // --- BUYER VIEW: Message Button ---
+              listingData.status === ListingStatusEnum.ACTIVE ? (
                 <button
                   onClick={handleSendMessageButton}
                   className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
@@ -248,12 +253,26 @@ export default function ListingDetails({
                     ? "Foglalt"
                     : "Eladva"}
                 </button>
-              )}
-              <p className="text-center text-xs text-slate-400 mt-3 font-medium">
-                A fizetés és a szállítás közvetlenül az eladóval történik.
-              </p>
-            </div>
-          )}
+              )
+            ) : (
+              // --- OWNER VIEW: Edit Button ---
+              <Link
+                href={`/my-listings/edit/${listingData.id}`}
+                className="block w-full">
+                <button className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-slate-900/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+                  <EditSVG className="w-5 h-5" />
+                  Hirdetés szerkesztése
+                </button>
+              </Link>
+            )}
+
+            <p className="text-center text-xs text-slate-400 mt-3 font-medium">
+              {!isOwner
+                ? "A fizetés és a szállítás közvetlenül az eladóval történik."
+                : "A hirdetés szerkesztésével frissítheted az adatokat."}
+            </p>
+          </div>
+
           {listingData && (
             <SendMessageModal
               isOpen={isMessageModalOpen}
