@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import EditSVG from "/public/svgs/edit.svg";
 import UserSVG from "/public/svgs/user.svg";
@@ -10,38 +10,92 @@ import TrashSVG from "/public/svgs/bin.svg";
 import CameraSVG from "/public/svgs/add-photo.svg";
 import {useRouter} from "next/navigation";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
+import {useQuery} from "@tanstack/react-query";
+import {
+  Profile,
+  ProfileAndUserUpdateProps,
+  ProfileUpdateRequest,
+} from "@/app/types/profile";
+import useGetProfile from "@/app/hooks/profile/useGetProfile";
+import {User, UserUpdateRequest} from "@/app/types/user";
+import useUpdateUser from "@/app/hooks/user/useUpdateUser";
+import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
 
-export default function Settings() {
+export default function Settings({user}: {user: User}) {
+  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-
-  // --- Form States ---
-  const [profile, setProfile] = useState({
-    name: "Kiss János",
-    email: "janos.kiss@example.com",
-    bio: "Szenvedélyes asztalos és hobbiművész. Szeretem a természetes anyagokat.",
-    city: "Budapest, XI. kerület",
+  const [profile, setProfile] = useState<ProfileAndUserUpdateProps>({
+    name: "",
+    email: "",
+    bio: "",
+    city: "",
+    birthDate: "",
   });
-
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
     confirm: "",
   });
 
-  const [darkMode, setDarkMode] = useState(false);
+  const {data: profileData} = useQuery<Profile>({
+    queryFn: () => useGetProfile(String(user.id)),
+    queryKey: ["profile" + user.id],
+  });
+
+  const {mutateAsync: userUpdateMutation} = useUpdateUser();
+  const {mutateAsync: profileUpdateMutation} = useUpdateProfile({
+    userId: String(user.id),
+  });
+
+  useEffect(() => {
+    if (profileData) {
+      setProfile({
+        name: profileData.user.name,
+        email: profileData.user.email,
+        bio: profileData.bio || "",
+        city: profileData.city || "",
+        birthDate: profileData.birthDate || "",
+      });
+    }
+  }, [profileData]);
 
   // --- Handlers ---
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    if (!profileData) {
+      return;
+    }
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    const hasProfileChanged =
+      profile.bio !== profileData.bio ||
+      profile.birthDate !== profileData.birthDate ||
+      profile.city !== profileData.city;
+
+    try {
+      if (profileData.user.name !== profile.name) {
+        const data: UserUpdateRequest = {name: profile.name};
+        await userUpdateMutation({
+          data: data,
+          id: String(user.id),
+        });
+      }
+      if (hasProfileChanged) {
+        const profileUpdateData: ProfileUpdateRequest = {
+          city: profile.city,
+          bio: profile.bio,
+          birthDate: profile.birthDate,
+        };
+        await profileUpdateMutation(profileUpdateData);
+      }
       notifySuccess("Profil sikeresen frissítve!");
-    }, 1000);
+    } catch (e) {
+      console.error(e);
+      notifyError("Hiba a profile frissítése közben!");
+    }
+    setIsLoading(false);
   };
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -73,6 +127,17 @@ export default function Settings() {
     "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-slate-800 font-medium placeholder-slate-400";
   const sectionClass =
     "bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 mb-8";
+
+  if (!profileData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="h-12 w-12 bg-slate-200 rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-slate-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
   return (
     <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-3xl font-bold text-slate-900 mb-2">Beállítások</h1>
@@ -121,13 +186,25 @@ export default function Settings() {
             </div>
           </div>
 
+          <div className="mb-6">
+            <label className={labelClass}>Teljes név</label>
+            <input
+              type="text"
+              value={profile.name}
+              onChange={e => setProfile({...profile, name: e.target.value})}
+              className={inputClass}
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className={labelClass}>Teljes név</label>
+              <label className={labelClass}>Születési dátum</label>
               <input
-                type="text"
-                value={profile.name}
-                onChange={e => setProfile({...profile, name: e.target.value})}
+                type="date"
+                value={profile.birthDate}
+                onChange={e =>
+                  setProfile({...profile, birthDate: e.target.value})
+                }
                 className={inputClass}
               />
             </div>

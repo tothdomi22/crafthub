@@ -10,8 +10,16 @@ export interface Profile {
   user: User;
 }
 
-export interface ProfileCreationRequest {
+export interface ProfileUpdateRequest {
   birthDate: string;
   city: string;
   bio: string;
+}
+
+export interface ProfileAndUserUpdateProps {
+  name: string;
+  email: string;
+  bio: string;
+  city: string;
+  birthDate: string;
 }

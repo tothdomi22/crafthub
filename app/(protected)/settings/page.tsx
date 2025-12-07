@@ -15,7 +15,7 @@ export default async function SettingsPage() {
   return (
     <div className="min-h-screen bg-[#F8F9FE] pb-20">
       <SubHeader user={user} />
-      <Settings />
+      <Settings user={user} />
     </div>
   );
 }

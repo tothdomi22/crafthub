@@ -10,3 +10,7 @@ export interface User {
   role: UserRole;
   createdAt: string;
 }
+
+export interface UserUpdateRequest {
+  name: string;
+}
