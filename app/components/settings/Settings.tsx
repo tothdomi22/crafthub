@@ -22,13 +22,13 @@ import useUpdateUser from "@/app/hooks/user/useUpdateUser";
 import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
 import useChangePassword from "@/app/hooks/auth/useChangePassword";
 import DeleteAccountModal from "@/app/components/settings/DeleteAccountModal";
+import useDeleteUser from "@/app/hooks/user/useDeleteUser";
 
 export default function Settings({user}: {user: User}) {
   const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [profile, setProfile] = useState<ProfileAndUserUpdateProps>({
     name: "",
     email: "",
@@ -52,6 +52,8 @@ export default function Settings({user}: {user: User}) {
     userId: String(user.id),
   });
   const {mutate: changePasswordMutation} = useChangePassword();
+  const {mutate: deleteUserMutation, isPending: isDeleteUserMutationPending} =
+    useDeleteUser();
 
   useEffect(() => {
     if (profileData) {
@@ -143,20 +145,15 @@ export default function Settings({user}: {user: User}) {
   };
 
   const handleDeleteAccount = async () => {
-    setIsDeleting(true);
-    try {
-      // Simulate API call to delete user
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      notifySuccess("Fiók sikeresen törölve.");
-      setIsDeleteModalOpen(false);
-      router.push("/login");
-    } catch (error) {
-      console.error(error);
-      notifyError("Hiba történt a törlés során.");
-    } finally {
-      setIsDeleting(false);
-    }
+    deleteUserMutation(undefined, {
+      onSuccess() {
+        setIsDeleteModalOpen(false);
+        router.push("/");
+      },
+      onError() {
+        notifyError("Hiba történt a törlés során.");
+      },
+    });
   };
 
   // Styles
@@ -411,7 +408,7 @@ export default function Settings({user}: {user: User}) {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteAccount}
-        isLoading={isDeleting}
+        isLoading={isDeleteUserMutationPending}
       />
     </main>
   );

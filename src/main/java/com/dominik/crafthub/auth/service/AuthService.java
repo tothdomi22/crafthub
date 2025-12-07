@@ -79,13 +79,7 @@ public class AuthService {
   }
 
   public ResponseCookie logoutUser() {
-    return ResponseCookie.from("accessToken", "")
-        .httpOnly(true)
-        .secure(false) // set true for prod
-        .path("/")
-        .maxAge(0) // delete cookie
-        .sameSite("Lax")
-        .build();
+    return deleteResponseCookie();
   }
 
   public UserEntity getCurrentUser() {
@@ -105,6 +99,16 @@ public class AuthService {
         .secure(false) // set true for prod
         .path("/")
         .maxAge(jwtConfig.getAccessTokenExpiration())
+        .sameSite("Lax")
+        .build();
+  }
+
+  public ResponseCookie deleteResponseCookie() {
+    return ResponseCookie.from("accessToken", "")
+        .httpOnly(true)
+        .secure(false) // set true for prod
+        .path("/")
+        .maxAge(0) // delete cookie
         .sameSite("Lax")
         .build();
   }
