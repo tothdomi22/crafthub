@@ -16,7 +16,7 @@ export interface ListingUpdateRequest {
   city?: string;
   description?: string;
   subCategoryId?: number;
-  status: ListingStatusEnum;
+  status?: ListingStatusEnum;
 }
 
 export enum ListingStatusEnum {

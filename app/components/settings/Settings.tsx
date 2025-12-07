@@ -21,11 +21,14 @@ import {ChangePasswordRequest, User, UserUpdateRequest} from "@/app/types/user";
 import useUpdateUser from "@/app/hooks/user/useUpdateUser";
 import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
 import useChangePassword from "@/app/hooks/auth/useChangePassword";
+import DeleteAccountModal from "@/app/components/settings/DeleteAccountModal";
 
 export default function Settings({user}: {user: User}) {
   const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [profile, setProfile] = useState<ProfileAndUserUpdateProps>({
     name: "",
     email: "",
@@ -139,13 +142,20 @@ export default function Settings({user}: {user: User}) {
     setPasswords({current: "", new: "", confirm: ""});
   };
 
-  const handleDeleteAccount = () => {
-    const confirmed = window.confirm(
-      "Biztosan törölni szeretnéd a fiókodat? Ez a művelet nem visszavonható.",
-    );
-    if (confirmed) {
-      notifySuccess("Fiók törölve.");
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      // Simulate API call to delete user
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      notifySuccess("Fiók sikeresen törölve.");
+      setIsDeleteModalOpen(false);
       router.push("/login");
+    } catch (error) {
+      console.error(error);
+      notifyError("Hiba történt a törlés során.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -391,12 +401,18 @@ export default function Settings({user}: {user: User}) {
 
         <div className="flex justify-end">
           <button
-            onClick={handleDeleteAccount}
+            onClick={() => setIsDeleteModalOpen(true)}
             className="bg-white text-red-600 border border-red-200 hover:bg-red-600 hover:text-white hover:border-red-600 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]">
             Fiók végleges törlése
           </button>
         </div>
       </section>
+      <DeleteAccountModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteAccount}
+        isLoading={isDeleting}
+      />
     </main>
   );
 }
