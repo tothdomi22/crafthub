@@ -10,3 +10,13 @@ export interface User {
   role: UserRole;
   createdAt: string;
 }
+
+export interface UserUpdateRequest {
+  name: string;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+}

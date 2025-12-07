@@ -53,14 +53,14 @@ export default function RegisterPage() {
   };
 
   // --- Helper to clear errors on type ---
-  const handleInputChange = (
-    setter: React.Dispatch<React.SetStateAction<any>>,
-    value: any,
+  const handleInputChange = <T,>(
+    setter: React.Dispatch<React.SetStateAction<T>>,
+    value: T,
     errorSetter?: React.Dispatch<React.SetStateAction<string>>,
   ) => {
     setter(value);
     if (errorSetter) errorSetter("");
-    if (generalError) setGeneralError("");
+    setGeneralError(""); // from component scope
   };
 
   const handleRegister = async (e: FormEvent) => {
@@ -305,7 +305,7 @@ export default function RegisterPage() {
                   }
                   className={`mt-1 w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary accent-primary cursor-pointer ${
                     termsError
-                      ? "outline outline-2 outline-red-500 outline-offset-1"
+                      ? "outline-2 outline-red-500 outline-offset-1"
                       : ""
                   }`}
                 />

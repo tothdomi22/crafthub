@@ -6,12 +6,20 @@ import {User} from "@/app/types/user";
 import useLogout from "@/app/hooks/auth/useLogout";
 import {notifyError} from "@/app/utils/toastHelper";
 import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
+import {useQuery} from "@tanstack/react-query";
+import {Profile} from "@/app/types/profile";
+import useGetProfile from "@/app/hooks/profile/useGetProfile";
 
 export default function ProfileDropdown({user}: {user: User}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {mutate: logoutMutation} = useLogout();
+
+  const {data: profileData} = useQuery<Profile>({
+    queryFn: () => useGetProfile(String(user.id)),
+    queryKey: ["profile" + user.id],
+  });
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -63,7 +71,7 @@ export default function ProfileDropdown({user}: {user: User}) {
           {/* Header section with Name */}
           <div className="px-5 py-4 border-b border-slate-100 bg-slate-50/50">
             <p className="text-sm font-bold text-slate-900 truncate">
-              {user.name}
+              {profileData?.user.name || user.name}
             </p>
             <Link
               href={`/user/${user.id}`}

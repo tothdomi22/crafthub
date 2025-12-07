@@ -1,11 +1,11 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {Profile, ProfileCreationRequest} from "@/app/types/profile";
+import {Profile, ProfileUpdateRequest} from "@/app/types/profile";
 
 export default function useUpdateProfile({userId}: {userId: string}) {
   const queryClient = useQueryClient();
   const queryKey = ["conversation" + userId];
   return useMutation({
-    mutationFn: async (data: ProfileCreationRequest) => {
+    mutationFn: async (data: ProfileUpdateRequest) => {
       const response = await fetch("/api/profile/update", {
         method: "PUT",
         body: JSON.stringify(data),

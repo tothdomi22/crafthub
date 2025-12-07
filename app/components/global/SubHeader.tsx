@@ -7,6 +7,7 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 import ProfileDropdown from "@/app/components/global/ProfileDropdown";
 import {User} from "@/app/types/user";
+import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 
 export default function SubHeader({user}: {user: User}) {
   const router = useRouter();
@@ -19,10 +20,11 @@ export default function SubHeader({user}: {user: User}) {
       .writeText(url)
       .then(() => {
         // You might want to use your notifySuccess toast here
-        alert("Link másolva!");
+        notifySuccess("Link másolva!");
       })
       .catch(err => {
         console.error("Failed to copy: ", err);
+        notifyError("Hiba a másolás közben!");
       });
   };
 

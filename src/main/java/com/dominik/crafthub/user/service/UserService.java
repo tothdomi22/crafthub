@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -42,8 +43,8 @@ public class UserService {
     return userMapper.toDto(user);
   }
 
-  public void deleteUser() {
-   var user = authService.getCurrentUser();
+  public ResponseCookie deleteUser() {
+    var user = authService.getCurrentUser();
     var profile = profileRepository.findByUserEntity_Id(user.getId()).orElse(null);
     if (profile != null) {
       profile.setBio(null);
@@ -58,5 +59,6 @@ public class UserService {
     user.setName(name);
     user.setDeletedAt(OffsetDateTime.now());
     userRepository.save(user);
+    return authService.deleteResponseCookie();
   }
 }

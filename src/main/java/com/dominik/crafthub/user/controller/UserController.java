@@ -8,9 +8,11 @@ import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
 import com.dominik.crafthub.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,9 +42,11 @@ public class UserController {
   }
 
   @DeleteMapping
-  public ResponseEntity<?> delete() {
-    userService.deleteUser();
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  public ResponseEntity<?> delete(HttpServletResponse response) {
+    var cookie = userService.deleteUser();
+    return ResponseEntity.status(HttpStatus.OK)
+        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        .body(Map.of("message", "Account deleted successfully!"));
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
