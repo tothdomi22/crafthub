@@ -14,3 +14,9 @@ export interface User {
 export interface UserUpdateRequest {
   name: string;
 }
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+}

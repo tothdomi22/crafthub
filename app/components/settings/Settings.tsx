@@ -17,9 +17,10 @@ import {
   ProfileUpdateRequest,
 } from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
-import {User, UserUpdateRequest} from "@/app/types/user";
+import {ChangePasswordRequest, User, UserUpdateRequest} from "@/app/types/user";
 import useUpdateUser from "@/app/hooks/user/useUpdateUser";
 import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
+import useChangePassword from "@/app/hooks/auth/useChangePassword";
 
 export default function Settings({user}: {user: User}) {
   const [darkMode, setDarkMode] = useState(false);
@@ -47,6 +48,7 @@ export default function Settings({user}: {user: User}) {
   const {mutateAsync: profileUpdateMutation} = useUpdateProfile({
     userId: String(user.id),
   });
+  const {mutate: changePasswordMutation} = useChangePassword();
 
   useEffect(() => {
     if (profileData) {
@@ -100,13 +102,40 @@ export default function Settings({user}: {user: User}) {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      !passwords.new.trim() ||
+      !passwords.confirm.trim() ||
+      !passwords.current.trim()
+    ) {
+      notifyError("Kérlek adj meg értékeket a jelszavaknak!");
+      return;
+    }
+
+    if (passwords.new.length < 6 || passwords.new.length > 30) {
+      notifyError("A jelszónak 6 és 30 karakter között kell lenni!");
+      return;
+    }
+
     if (passwords.new !== passwords.confirm) {
       notifyError("Az új jelszavak nem egyeznek.");
       return;
     }
-
-    // Simulate API call
-    notifySuccess("Jelszó sikeresen megváltoztatva.");
+    const data: ChangePasswordRequest = {
+      oldPassword: passwords.current,
+      newPassword: passwords.new,
+      newPasswordConfirmation: passwords.confirm,
+    };
+    changePasswordMutation(
+      {data},
+      {
+        onSuccess() {
+          notifySuccess("Jelszó sikeresen megváltoztatva.");
+        },
+        onError() {
+          notifyError("Hiba történt a jelszó megváltoztatása közben!");
+        },
+      },
+    );
     setPasswords({current: "", new: "", confirm: ""});
   };
 
