@@ -1,11 +1,15 @@
 package com.dominik.crafthub.auth.service;
 
+import com.dominik.crafthub.auth.exception.NewPasswordCannotMatchTheOldOneException;
+import com.dominik.crafthub.auth.exception.OldPasswordDoesntMatchException;
+import com.dominik.crafthub.auth.exception.PasswordsDontMatchException;
 import com.dominik.crafthub.jwt.config.JwtConfig;
 import com.dominik.crafthub.jwt.service.JwtService;
 import com.dominik.crafthub.profile.mapper.ProfileMapper;
 import com.dominik.crafthub.profile.repository.ProfileRepository;
 import com.dominik.crafthub.user.dto.UserDto;
 import com.dominik.crafthub.user.dto.UserLoginRequest;
+import com.dominik.crafthub.user.dto.UserPasswordChangeRequest;
 import com.dominik.crafthub.user.dto.UserRegisterRequest;
 import com.dominik.crafthub.user.entity.UserEntity;
 import com.dominik.crafthub.user.entity.UserRole;
@@ -33,7 +37,7 @@ public class AuthService {
   private PasswordEncoder passwordEncoder;
   private AuthenticationManager authenticationManager;
   private JwtService jwtService;
-  
+
   public UserDto registerUser(UserRegisterRequest request) {
     var userExists = userRepository.existsByEmail(request.email());
     if (userExists) {
@@ -50,18 +54,28 @@ public class AuthService {
     return userMapper.toDto(userEntity);
   }
 
+  public ResponseCookie changePassword(UserPasswordChangeRequest request) {
+    var user = getCurrentUser();
+    var newPasswordEncoded = passwordEncoder.encode(request.newPassword());
+    if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+      throw new OldPasswordDoesntMatchException();
+    }
+    if (!request.newPassword().equals(request.newPasswordConfirmation())) {
+      throw new PasswordsDontMatchException();
+    }
+    if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+      throw new NewPasswordCannotMatchTheOldOneException();
+    }
+    user.setPassword(newPasswordEncoded);
+    userRepository.save(user);
+    return createResponseCookie(user);
+  }
+
   public ResponseCookie loginUser(UserLoginRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.email(), request.password()));
     var user = userRepository.findByEmail(request.email()).orElseThrow();
-    var accessToken = jwtService.generateAccessToken(user);
-    return ResponseCookie.from("accessToken", accessToken.toString())
-        .httpOnly(true)
-        .secure(false) // set true for prod
-        .path("/")
-        .maxAge(jwtConfig.getAccessTokenExpiration())
-        .sameSite("Lax")
-        .build();
+    return createResponseCookie(user);
   }
 
   public ResponseCookie logoutUser() {
@@ -82,5 +96,16 @@ public class AuthService {
       throw new UserNotFoundException();
     }
     return user;
+  }
+
+  public ResponseCookie createResponseCookie(UserEntity user) {
+    var accessToken = jwtService.generateAccessToken(user);
+    return ResponseCookie.from("accessToken", accessToken.toString())
+        .httpOnly(true)
+        .secure(false) // set true for prod
+        .path("/")
+        .maxAge(jwtConfig.getAccessTokenExpiration())
+        .sameSite("Lax")
+        .build();
   }
 }
