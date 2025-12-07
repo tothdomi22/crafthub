@@ -6,20 +6,21 @@ import ShareSVG from "/public/svgs/share.svg";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import ProfileDropdown from "@/app/components/global/ProfileDropdown";
+import NotificationDropdown from "@/app/components/global/NotificationDropdown"; // <--- Import
 import {User} from "@/app/types/user";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 
 export default function SubHeader({user}: {user: User}) {
   const router = useRouter();
-  // TODO: Replace with auth hook
-  const isLoggedIn = true;
+
+  // Use the user prop to check auth status
+  const isLoggedIn = !!user;
 
   const copyURL = () => {
     const url = window.location.href;
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        // You might want to use your notifySuccess toast here
         notifySuccess("Link másolva!");
       })
       .catch(err => {
@@ -49,7 +50,7 @@ export default function SubHeader({user}: {user: User}) {
         </Link>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={copyURL}
             className="text-slate-400 hover:text-primary p-2 rounded-xl hover:bg-slate-50 transition-colors"
@@ -61,9 +62,15 @@ export default function SubHeader({user}: {user: User}) {
           <div className="h-6 w-px bg-slate-200 mx-1"></div>
 
           {isLoggedIn ? (
-            <ProfileDropdown user={user} />
+            <>
+              {/* Notification Dropdown (New) */}
+              <NotificationDropdown />
+
+              {/* Profile Dropdown */}
+              <ProfileDropdown user={user} />
+            </>
           ) : (
-            <Link href="/login" className="text-sm font-bold text-primary">
+            <Link href="/login" className="text-sm font-bold text-primary px-3">
               Belépés
             </Link>
           )}
