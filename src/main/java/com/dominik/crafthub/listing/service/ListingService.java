@@ -2,7 +2,6 @@ package com.dominik.crafthub.listing.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.conversation.repository.ConversationRepository;
-import com.dominik.crafthub.listing.controller.ListingMapper;
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingDto;
 import com.dominik.crafthub.listing.dto.ListingSingleViewDto;
@@ -11,6 +10,7 @@ import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
+import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
 import com.dominik.crafthub.user.service.UserService;

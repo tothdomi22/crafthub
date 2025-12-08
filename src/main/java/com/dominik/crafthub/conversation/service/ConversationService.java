@@ -12,7 +12,7 @@ import com.dominik.crafthub.conversation.exception.NotPartOfThisConversationExce
 import com.dominik.crafthub.conversation.exception.YourConversationException;
 import com.dominik.crafthub.conversation.mapper.ConversationMapper;
 import com.dominik.crafthub.conversation.repository.ConversationRepository;
-import com.dominik.crafthub.listing.controller.ListingMapper;
+import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.message.mapper.MessageMapper;
