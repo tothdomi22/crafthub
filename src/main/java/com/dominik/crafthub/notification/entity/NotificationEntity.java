@@ -3,7 +3,6 @@ package com.dominik.crafthub.notification.entity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -13,7 +12,7 @@ import org.hibernate.type.SqlTypes;
 @Setter
 @Entity
 @Table(name = "notification")
-public class Notification {
+public class NotificationEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
@@ -29,9 +28,9 @@ public class Notification {
   @Column(name = "type")
   private NotificationTypeEnum type;
 
-  @Column(name = "data")
+  @Column(name = "data", columnDefinition = "jsonb")
   @JdbcTypeCode(SqlTypes.JSON)
-  private Map<String, Object> data;
+  private NotificationPayload data;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
