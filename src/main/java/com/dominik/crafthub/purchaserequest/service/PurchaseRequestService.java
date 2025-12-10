@@ -4,14 +4,17 @@ import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
+import com.dominik.crafthub.notification.dto.PurchaseRequestNotificationPayload;
+import com.dominik.crafthub.notification.entity.NotificationTypeEnum;
+import com.dominik.crafthub.notification.service.NotificationService;
+import com.dominik.crafthub.purchaserequest.dto.PurchaseRequestDecideRequest;
 import com.dominik.crafthub.purchaserequest.dto.PurchaseRequestDto;
+import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestPatchStatusEnum;
 import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestStatusEnum;
-import com.dominik.crafthub.purchaserequest.exception.CantPurchaseArchivedListingException;
-import com.dominik.crafthub.purchaserequest.exception.CantPurchaseYourOwnListingException;
-import com.dominik.crafthub.purchaserequest.exception.ListingIsPurchasedException;
-import com.dominik.crafthub.purchaserequest.exception.YourPurchaseIsPendingException;
+import com.dominik.crafthub.purchaserequest.exception.*;
 import com.dominik.crafthub.purchaserequest.mapper.PurchaseRequestMapper;
 import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
+import java.beans.Transient;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +26,9 @@ public class PurchaseRequestService {
   private final AuthService authService;
   private final PurchaseRequestRepostitory purchaseRequestRepostitory;
   private final PurchaseRequestMapper purchaseRequestMapper;
+  private final NotificationService notificationService;
 
+  @Transient
   public PurchaseRequestDto createRequest(long listingId) {
     var user = authService.getCurrentUser();
     var listing = listingRepository.findById(listingId).orElse(null);
@@ -55,6 +60,40 @@ public class PurchaseRequestService {
     purchaseRequestRepostitory.save(purchaseRequestEntity);
     purchaseRequestEntity.setRequesterUser(user);
     purchaseRequestEntity.setListing(listing);
+    var payload =
+        new PurchaseRequestNotificationPayload(
+            purchaseRequestEntity.getId(),
+            listing.getId(),
+            listing.getName(),
+            user.getId(),
+            user.getName());
+    notificationService.createNotification(
+        listing.getUserEntity(), NotificationTypeEnum.PURCHASE_REQUEST, payload);
     return purchaseRequestMapper.toDto(purchaseRequestEntity);
+  }
+
+  public PurchaseRequestDto decideRequest(
+      long purchaseRequestId, PurchaseRequestDecideRequest request) {
+    var purchaseRequest = purchaseRequestRepostitory.findById(purchaseRequestId).orElse(null);
+    if (purchaseRequest == null) {
+      throw new PurchaseRequestNotFoundException();
+    }
+    if (!purchaseRequest.getStatus().equals(PurchaseRequestStatusEnum.PENDING)) {
+      throw new CantAcceptNotPendingPurchaseRequestException();
+    }
+    var user = authService.getCurrentUser();
+    if (!purchaseRequest.getRequesterUser().getId().equals(user.getId())) {
+      throw new NotTheOwnerOfPurchaseRequestException();
+    }
+    var listing = listingRepository.findById(purchaseRequest.getListing().getId()).orElseThrow();
+    if (request.status().equals(PurchaseRequestPatchStatusEnum.ACCEPT)) {
+      listing.setStatus(ListingStatusEnum.ARCHIVED);
+      listingRepository.save(listing);
+      purchaseRequest.setStatus(PurchaseRequestStatusEnum.ACCEPTED);
+    } else {
+      purchaseRequest.setStatus(PurchaseRequestStatusEnum.DECLINED);
+    }
+    purchaseRequestRepostitory.save(purchaseRequest);
+    return purchaseRequestMapper.toDto(purchaseRequest);
   }
 }
