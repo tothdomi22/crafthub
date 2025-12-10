@@ -278,7 +278,8 @@ export default function ListingDetails({
                       : "Üzenj az eladónak"}
                   </button>
 
-                  {/* 2. Secondary: I Purchased This (New Feature) */}
+                  {/* 2. Secondary: I Purchased This */}
+                  {/*TODO: Render this conditionally based on if i have a pending request already*/}
                   <button
                     onClick={() => setIsPurchaseModalOpen(true)}
                     className="w-full bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-200 py-3 rounded-xl font-bold text-base shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2">
