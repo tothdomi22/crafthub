@@ -23,9 +23,7 @@ import LocationSVG from "/public/svgs/location.svg";
 import ChatSVG from "/public/svgs/chat.svg";
 import EditSVG from "/public/svgs/edit.svg";
 import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
-
-// TODO: Create this hook to hit your backend endpoint for review requests
-// import useCreateTransaction from "@/app/hooks/transaction/useCreateTransaction";
+import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
 
 export default function ListingDetails({
   listingId,
@@ -41,10 +39,7 @@ export default function ListingDetails({
   const [isSaved, setIsSaved] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isMessagePending, setIsMessagePending] = useState(false);
-
-  // New State for Purchase Flow
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
-  const [isPurchasePending, setIsPurchasePending] = useState(false);
 
   // --- Queries ---
   const {data: listingData} = useQuery<Listing>({
@@ -61,8 +56,10 @@ export default function ListingDetails({
   const {mutateAsync: createConversation} = useCreateConversation();
   const {mutateAsync: createMessage} = useCreateFirstMessage();
 
-  // Mock Hook usage (Replace with real hook)
-  // const { mutateAsync: createTransaction } = useCreateTransaction();
+  const {
+    mutate: createPurchaseRequestMutation,
+    isPending: isPurchaseMutationPending,
+  } = useCreatePurchaseRequest();
 
   // --- Handlers ---
 
@@ -99,23 +96,17 @@ export default function ListingDetails({
     setIsMessagePending(false);
   };
 
-  const handlePurchaseRequest = async () => {
-    setIsPurchasePending(true);
-    try {
-      // TODO: Call your actual backend API here
-      // await createTransaction({ listingId: Number(listingId) });
-
-      // Simulation delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      notifySuccess("Vásárlási kérelem elküldve az eladónak!");
-      setIsPurchaseModalOpen(false);
-    } catch (e) {
-      console.error(e);
-      notifyError("Hiba történt a kérelem küldésekor.");
-    } finally {
-      setIsPurchasePending(false);
-    }
+  const handlePurchaseRequest = () => {
+    createPurchaseRequestMutation(listingId, {
+      onSuccess: () => {
+        notifySuccess("Vásárlási kérelem elküldve az eladónak!");
+      },
+      onError: e => {
+        console.error(e);
+        notifyError("Hiba történt a kérelem küldésekor.");
+      },
+    });
+    setIsPurchaseModalOpen(false);
   };
 
   if (!listingData || !profileData) {
@@ -346,7 +337,7 @@ export default function ListingDetails({
               isOpen={isPurchaseModalOpen}
               onClose={() => setIsPurchaseModalOpen(false)}
               onConfirm={handlePurchaseRequest}
-              isLoading={isPurchasePending}
+              isLoading={isPurchaseMutationPending}
               productName={listingData.name}
               sellerName={listingData.user.name}
             />
