@@ -82,7 +82,7 @@ public class PurchaseRequestController {
 
   @ExceptionHandler(NotTheOwnerOfPurchaseRequestException.class)
   public ResponseEntity<Map<String, String>> notTheOwner() {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body(Map.of("message", "You are not the owner of the purchase request"));
   }
 }
