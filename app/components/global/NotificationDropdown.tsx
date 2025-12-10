@@ -3,42 +3,18 @@
 import React, {useEffect, useRef, useState} from "react";
 import BellSVG from "/public/svgs/bell.svg";
 import CheckSVG from "/public/svgs/check.svg";
-
-// Mock Notification Type
-type Notification = {
-  id: string;
-  type: "PURCHASE_REQUEST" | "REVIEW" | "SYSTEM";
-  isRead: boolean;
-  createdAt: Date;
-  data: {
-    buyerName: string;
-    listingName: string;
-    listingImage: string;
-    listingId: string;
-  };
-};
+import {Notification, NotificationTypeEnum} from "@/app/types/notification";
+import {useQuery} from "@tanstack/react-query";
+import useListUnread from "@/app/hooks/notification/useListUnread";
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Mock Data
-  const [notifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "PURCHASE_REQUEST",
-      isRead: false,
-      createdAt: new Date(),
-      data: {
-        buyerName: "Nagy Anna",
-        listingName: "Kézzel festett kerámia váza",
-        listingImage: "/images/placeholder.jpg",
-        listingId: "123",
-      },
-    },
-  ]);
-
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const {data: notificationsData} = useQuery<Notification[]>({
+    queryFn: useListUnread,
+    queryKey: ["unread-notification"],
+  });
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -53,6 +29,22 @@ export default function NotificationDropdown() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (!notificationsData) {
+    return (
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`relative p-2.5 rounded-xl transition-all ${
+          isOpen
+            ? "bg-slate-100 text-primary"
+            : "text-slate-500 hover:text-primary hover:bg-slate-50"
+        }`}>
+        <BellSVG className="w-6 h-6" />
+      </button>
+    );
+  }
+
+  const unreadCount = notificationsData.filter(n => !n.isRead).length;
 
   const handleAccept = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -99,12 +91,12 @@ export default function NotificationDropdown() {
           </div>
 
           <div className="max-h-[400px] overflow-y-auto">
-            {notifications.length === 0 ? (
+            {notificationsData.length === 0 ? (
               <div className="p-8 text-center text-slate-400 text-sm">
                 Nincs új értesítésed.
               </div>
             ) : (
-              notifications.map(notif => (
+              notificationsData.map(notif => (
                 <div
                   key={notif.id}
                   className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors relative ${!notif.isRead ? "bg-indigo-50/30" : ""}`}>
@@ -113,12 +105,12 @@ export default function NotificationDropdown() {
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
                   )}
 
-                  {notif.type === "PURCHASE_REQUEST" && (
+                  {notif.type === NotificationTypeEnum.PURCHASE_REQUEST && (
                     <div className="flex gap-4">
                       {/* Item Image */}
                       <div className="w-12 h-12 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden border border-slate-100">
                         <img
-                          src={notif.data.listingImage}
+                          src={"/images/placeholder.jpg"}
                           alt=""
                           className="w-full h-full object-cover"
                         />
@@ -127,11 +119,11 @@ export default function NotificationDropdown() {
                       <div className="flex-1">
                         <p className="text-sm text-slate-600 leading-snug mb-2">
                           <span className="font-bold text-slate-900">
-                            {notif.data.buyerName}
+                            {notif.data.requesterName}
                           </span>{" "}
                           jelezte, hogy megvásárolta a(z){" "}
                           <span className="font-bold text-slate-900">
-                            {notif.data.listingName}
+                            {notif.data.listingTitle}
                           </span>{" "}
                           termékedet.
                         </p>
@@ -139,12 +131,12 @@ export default function NotificationDropdown() {
                         {/* Action Buttons */}
                         <div className="flex gap-2">
                           <button
-                            onClick={e => handleAccept(e, notif.id)}
+                            onClick={e => handleAccept(e, String(notif.id))}
                             className="flex-1 bg-primary hover:bg-[#5b4cc4] text-white text-xs font-bold py-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition-all">
                             <CheckSVG className="w-3.5 h-3.5" /> Elfogadás
                           </button>
                           <button
-                            onClick={e => handleDecline(e, notif.id)}
+                            onClick={e => handleDecline(e, String(notif.id))}
                             className="flex-1 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 text-xs font-bold py-2 rounded-lg transition-all">
                             Elutasítás
                           </button>

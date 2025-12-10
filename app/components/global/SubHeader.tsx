@@ -63,7 +63,7 @@ export default function SubHeader({user}: {user: User}) {
 
           {isLoggedIn ? (
             <>
-              {/* Notification Dropdown (New) */}
+              {/* NotificationEntity Dropdown (New) */}
               <NotificationDropdown />
 
               {/* Profile Dropdown */}
