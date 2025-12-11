@@ -16,4 +16,5 @@ public record ListingSingleViewDto(
     ListingStatusEnum status,
     SubCategoryDto subCategory,
     UserDto user,
-    Long conversationId) {}
+    Long conversationId,
+    Boolean pendingRequestExists) {}

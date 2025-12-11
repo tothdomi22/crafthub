@@ -6,18 +6,24 @@ import {Listing, ListingStatusEnum} from "@/app/types/listing";
 import useGetListing from "@/app/hooks/listing/useGetListing";
 import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
-import FavoriteSVG from "/public/svgs/favorite.svg";
 import {formatDate} from "@/app/components/utils";
 import Link from "next/link";
-import LocationSVG from "/public/svgs/location.svg";
-import ChatSVG from "/public/svgs/chat.svg";
-import EditSVG from "/public/svgs/edit.svg"; // Import Edit Icon
-import SendMessageModal from "@/app/components/message/SendMessageModal";
 import {useRouter} from "next/navigation";
 import useCreateConversation from "@/app/hooks/conversation/useCreateConversation";
 import useCreateFirstMessage from "@/app/hooks/message/useCreateFirstMessage";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {User} from "@/app/types/user";
+
+// Components
+import SendMessageModal from "@/app/components/message/SendMessageModal";
+import ConfirmTransactionModal from "@/app/components/listing/ConfirmTransactionModal";
+// SVGs
+import FavoriteSVG from "/public/svgs/favorite.svg";
+import LocationSVG from "/public/svgs/location.svg";
+import ChatSVG from "/public/svgs/chat.svg";
+import EditSVG from "/public/svgs/edit.svg";
+import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
+import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
 
 export default function ListingDetails({
   listingId,
@@ -28,10 +34,14 @@ export default function ListingDetails({
 }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  // --- States ---
   const [isSaved, setIsSaved] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isMessagePending, setIsMessagePending] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
+  // --- Queries ---
   const {data: listingData} = useQuery<Listing>({
     queryFn: () => useGetListing(listingId),
     queryKey: ["listing" + listingId],
@@ -42,8 +52,16 @@ export default function ListingDetails({
     queryKey: ["profile" + listingId],
     enabled: !!listingData,
   });
+
   const {mutateAsync: createConversation} = useCreateConversation();
   const {mutateAsync: createMessage} = useCreateFirstMessage();
+
+  const {
+    mutate: createPurchaseRequestMutation,
+    isPending: isPurchaseMutationPending,
+  } = useCreatePurchaseRequest();
+
+  // --- Handlers ---
 
   const handleSendMessage = async (message: string) => {
     setIsMessagePending(true);
@@ -76,6 +94,19 @@ export default function ListingDetails({
       setIsMessageModalOpen(false);
     }
     setIsMessagePending(false);
+  };
+
+  const handlePurchaseRequest = () => {
+    createPurchaseRequestMutation(listingId, {
+      onSuccess: () => {
+        notifySuccess("Vásárlási kérelem elküldve az eladónak!");
+      },
+      onError: e => {
+        console.error(e);
+        notifyError("Hiba történt a kérelem küldésekor.");
+      },
+    });
+    setIsPurchaseModalOpen(false);
   };
 
   if (!listingData || !profileData) {
@@ -146,7 +177,6 @@ export default function ListingDetails({
               </div>
             )}
           </div>
-          {/* Thumbnails would go here... */}
         </div>
 
         {/* --- RIGHT COLUMN: INFO (5/12) --- */}
@@ -232,19 +262,37 @@ export default function ListingDetails({
             </p>
           </div>
 
-          {/* Action Bar (Sticky on Desktop too for ease) */}
-          <div className="sticky bottom-4 z-40 pt-2">
+          {/* --- STICKY ACTION BAR --- */}
+          <div className="sticky bottom-4 z-40 pt-2 pb-4">
             {!isOwner ? (
-              // --- BUYER VIEW: Message Button ---
+              // --- BUYER VIEW ---
               listingData.status === ListingStatusEnum.ACTIVE ? (
-                <button
-                  onClick={handleSendMessageButton}
-                  className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
-                  <ChatSVG className="w-6 h-6" />
-                  {listingData.conversationId
-                    ? "Üzenetek az eladóval"
-                    : "Üzenj az eladónak"}
-                </button>
+                <div className="flex flex-col gap-3">
+                  {/* 1. Primary: Message */}
+                  <button
+                    onClick={handleSendMessageButton}
+                    className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+                    <ChatSVG className="w-6 h-6" />
+                    {listingData.conversationId
+                      ? "Üzenetek az eladóval"
+                      : "Üzenj az eladónak"}
+                  </button>
+
+                  {/* 2. Secondary: I Purchased This */}
+                  <button
+                    onClick={() => setIsPurchaseModalOpen(true)}
+                    disabled={listingData.pendingRequestExists}
+                    className={`w-full bg-white text-emerald-600 border border-emerald-200 py-3 rounded-xl font-bold text-base shadow-sm transition-all flex items-center justify-center gap-2 hover:bg-emerald-50 active:scale-[0.98] disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100`}>
+                    <ShoppingBagSVG className="w-5 h-5" />
+                    {listingData.pendingRequestExists
+                      ? "Vásárlási kérelem folyamatban"
+                      : "Megvásároltam a terméket"}
+                  </button>
+
+                  <p className="text-center text-xs text-slate-400 font-medium">
+                    A fizetés és a szállítás közvetlenül az eladóval történik.
+                  </p>
+                </div>
               ) : (
                 <button
                   disabled
@@ -256,23 +304,25 @@ export default function ListingDetails({
               )
             ) : (
               // --- OWNER VIEW: Edit Button ---
-              <Link
-                href={`/my-listings/edit/${listingData.id}`}
-                className="block w-full">
-                <button className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-slate-900/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
-                  <EditSVG className="w-5 h-5" />
-                  Hirdetés szerkesztése
-                </button>
-              </Link>
+              <div className="flex flex-col gap-3">
+                <Link
+                  href={`/my-listings/edit/${listingData.id}`}
+                  className="block w-full">
+                  <button className="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl shadow-lg shadow-slate-900/20 font-bold text-lg flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+                    <EditSVG className="w-5 h-5" />
+                    Hirdetés szerkesztése
+                  </button>
+                </Link>
+                <p className="text-center text-xs text-slate-400 font-medium">
+                  A hirdetés szerkesztésével frissítheted az adatokat.
+                </p>
+              </div>
             )}
-
-            <p className="text-center text-xs text-slate-400 mt-3 font-medium">
-              {!isOwner
-                ? "A fizetés és a szállítás közvetlenül az eladóval történik."
-                : "A hirdetés szerkesztésével frissítheted az adatokat."}
-            </p>
           </div>
 
+          {/* --- MODALS --- */}
+
+          {/* Message Modal */}
           {listingData && (
             <SendMessageModal
               isOpen={isMessageModalOpen}
@@ -281,6 +331,18 @@ export default function ListingDetails({
               sellerName={listingData.user.name}
               onSubmitAction={handleSendMessage}
               isSending={isMessagePending}
+            />
+          )}
+
+          {/* Confirm Purchase Modal */}
+          {listingData && (
+            <ConfirmTransactionModal
+              isOpen={isPurchaseModalOpen}
+              onClose={() => setIsPurchaseModalOpen(false)}
+              onConfirm={handlePurchaseRequest}
+              isLoading={isPurchaseMutationPending}
+              productName={listingData.name}
+              sellerName={listingData.user.name}
             />
           )}
         </div>

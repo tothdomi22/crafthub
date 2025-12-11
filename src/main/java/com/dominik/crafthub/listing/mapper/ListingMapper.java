@@ -1,4 +1,4 @@
-package com.dominik.crafthub.listing.controller;
+package com.dominik.crafthub.listing.mapper;
 
 import com.dominik.crafthub.listing.dto.*;
 import com.dominik.crafthub.listing.entity.ListingEntity;
@@ -33,5 +33,6 @@ public interface ListingMapper {
   @Mapping(source = "listingEntity.subCategoryEntity", target = "subCategory")
   @Mapping(source = "listingEntity.shippable", target = "canShip")
   @Mapping(source = "listingEntity.userEntity", target = "user")
-  ListingSingleViewDto toSingleViewDto(ListingEntity listingEntity, Long conversationId);
+  ListingSingleViewDto toSingleViewDto(
+      ListingEntity listingEntity, Long conversationId, Boolean pendingRequestExists);
 }

@@ -3,8 +3,9 @@ import Link from "next/link";
 import ChatSVG from "/public/svgs/chat.svg";
 import SearchSVG from "/public/svgs/search.svg";
 import ProfileDropdown from "@/app/components/global/ProfileDropdown";
+import NotificationDropdown from "@/app/components/global/NotificationDropdown"; // <--- Import
 import getCurrentUser from "@/app/utils/getCurrentUser";
-import {User} from "@/app/types/user"; // Import the new component
+import {User} from "@/app/types/user";
 
 export default async function Header() {
   const user: User | null = await getCurrentUser();
@@ -39,11 +40,11 @@ export default async function Header() {
         </div>
 
         {/* --- RIGHT: ACTIONS --- */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {user ? (
             <>
               {/* Create Listing CTA (Desktop) */}
-              <Link href={"/create-listing"} className="hidden sm:block">
+              <Link href={"/create-listing"} className="hidden lg:block mr-2">
                 <button className="bg-primary hover:bg-[#5b4cc4] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
                   Termék eladása
                 </button>
@@ -55,6 +56,9 @@ export default async function Header() {
                   <ChatSVG className="w-6 h-6" />
                 </button>
               </Link>
+
+              {/* Notifications Dropdown (New) */}
+              <NotificationDropdown />
 
               {/* Profile Dropdown */}
               <ProfileDropdown user={user} />

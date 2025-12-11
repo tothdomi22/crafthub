@@ -1,6 +1,6 @@
 package com.dominik.crafthub.review.mapper;
 
-import com.dominik.crafthub.listing.controller.ListingMapper;
+import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.review.dto.ReviewCreateRequest;
 import com.dominik.crafthub.review.dto.ReviewDto;
 import com.dominik.crafthub.review.dto.ReviewListingResponse;

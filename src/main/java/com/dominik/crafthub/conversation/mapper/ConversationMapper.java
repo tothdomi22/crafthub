@@ -3,7 +3,7 @@ package com.dominik.crafthub.conversation.mapper;
 import com.dominik.crafthub.conversation.dto.ConversationDto;
 import com.dominik.crafthub.conversation.dto.ConversationListDto;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
-import com.dominik.crafthub.listing.controller.ListingMapper;
+import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.user.mapper.UserMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
