@@ -279,12 +279,14 @@ export default function ListingDetails({
                   </button>
 
                   {/* 2. Secondary: I Purchased This */}
-                  {/*TODO: Render this conditionally based on if i have a pending request already*/}
                   <button
                     onClick={() => setIsPurchaseModalOpen(true)}
-                    className="w-full bg-white hover:bg-emerald-50 text-emerald-600 border border-emerald-200 py-3 rounded-xl font-bold text-base shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                    disabled={listingData.pendingRequestExists}
+                    className={`w-full bg-white text-emerald-600 border border-emerald-200 py-3 rounded-xl font-bold text-base shadow-sm transition-all flex items-center justify-center gap-2 hover:bg-emerald-50 active:scale-[0.98] disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100`}>
                     <ShoppingBagSVG className="w-5 h-5" />
-                    Megvásároltam a terméket
+                    {listingData.pendingRequestExists
+                      ? "Vásárlási kérelem folyamatban"
+                      : "Megvásároltam a terméket"}
                   </button>
 
                   <p className="text-center text-xs text-slate-400 font-medium">

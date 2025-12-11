@@ -6,6 +6,7 @@ import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.notification.dto.PurchaseRequestNotificationPayload;
 import com.dominik.crafthub.notification.entity.NotificationTypeEnum;
+import com.dominik.crafthub.notification.repository.NotificationRepository;
 import com.dominik.crafthub.notification.service.NotificationService;
 import com.dominik.crafthub.purchaserequest.dto.PurchaseRequestDecideRequest;
 import com.dominik.crafthub.purchaserequest.dto.PurchaseRequestDto;
@@ -27,6 +28,7 @@ public class PurchaseRequestService {
   private final PurchaseRequestRepostitory purchaseRequestRepostitory;
   private final PurchaseRequestMapper purchaseRequestMapper;
   private final NotificationService notificationService;
+  private final NotificationRepository notificationRepository;
 
   @Transient
   public PurchaseRequestDto createRequest(long listingId) {
@@ -82,18 +84,25 @@ public class PurchaseRequestService {
       throw new CantAcceptNotPendingPurchaseRequestException();
     }
     var user = authService.getCurrentUser();
-    if (!purchaseRequest.getRequesterUser().getId().equals(user.getId())) {
-      throw new NotTheOwnerOfPurchaseRequestException();
+    if (!purchaseRequest.getListing().getUserEntity().getId().equals(user.getId())) {
+      throw new NotTheRecipientOfPurchaseRequestException();
     }
     var listing = listingRepository.findById(purchaseRequest.getListing().getId()).orElseThrow();
     if (request.status().equals(PurchaseRequestPatchStatusEnum.ACCEPT)) {
       listing.setStatus(ListingStatusEnum.ARCHIVED);
       listingRepository.save(listing);
-      purchaseRequest.setStatus(PurchaseRequestStatusEnum.ACCEPTED);
+      purchaseRequestRepostitory.acceptOneDeclineOthers(
+          purchaseRequestId,
+          listing.getId(),
+          PurchaseRequestStatusEnum.ACCEPTED.name(),
+          PurchaseRequestStatusEnum.DECLINED.name());
+      notificationRepository.markAllReadByListingId(listing.getId());
     } else {
       purchaseRequest.setStatus(PurchaseRequestStatusEnum.DECLINED);
     }
     purchaseRequestRepostitory.save(purchaseRequest);
+    var notification = notificationRepository.findByRequestId(purchaseRequestId);
+    notificationService.markNotificationRead(notification.getId());
     return purchaseRequestMapper.toDto(purchaseRequest);
   }
 }

@@ -6,6 +6,11 @@ import CheckSVG from "/public/svgs/check.svg";
 import {Notification, NotificationTypeEnum} from "@/app/types/notification";
 import {useQuery} from "@tanstack/react-query";
 import useListUnread from "@/app/hooks/notification/useListUnread";
+import usePatchPurchaseRequest from "@/app/hooks/purchase-request/usePatchPurchaseRequest";
+import {
+  PurchaseRequestPatchRequest,
+  PurchaseRequestStatusEnum,
+} from "@/app/types/purchaseRequest";
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +20,11 @@ export default function NotificationDropdown() {
     queryFn: useListUnread,
     queryKey: ["unread-notification"],
   });
+
+  const {
+    mutate: patchPurchaseRequestMutation,
+    isPending: isPatchMutationPending,
+  } = usePatchPurchaseRequest();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -46,18 +56,14 @@ export default function NotificationDropdown() {
 
   const unreadCount = notificationsData.filter(n => !n.isRead).length;
 
-  const handleAccept = (e: React.MouseEvent, id: string) => {
+  const handlePurchaseSelection = (
+    e: React.MouseEvent,
+    status: PurchaseRequestStatusEnum,
+    id: string,
+  ) => {
     e.stopPropagation();
-    // TODO: Call API to accept purchase request
-    console.log("Accepted request", id);
-    setIsOpen(false);
-  };
-
-  const handleDecline = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    // TODO: Call API to decline
-    console.log("Declined request", id);
-    setIsOpen(false);
+    const data: PurchaseRequestPatchRequest = {status: status};
+    patchPurchaseRequestMutation({purchaseRequestId: id, data: data});
   };
 
   return (
@@ -131,12 +137,26 @@ export default function NotificationDropdown() {
                         {/* Action Buttons */}
                         <div className="flex gap-2">
                           <button
-                            onClick={e => handleAccept(e, String(notif.id))}
+                            onClick={e =>
+                              handlePurchaseSelection(
+                                e,
+                                PurchaseRequestStatusEnum.ACCEPT,
+                                String(notif.data.requestId),
+                              )
+                            }
+                            disabled={isPatchMutationPending}
                             className="flex-1 bg-primary hover:bg-[#5b4cc4] text-white text-xs font-bold py-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition-all">
                             <CheckSVG className="w-3.5 h-3.5" /> Elfogadás
                           </button>
                           <button
-                            onClick={e => handleDecline(e, String(notif.id))}
+                            onClick={e =>
+                              handlePurchaseSelection(
+                                e,
+                                PurchaseRequestStatusEnum.DECLINE,
+                                String(notif.data.requestId),
+                              )
+                            }
+                            disabled={isPatchMutationPending}
                             className="flex-1 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 text-xs font-bold py-2 rounded-lg transition-all">
                             Elutasítás
                           </button>

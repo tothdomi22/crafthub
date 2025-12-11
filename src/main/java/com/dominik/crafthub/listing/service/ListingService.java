@@ -12,6 +12,8 @@ import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
+import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestStatusEnum;
+import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
 import com.dominik.crafthub.user.service.UserService;
 import java.time.OffsetDateTime;
@@ -28,6 +30,7 @@ public class ListingService {
   private final ListingRepository listingRepository;
   private final UserService userService;
   private final ConversationRepository conversationRepository;
+  private final PurchaseRequestRepostitory purchaseRequestRepostitory;
 
   public ListingDto createListing(ListingCreateRequest request) {
     var user = authService.getCurrentUser();
@@ -67,7 +70,10 @@ public class ListingService {
                 listing.getId(), user.getId(), listing.getUserEntity().getId())
             .orElse(null);
     Long conversationId = (conversation != null) ? conversation.getId() : null;
-    return listingMapper.toSingleViewDto(listing, conversationId);
+    var purchaseRequestExists =
+        purchaseRequestRepostitory.existsByRequesterUser_IdAndListing_IdAndStatus(
+            user.getId(), id, PurchaseRequestStatusEnum.PENDING);
+    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists);
   }
 
   public ListingDto updateListing(Long id, ListingUpdateRequest request) {

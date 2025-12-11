@@ -80,9 +80,12 @@ public class PurchaseRequestController {
         .body(Map.of("message", "Can't accept a purchase request thats not pending"));
   }
 
-  @ExceptionHandler(NotTheOwnerOfPurchaseRequestException.class)
+  @ExceptionHandler(NotTheRecipientOfPurchaseRequestException.class)
   public ResponseEntity<Map<String, String>> notTheOwner() {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        .body(Map.of("message", "You are not the owner of the purchase request"));
+        .body(
+            Map.of(
+                "message",
+                "You are not the owner of the listing. You can't accept a purchase request for that"));
   }
 }
