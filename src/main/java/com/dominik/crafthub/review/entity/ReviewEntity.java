@@ -1,6 +1,5 @@
 package com.dominik.crafthub.review.entity;
 
-import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -26,10 +25,6 @@ public class ReviewEntity {
 
   @Column(name = "created_at")
   private OffsetDateTime createdAt;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "listing_id")
-  private ListingEntity listingEntity;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reviewer_user_id")

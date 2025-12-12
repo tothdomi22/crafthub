@@ -9,7 +9,6 @@ import com.dominik.crafthub.profile.exception.ProfileAlreadyExistsException;
 import com.dominik.crafthub.profile.exception.ProfileNotFoundException;
 import com.dominik.crafthub.profile.mapper.ProfileMapper;
 import com.dominik.crafthub.profile.repository.ProfileRepository;
-import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.review.repository.ReviewRepository;
 import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.repository.UserRepository;
@@ -58,9 +57,10 @@ public class ProfileService {
       throw new UserNotFoundException();
     }
     profile.setUserEntity(user);
-    var reviews = reviewRepository.findAllByListingEntity_UserEntity_Id(id);
-    var reviewCount = reviews.size();
-    var reviewAverage = reviews.stream().mapToInt(ReviewEntity::getStars).average().orElse(0);
-    return profileMapper.toProfilePageDto(profile, reviewAverage, reviewCount);
+    //    FIXME: get listingid through purchaserequest
+    //    var reviews = reviewRepository.findAllByListingEntity_UserEntity_Id(id);
+    //    var reviewCount = reviews.size();
+    //    var reviewAverage = reviews.stream().mapToInt(ReviewEntity::getStars).average().orElse(0);
+    return profileMapper.toProfilePageDto(profile, 0D, 0);
   }
 }

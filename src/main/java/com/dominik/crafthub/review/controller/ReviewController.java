@@ -28,11 +28,11 @@ public class ReviewController {
     return ResponseEntity.status(HttpStatus.CREATED).body(reviewDto);
   }
 
-  @GetMapping("/list/{userId}")
-  public ResponseEntity<?> getUserReviews(@PathVariable Long userId) {
-    var reviews = reviewService.listReviewsByUser(userId);
-    return ResponseEntity.status(HttpStatus.OK).body(reviews);
-  }
+  //  @GetMapping("/list/{userId}")
+  //  public ResponseEntity<?> getUserReviews(@PathVariable Long userId) {
+  //    var reviews = reviewService.listReviewsByUser(userId);
+  //    return ResponseEntity.status(HttpStatus.OK).body(reviews);
+  //  }
 
   @ExceptionHandler(ReviewAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> reviewAlreadyExists() {

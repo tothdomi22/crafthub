@@ -1,7 +1,6 @@
 package com.dominik.crafthub.listing.entity;
 
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
-import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.subcategory.entity.SubCategoryEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -53,7 +52,4 @@ public class ListingEntity {
 
   @OneToMany(mappedBy = "listingEntity")
   private Set<ConversationEntity> conversationEntities = new LinkedHashSet<>();
-
-  @OneToMany(mappedBy = "listingEntity")
-  private Set<ReviewEntity> reviewEntities = new LinkedHashSet<>();
 }

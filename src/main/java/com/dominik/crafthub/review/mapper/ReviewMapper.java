@@ -5,7 +5,6 @@ import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestEntity;
 import com.dominik.crafthub.review.dto.ReviewCreateRequest;
 import com.dominik.crafthub.review.dto.ReviewDto;
-import com.dominik.crafthub.review.dto.ReviewListingResponse;
 import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.review.entity.ReviewTypeEnum;
 import com.dominik.crafthub.user.dto.UserDto;
@@ -36,7 +35,6 @@ public interface ReviewMapper {
 
   ReviewDto toDto(ReviewEntity reviewEntity);
 
-  @Mapping(source = "reviewerUserEntity", target = "reviewerUser")
-  @Mapping(source = "listingEntity", target = "listing")
-  ReviewListingResponse toListingResponse(ReviewEntity reviewEntity);
+//  @Mapping(source = "reviewerUserEntity", target = "reviewerUser")
+//  ReviewListingResponse toListingResponse(ReviewEntity reviewEntity);
 }
