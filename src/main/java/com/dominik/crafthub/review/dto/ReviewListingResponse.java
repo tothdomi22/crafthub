@@ -1,6 +1,7 @@
 package com.dominik.crafthub.review.dto;
 
-import com.dominik.crafthub.listing.dto.ListingReviewDto;
+import com.dominik.crafthub.listing.dto.ListingNoCategoriesNoUserDto;
+import com.dominik.crafthub.review.entity.ReviewTypeEnum;
 import com.dominik.crafthub.user.dto.UserDto;
 import java.time.OffsetDateTime;
 
@@ -10,4 +11,5 @@ public record ReviewListingResponse(
     String reviewText,
     OffsetDateTime createdAt,
     UserDto reviewerUser,
-    ListingReviewDto listing) {}
+    ListingNoCategoriesNoUserDto listing,
+    ReviewTypeEnum reviewType) {}

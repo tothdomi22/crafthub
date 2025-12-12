@@ -28,6 +28,10 @@ public interface ListingMapper {
   void update(ListingUpdateRequest request, @MappingTarget ListingEntity listingEntity);
 
   @Mapping(target = "canShip", source = "shippable")
+  ListingNoCategoriesNoUserDto toNoCategoriesNoUserDto(ListingEntity listing);
+
+  @Mapping(target = "user", source = "listing.userEntity")
+  @Mapping(target = "canShip", source = "shippable")
   ListingNoCategoriesDto toNoCategoriesDto(ListingEntity listing);
 
   @Mapping(source = "listingEntity.subCategoryEntity", target = "subCategory")

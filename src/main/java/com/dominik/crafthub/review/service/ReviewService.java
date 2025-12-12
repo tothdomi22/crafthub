@@ -7,6 +7,7 @@ import com.dominik.crafthub.purchaserequest.exception.PurchaseRequestNotFoundExc
 import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
 import com.dominik.crafthub.review.dto.ReviewCreateRequest;
 import com.dominik.crafthub.review.dto.ReviewDto;
+import com.dominik.crafthub.review.dto.ReviewListingResponse;
 import com.dominik.crafthub.review.entity.ReviewTypeEnum;
 import com.dominik.crafthub.review.exception.CantReviewNotAcceptedPurchaseRequestsException;
 import com.dominik.crafthub.review.exception.NotPartOfThisPurchaseRequestException;
@@ -14,6 +15,7 @@ import com.dominik.crafthub.review.exception.ReviewAlreadyExistsException;
 import com.dominik.crafthub.review.mapper.ReviewMapper;
 import com.dominik.crafthub.review.repository.ReviewRepository;
 import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -58,8 +60,8 @@ public class ReviewService {
     return reviewMapper.toDto(review);
   }
 
-  //  public List<ReviewListingResponse> listReviewsByUser(Long userId) {
-  //    var reviews = reviewRepository.findAllByListingEntity_UserEntity_Id(userId);
-  //    return reviews.stream().map(reviewMapper::toListingResponse).toList();
-  //  }
+  public List<ReviewListingResponse> listReviewsByUser(Long userId) {
+    var reviews = reviewRepository.findAllReviewsOfUser(userId);
+    return reviews.stream().map(reviewMapper::toListingResponse).toList();
+  }
 }
