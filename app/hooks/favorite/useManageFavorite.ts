@@ -1,29 +1,29 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {ListingUpdateRequest} from "@/app/types/listing";
 
-export default function useUpdateListing() {
+export default function useManageFavorite() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
-      data,
-      id,
+      listingId,
+      isCurrentlyLiked,
     }: {
-      data: ListingUpdateRequest;
-      id: string;
+      listingId: number;
+      isCurrentlyLiked: boolean;
     }) => {
-      const response = await fetch(`/api/listing/update?id=${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
+      const url = isCurrentlyLiked
+        ? `/api/favorite/delete?listingId=${listingId}`
+        : `/api/favorite/create?listingId=${listingId}`;
+      const method = isCurrentlyLiked ? "DELETE" : "POST";
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
       });
-
       const responseJson = await response.json();
-
       if (!response.ok) {
-        throw new Error(responseJson.message || "Listing update failed");
+        throw new Error(responseJson.message || "Favorite failed");
       }
       return responseJson;
     },
@@ -31,7 +31,7 @@ export default function useUpdateListing() {
       await queryClient.invalidateQueries({queryKey: ["listings"]});
       await queryClient.invalidateQueries({queryKey: ["my-listings"]});
       await queryClient.invalidateQueries({
-        queryKey: ["listing" + variables.id],
+        queryKey: ["listing" + variables.listingId],
       });
     },
   });
