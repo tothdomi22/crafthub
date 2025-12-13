@@ -58,7 +58,7 @@ public class ProfileService {
       throw new UserNotFoundException();
     }
     profile.setUserEntity(user);
-    var reviews = reviewRepository.findAllByPurchaseRequestEntity_Listing_UserEntity_Id(id);
+    var reviews = reviewRepository.findAllReviewsOfUser(id);
     var reviewCount = reviews.size();
     var reviewAverage = reviews.stream().mapToInt(ReviewEntity::getStars).average().orElse(0);
     return profileMapper.toProfilePageDto(profile, reviewAverage, reviewCount);

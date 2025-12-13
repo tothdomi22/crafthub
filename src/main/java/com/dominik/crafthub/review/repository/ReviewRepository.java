@@ -11,10 +11,6 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
   Boolean existsByPurchaseRequestEntity_IdAndReviewType(
       Long purchaseRequestEntityId, ReviewTypeEnum reviewType);
 
-  List<ReviewEntity> findAllByPurchaseRequestEntity_Listing_UserEntity_Id(
-      Long purchaseRequestEntityListingUserEntityId);
-
-  //  @Transient
   @Query(
       value =
           """
