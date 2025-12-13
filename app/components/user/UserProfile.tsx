@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {Listing} from "@/app/types/listing";
 import useListListingById from "@/app/hooks/listing/useListListingById";
-import {Review} from "@/app/types/review";
+import {Review, ReviewTypeEnum} from "@/app/types/review";
 import useListReviewsById from "@/app/hooks/review/useListReviewsById";
 import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
@@ -219,7 +219,11 @@ export default function UserProfile({id}: {id: string}) {
                       <span className="block font-bold text-slate-900">
                         {review.reviewerUser.name}
                       </span>
-                      <span className="text-slate-400">Vásárló</span>
+                      <span className="text-slate-400">
+                        {review.reviewType == ReviewTypeEnum.PURCHASER
+                          ? "Vásárló"
+                          : "Eladó"}
+                      </span>
                     </div>
                   </div>
                 </div>

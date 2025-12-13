@@ -1,6 +1,11 @@
 import {Listing} from "@/app/types/listing";
 import {User} from "@/app/types/user";
 
+export enum ReviewTypeEnum {
+  OWNER = "OWNER",
+  PURCHASER = "PURCHASER",
+}
+
 export interface Review {
   id: number;
   reviewText: string;
@@ -8,4 +13,5 @@ export interface Review {
   createdAt: string;
   listing: Listing;
   reviewerUser: User;
+  reviewType: ReviewTypeEnum;
 }
