@@ -29,6 +29,12 @@ public class FavoriteController {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
+  @GetMapping("/list")
+  public ResponseEntity<?> getUserFavorites() {
+    var userFavoritesDto = favoriteService.getUserFavorites();
+    return ResponseEntity.status(HttpStatus.OK).body(userFavoritesDto);
+  }
+
   @ExceptionHandler(ListingNotFoundException.class)
   public ResponseEntity<Map<String, String>> listingNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Listing not found"));

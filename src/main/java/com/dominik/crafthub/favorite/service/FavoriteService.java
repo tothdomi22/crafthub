@@ -2,6 +2,7 @@ package com.dominik.crafthub.favorite.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.favorite.dto.FavoriteDto;
+import com.dominik.crafthub.favorite.dto.FavoriteNoUserDto;
 import com.dominik.crafthub.favorite.exception.FavoriteExistsException;
 import com.dominik.crafthub.favorite.exception.FavoriteNotFoundException;
 import com.dominik.crafthub.favorite.mapper.FavoriteMapper;
@@ -9,6 +10,7 @@ import com.dominik.crafthub.favorite.repository.FavoriteRepository;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +52,11 @@ public class FavoriteService {
       throw new FavoriteNotFoundException();
     }
     favoriteRepository.delete(favoriteEntity);
+  }
+
+  public List<FavoriteNoUserDto> getUserFavorites() {
+    var user = authService.getCurrentUser();
+    var favoriteList = favoriteRepository.findAllByUserEntityId(user.getId());
+    return favoriteList.stream().map(favoriteMapper::toListDto).toList();
   }
 }
