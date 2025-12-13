@@ -3,7 +3,7 @@ package com.dominik.crafthub.subcategory.dto;
 import com.dominik.crafthub.maincategory.dto.MainCategoryDto;
 
 public record SubCategoryDto(
-    String id,
+    Integer id,
     String description,
     String uniqueName,
     String displayName,

@@ -5,9 +5,15 @@ import FavoriteSVG from "/public/svgs/favorite.svg";
 export default function ListingCard({
   listing,
   showFooter = true,
+  isManageFavoritePending,
+  handleManageFavorite,
+  isFavoritesPage = false,
 }: {
   listing: Listing;
   showFooter?: boolean;
+  isFavoritesPage?: boolean;
+  isManageFavoritePending: boolean;
+  handleManageFavorite: (listingId: number, isCurrentlyLiked: boolean) => void;
 }) {
   const isNew = (itemCreatedDate: string) => {
     const createdDate = new Date(itemCreatedDate).getTime();
@@ -31,14 +37,25 @@ export default function ListingCard({
           </span>
         )}
 
-        {/* Favorite Button */}
+        {/* Like Button */}
         <button
-          className="absolute top-3 right-3 p-2 bg-white/60 backdrop-blur-md rounded-full text-slate-600 hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+          disabled={isManageFavoritePending}
           onClick={e => {
             e.preventDefault();
-            // TODO: Add favorite logic
-          }}>
-          <FavoriteSVG />
+            e.stopPropagation();
+            handleManageFavorite(listing.id, listing.isLiked);
+          }}
+          title={listing.isLiked || isFavoritesPage ? "Eltávolítás" : "Mentés"}
+          className={`
+            absolute top-2 right-2 p-2 rounded-full shadow-sm backdrop-blur-sm z-10 
+            transition-all duration-200 hover:scale-110 active:scale-95 flex items-center justify-center
+            ${
+              listing.isLiked || isFavoritesPage
+                ? "bg-white text-red-500 opacity-100"
+                : "bg-white/80 text-slate-400 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-slate-400"
+            }
+          `}>
+          <FavoriteSVG className={`w-5 h-5 transition-colors`} />
         </button>
       </div>
 

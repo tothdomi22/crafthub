@@ -24,6 +24,7 @@ import ChatSVG from "/public/svgs/chat.svg";
 import EditSVG from "/public/svgs/edit.svg";
 import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
 import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
+import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 
 export default function ListingDetails({
   listingId,
@@ -36,7 +37,6 @@ export default function ListingDetails({
   const queryClient = useQueryClient();
 
   // --- States ---
-  const [isSaved, setIsSaved] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isMessagePending, setIsMessagePending] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
@@ -60,6 +60,9 @@ export default function ListingDetails({
     mutate: createPurchaseRequestMutation,
     isPending: isPurchaseMutationPending,
   } = useCreatePurchaseRequest();
+
+  const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
+    useManageFavorite();
 
   // --- Handlers ---
 
@@ -94,6 +97,13 @@ export default function ListingDetails({
       setIsMessageModalOpen(false);
     }
     setIsMessagePending(false);
+  };
+
+  const handleManageFavorite = (
+    listingId: number,
+    isCurrentlyLiked: boolean,
+  ) => {
+    manageFavoriteMutation({listingId, isCurrentlyLiked});
   };
 
   const handlePurchaseRequest = () => {
@@ -188,14 +198,17 @@ export default function ListingDetails({
                 {listingData.name}
               </h1>
               <button
-                onClick={() => setIsSaved(!isSaved)}
+                disabled={isManageFavoritePending}
+                onClick={() =>
+                  handleManageFavorite(listingData.id, listingData.isLiked)
+                }
                 className={`flex-shrink-0 p-3 rounded-xl transition-all ${
-                  isSaved
+                  listingData.isLiked
                     ? "text-red-500 bg-red-50"
                     : "text-slate-400 bg-slate-50 hover:bg-slate-100"
                 }`}>
                 <FavoriteSVG
-                  className={`w-6 h-6 ${isSaved ? "fill-current" : ""}`}
+                  className={`w-6 h-6 ${listingData.isLiked ? "fill-current" : ""}`}
                 />
               </button>
             </div>

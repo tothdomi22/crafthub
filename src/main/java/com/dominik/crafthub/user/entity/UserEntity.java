@@ -1,6 +1,7 @@
 package com.dominik.crafthub.user.entity;
 
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
+import com.dominik.crafthub.favorite.entity.FavoriteEntity;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.message.entity.MessageEntity;
 import com.dominik.crafthub.profile.entity.ProfileEntity;
@@ -61,4 +62,7 @@ public class UserEntity {
 
   @OneToMany(mappedBy = "reviewerUserEntity")
   private Set<ReviewEntity> reviews = new LinkedHashSet<>();
+
+  @OneToMany(mappedBy = "userEntity")
+  private Set<FavoriteEntity> favoriteEntities = new LinkedHashSet<>();
 }

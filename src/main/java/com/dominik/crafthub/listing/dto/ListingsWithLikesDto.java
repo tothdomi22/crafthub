@@ -5,7 +5,7 @@ import com.dominik.crafthub.subcategory.dto.SubCategoryDto;
 import com.dominik.crafthub.user.dto.UserDto;
 import java.time.OffsetDateTime;
 
-public record ListingSingleViewDto(
+public record ListingsWithLikesDto(
     Long id,
     String name,
     Integer price,
@@ -16,6 +16,4 @@ public record ListingSingleViewDto(
     ListingStatusEnum status,
     SubCategoryDto subCategory,
     UserDto user,
-    Long conversationId,
-    Boolean isLiked,
-    Boolean pendingRequestExists) {}
+    boolean isLiked) {}

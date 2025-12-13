@@ -12,6 +12,7 @@ import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {User} from "@/app/types/user";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
+import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
@@ -27,12 +28,27 @@ export default function ListingsPage({user}: {user: User | null}) {
   const {data: listingData} = useQuery<Listing[]>({
     queryFn: useListListings,
     queryKey: ["listings"],
+    select: data =>
+      [...data].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
   });
   const {data: profileData} = useQuery<Profile>({
     queryFn: () => useGetProfile(String(user?.id)),
     queryKey: ["profile" + user?.id],
     enabled: !!user,
   });
+
+  const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
+    useManageFavorite();
+
+  const handleManageFavorite = (
+    listingId: number,
+    isCurrentlyLiked: boolean,
+  ) => {
+    manageFavoriteMutation({listingId, isCurrentlyLiked});
+  };
 
   const handleSetCategory = (category: MainCategory) => {
     setActiveCategory(activeCategory === category ? null : category);
@@ -90,7 +106,11 @@ export default function ListingsPage({user}: {user: User | null}) {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredListings.map(item => (
           <Link key={item.id} href={`/listing/${item.id}`}>
-            <ListingCard listing={item} />
+            <ListingCard
+              listing={item}
+              handleManageFavorite={handleManageFavorite}
+              isManageFavoritePending={isManageFavoritePending}
+            />
           </Link>
         ))}
       </div>

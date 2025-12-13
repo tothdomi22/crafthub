@@ -2,10 +2,8 @@ package com.dominik.crafthub.listing.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.conversation.repository.ConversationRepository;
-import com.dominik.crafthub.listing.dto.ListingCreateRequest;
-import com.dominik.crafthub.listing.dto.ListingDto;
-import com.dominik.crafthub.listing.dto.ListingSingleViewDto;
-import com.dominik.crafthub.listing.dto.ListingUpdateRequest;
+import com.dominik.crafthub.favorite.repository.FavoriteRepository;
+import com.dominik.crafthub.listing.dto.*;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
@@ -31,6 +29,7 @@ public class ListingService {
   private final UserService userService;
   private final ConversationRepository conversationRepository;
   private final PurchaseRequestRepostitory purchaseRequestRepostitory;
+  private final FavoriteRepository favoriteRepository;
 
   public ListingDto createListing(ListingCreateRequest request) {
     var user = authService.getCurrentUser();
@@ -44,14 +43,21 @@ public class ListingService {
     return listingMapper.toDto(listing);
   }
 
-  public List<ListingDto> listListings(Long id) {
-    if (id != null) {
-      return listingRepository.findAllByUserEntityId(id).stream()
-          .map(listingMapper::toDto)
-          .toList();
-    } else {
-      return listingRepository.findAll().stream().map(listingMapper::toDto).toList();
-    }
+  public List<ListingsWithLikesDto> listListings(Long id) {
+    var user = authService.getCurrentUser();
+    return listingRepository.findAllListingsWithIsLiked(user.getId());
+    //    return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
+    //        .map(listingMapper::toListingWithLikesDto)
+    //        .toList();
+    //    if (id != null) {
+    //      return listingRepository.findAllByUserEntityId(id).stream()
+    //          .map(listingMapper::toDto)
+    //          .toList();
+    //    } else {
+    //      return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
+    //          .map(listingMapper::toListingWithLikesDto)
+    //          .toList();
+    //    }
   }
 
   public List<ListingDto> listMyListings() {
@@ -73,7 +79,8 @@ public class ListingService {
     var purchaseRequestExists =
         purchaseRequestRepostitory.existsByRequesterUser_IdAndListing_IdAndStatus(
             user.getId(), id, PurchaseRequestStatusEnum.PENDING);
-    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists);
+    var favorite = favoriteRepository.existsByListingEntity_IdAndUserEntity_Id(id, user.getId());
+    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists, favorite);
   }
 
   public ListingDto updateListing(Long id, ListingUpdateRequest request) {

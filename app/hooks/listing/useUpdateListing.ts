@@ -1,7 +1,7 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ListingUpdateRequest} from "@/app/types/listing";
 
-export default function useCreateListing() {
+export default function useUpdateListing() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({

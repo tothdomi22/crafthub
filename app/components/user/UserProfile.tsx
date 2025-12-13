@@ -13,12 +13,18 @@ import StarSvg from "/public/svgs/star.svg";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
 import {formatDate} from "@/app/components/utils";
+import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 
 export default function UserProfile({id}: {id: string}) {
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
   const {data: listingData} = useQuery<Listing[]>({
     queryFn: () => useListListingById(id),
     queryKey: ["listings" + id],
+    select: data =>
+      [...data].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
   });
   const {data: reviewData} = useQuery<Review[]>({
     queryFn: () => useListReviewsById(id),
@@ -28,6 +34,16 @@ export default function UserProfile({id}: {id: string}) {
     queryFn: () => useGetProfile(id),
     queryKey: ["profile" + id],
   });
+
+  const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
+    useManageFavorite();
+
+  const handleManageFavorite = (
+    listingId: number,
+    isCurrentlyLiked: boolean,
+  ) => {
+    manageFavoriteMutation({listingId, isCurrentlyLiked, userId: id});
+  };
 
   if (!profileData) {
     return (
@@ -150,7 +166,12 @@ export default function UserProfile({id}: {id: string}) {
           {listingData &&
             listingData.map(item => (
               <Link key={item.id} href={`/listing/${item.id}`}>
-                <ListingCard listing={item} showFooter={false} />
+                <ListingCard
+                  listing={item}
+                  showFooter={false}
+                  handleManageFavorite={handleManageFavorite}
+                  isManageFavoritePending={isManageFavoritePending}
+                />
               </Link>
             ))}
         </div>
