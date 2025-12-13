@@ -5,6 +5,7 @@ import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.notification.dto.PurchaseRequestNotificationPayload;
+import com.dominik.crafthub.notification.dto.ReviewNotificationPayload;
 import com.dominik.crafthub.notification.entity.NotificationTypeEnum;
 import com.dominik.crafthub.notification.repository.NotificationRepository;
 import com.dominik.crafthub.notification.service.NotificationService;
@@ -97,10 +98,25 @@ public class PurchaseRequestService {
           PurchaseRequestStatusEnum.ACCEPTED.name(),
           PurchaseRequestStatusEnum.DECLINED.name());
       notificationRepository.markAllReadByListingId(listing.getId());
+      purchaseRequestRepostitory.save(purchaseRequest);
+      //      FIXME: this is ugly as shit, refactor later
+      var payload =
+          new ReviewNotificationPayload(
+              purchaseRequestId, listing.getName(), purchaseRequest.getRequesterUser().getName());
+      notificationService.createNotification(
+          purchaseRequest.getListing().getUserEntity(),
+          NotificationTypeEnum.REVIEW_REQUEST,
+          payload);
+      var payload2 =
+          new ReviewNotificationPayload(
+              purchaseRequestId, listing.getName(), purchaseRequest.getListing().getName());
+      notificationService.createNotification(
+          purchaseRequest.getRequesterUser(), NotificationTypeEnum.REVIEW_REQUEST, payload2);
     } else {
       purchaseRequest.setStatus(PurchaseRequestStatusEnum.DECLINED);
+      purchaseRequestRepostitory.save(purchaseRequest);
     }
-    purchaseRequestRepostitory.save(purchaseRequest);
+
     var notification = notificationRepository.findByRequestId(purchaseRequestId);
     notificationService.markNotificationRead(notification.getId());
     return purchaseRequestMapper.toDto(purchaseRequest);

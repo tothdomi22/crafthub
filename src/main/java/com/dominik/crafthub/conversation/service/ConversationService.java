@@ -76,7 +76,7 @@ public class ConversationService {
       throw new NotPartOfThisConversationException();
     }
     var listing = listingRepository.findById(conversation.getListingEntity().getId()).orElseThrow();
-    var listingDto = listingMapper.toNoCategoriesDto(listing);
+    var listingDto = listingMapper.toNoCategoriesNoUserDto(listing);
     var recipient =
         conversation.getUserEntity1().getId().equals(user.getId())
             ? conversation.getUserEntity2()

@@ -2,8 +2,11 @@
 
 import React, {useEffect, useRef, useState} from "react";
 import BellSVG from "/public/svgs/bell.svg";
-import CheckSVG from "/public/svgs/check.svg";
-import {Notification, NotificationTypeEnum} from "@/app/types/notification";
+import {
+  Notification,
+  NotificationTypeEnum,
+  ReviewRequestNotificationType,
+} from "@/app/types/notification";
 import {useQuery} from "@tanstack/react-query";
 import useListUnread from "@/app/hooks/notification/useListUnread";
 import usePatchPurchaseRequest from "@/app/hooks/purchase-request/usePatchPurchaseRequest";
@@ -11,10 +14,16 @@ import {
   PurchaseRequestPatchRequest,
   PurchaseRequestStatusEnum,
 } from "@/app/types/purchaseRequest";
+import CreateReviewModal from "@/app/components/notification/CreateReviewModal";
+import ReviewNotification from "@/app/components/notification/ReviewNotification";
+import PurchaseRequestNotification from "@/app/components/notification/PurchaseRequestNotification";
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
+  const [reviewModalData, setReviewModalData] =
+    useState<ReviewRequestNotificationType | null>(null);
 
   const {data: notificationsData} = useQuery<Notification[]>({
     queryFn: useListUnread,
@@ -40,21 +49,7 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!notificationsData) {
-    return (
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2.5 rounded-xl transition-all ${
-          isOpen
-            ? "bg-slate-100 text-primary"
-            : "text-slate-500 hover:text-primary hover:bg-slate-50"
-        }`}>
-        <BellSVG className="w-6 h-6" />
-      </button>
-    );
-  }
-
-  const unreadCount = notificationsData.filter(n => !n.isRead).length;
+  const unreadCount = notificationsData?.filter(n => !n.isRead).length || 0;
 
   const handlePurchaseSelection = (
     e: React.MouseEvent,
@@ -65,6 +60,23 @@ export default function NotificationDropdown() {
     const data: PurchaseRequestPatchRequest = {status: status};
     patchPurchaseRequestMutation({purchaseRequestId: id, data: data});
   };
+
+  const openReviewModal = (e: React.MouseEvent, notif: Notification) => {
+    e.stopPropagation();
+    if (notif.type == NotificationTypeEnum.REVIEW_REQUEST) {
+      setReviewModalData(notif);
+      setIsReviewModalOpen(true);
+    }
+    setIsOpen(false); // Close dropdown
+  };
+
+  if (!notificationsData) {
+    return (
+      <button className="relative p-2.5 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-50 transition-all">
+        <BellSVG className="w-6 h-6" />
+      </button>
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -110,65 +122,33 @@ export default function NotificationDropdown() {
                   {!notif.isRead && (
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
                   )}
-
                   {notif.type === NotificationTypeEnum.PURCHASE_REQUEST && (
-                    <div className="flex gap-4">
-                      {/* Item Image */}
-                      <div className="w-12 h-12 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden border border-slate-100">
-                        <img
-                          src={"/images/placeholder.jpg"}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      <div className="flex-1">
-                        <p className="text-sm text-slate-600 leading-snug mb-2">
-                          <span className="font-bold text-slate-900">
-                            {notif.data.requesterName}
-                          </span>{" "}
-                          jelezte, hogy megvásárolta a(z){" "}
-                          <span className="font-bold text-slate-900">
-                            {notif.data.listingTitle}
-                          </span>{" "}
-                          termékedet.
-                        </p>
-
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
-                          <button
-                            onClick={e =>
-                              handlePurchaseSelection(
-                                e,
-                                PurchaseRequestStatusEnum.ACCEPT,
-                                String(notif.data.requestId),
-                              )
-                            }
-                            disabled={isPatchMutationPending}
-                            className="flex-1 bg-primary hover:bg-[#5b4cc4] text-white text-xs font-bold py-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition-all">
-                            <CheckSVG className="w-3.5 h-3.5" /> Elfogadás
-                          </button>
-                          <button
-                            onClick={e =>
-                              handlePurchaseSelection(
-                                e,
-                                PurchaseRequestStatusEnum.DECLINE,
-                                String(notif.data.requestId),
-                              )
-                            }
-                            disabled={isPatchMutationPending}
-                            className="flex-1 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 text-xs font-bold py-2 rounded-lg transition-all">
-                            Elutasítás
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <PurchaseRequestNotification
+                      notif={notif}
+                      isPatchMutationPending={isPatchMutationPending}
+                      handlePurchaseSelection={handlePurchaseSelection}
+                      key={notif.id}
+                    />
+                  )}
+                  {notif.type === NotificationTypeEnum.REVIEW_REQUEST && (
+                    <ReviewNotification
+                      notif={notif}
+                      openReviewModal={openReviewModal}
+                      key={notif.id}
+                    />
                   )}
                 </div>
               ))
             )}
           </div>
         </div>
+      )}
+      {reviewModalData && (
+        <CreateReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setReviewModalData(null)}
+          notif={reviewModalData}
+        />
       )}
     </div>
   );

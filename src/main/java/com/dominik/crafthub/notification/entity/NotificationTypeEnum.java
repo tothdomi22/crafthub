@@ -1,5 +1,6 @@
 package com.dominik.crafthub.notification.entity;
 
 public enum NotificationTypeEnum {
-  PURCHASE_REQUEST
+  PURCHASE_REQUEST,
+  REVIEW_REQUEST
 }

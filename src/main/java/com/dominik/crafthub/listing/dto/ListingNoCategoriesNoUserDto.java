@@ -1,10 +1,9 @@
 package com.dominik.crafthub.listing.dto;
 
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
-import com.dominik.crafthub.user.dto.UserDto;
 import java.time.OffsetDateTime;
 
-public record ListingNoCategoriesDto(
+public record ListingNoCategoriesNoUserDto(
     Long id,
     String name,
     Integer price,
@@ -12,5 +11,4 @@ public record ListingNoCategoriesDto(
     String city,
     String description,
     OffsetDateTime createdAt,
-    UserDto user,
     ListingStatusEnum status) {}

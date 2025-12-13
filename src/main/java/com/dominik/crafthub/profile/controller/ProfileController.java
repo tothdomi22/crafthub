@@ -45,12 +45,11 @@ public class ProfileController {
   @ExceptionHandler(ProfileAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> handleUserAlreadyExists() {
     return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(Map.of("message:", "User already has a profile"));
+        .body(Map.of("message", "User already has a profile"));
   }
 
   @ExceptionHandler(ProfileNotFoundException.class)
   public ResponseEntity<Map<String, String>> handleProfileNotFound() {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(Map.of("message:", "Profile not found"));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Profile not found"));
   }
 }

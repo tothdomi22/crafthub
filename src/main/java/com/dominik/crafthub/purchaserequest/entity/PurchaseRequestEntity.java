@@ -1,9 +1,12 @@
 package com.dominik.crafthub.purchaserequest.entity;
 
 import com.dominik.crafthub.listing.entity.ListingEntity;
+import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,4 +34,7 @@ public class PurchaseRequestEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "requester_user_id")
   private UserEntity requesterUser;
+
+  @OneToMany(mappedBy = "purchaseRequestEntity")
+  private Set<ReviewEntity> reviewEntity  = new LinkedHashSet<>();
 }
