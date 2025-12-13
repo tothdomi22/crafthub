@@ -3,6 +3,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import BellSVG from "/public/svgs/bell.svg";
 import CheckSVG from "/public/svgs/check.svg";
+import StarSVG from "/public/svgs/star.svg"; // Make sure to have this for the button icon
 import {Notification, NotificationTypeEnum} from "@/app/types/notification";
 import {useQuery} from "@tanstack/react-query";
 import useListUnread from "@/app/hooks/notification/useListUnread";
@@ -11,10 +12,19 @@ import {
   PurchaseRequestPatchRequest,
   PurchaseRequestStatusEnum,
 } from "@/app/types/purchaseRequest";
+import CreateReviewModal from "@/app/components/notification/CreateReviewModal";
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // --- New State for Review Modal ---
+  const [reviewModalData, setReviewModalData] = useState<{
+    isOpen: boolean;
+    purchaseRequestId: number;
+    listingTitle: string;
+    recipientName: string;
+  } | null>(null);
 
   const {data: notificationsData} = useQuery<Notification[]>({
     queryFn: useListUnread,
@@ -40,21 +50,7 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!notificationsData) {
-    return (
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2.5 rounded-xl transition-all ${
-          isOpen
-            ? "bg-slate-100 text-primary"
-            : "text-slate-500 hover:text-primary hover:bg-slate-50"
-        }`}>
-        <BellSVG className="w-6 h-6" />
-      </button>
-    );
-  }
-
-  const unreadCount = notificationsData.filter(n => !n.isRead).length;
+  const unreadCount = notificationsData?.filter(n => !n.isRead).length || 0;
 
   const handlePurchaseSelection = (
     e: React.MouseEvent,
@@ -65,6 +61,29 @@ export default function NotificationDropdown() {
     const data: PurchaseRequestPatchRequest = {status: status};
     patchPurchaseRequestMutation({purchaseRequestId: id, data: data});
   };
+
+  const openReviewModal = (e: React.MouseEvent, notif: Notification) => {
+    // Type as ReviewRequestNotification
+    e.stopPropagation();
+    if (notif.type == NotificationTypeEnum.REVIEW_REQUEST) {
+      setReviewModalData({
+        isOpen: true,
+        purchaseRequestId: notif.data.purchaseRequestId,
+        listingTitle: notif.data.listingTitle,
+        recipientName: notif.data.recipientName,
+      });
+    }
+
+    setIsOpen(false); // Close dropdown
+  };
+
+  if (!notificationsData) {
+    return (
+      <button className="relative p-2.5 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-50 transition-all">
+        <BellSVG className="w-6 h-6" />
+      </button>
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -111,9 +130,10 @@ export default function NotificationDropdown() {
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
                   )}
 
+                  {/* 1. PURCHASE REQUEST NOTIFICATION */}
                   {notif.type === NotificationTypeEnum.PURCHASE_REQUEST && (
                     <div className="flex gap-4">
-                      {/* Item Image */}
+                      {/* Placeholder Image - Ideally get from API */}
                       <div className="w-12 h-12 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden border border-slate-100">
                         <img
                           src={"/images/placeholder.jpg"}
@@ -134,7 +154,6 @@ export default function NotificationDropdown() {
                           termékedet.
                         </p>
 
-                        {/* Action Buttons */}
                         <div className="flex gap-2">
                           <button
                             onClick={e =>
@@ -164,11 +183,66 @@ export default function NotificationDropdown() {
                       </div>
                     </div>
                   )}
+
+                  {/* 2. REVIEW REQUEST NOTIFICATION (New) */}
+                  {notif.type === NotificationTypeEnum.REVIEW_REQUEST && (
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-yellow-100 text-yellow-500 rounded-lg flex-shrink-0 flex items-center justify-center border border-yellow-200">
+                        <StarSVG className="w-6 h-6 fill-current" />
+                      </div>
+
+                      <div className="flex-1">
+                        <p className="text-sm text-slate-600 leading-snug mb-2">
+                          Sikeres adásvétel! Kérlek értékeld a(z){" "}
+                          <span className="font-bold text-slate-900">
+                            {notif.data.recipientName}
+                          </span>{" "}
+                          felhasználóval kötött tranzakciót a{" "}
+                          <span className="font-bold text-slate-900">
+                            {notif.data.listingTitle}
+                          </span>{" "}
+                          termék kapcsán.
+                        </p>
+
+                        <button
+                          onClick={e => openReviewModal(e, notif)}
+                          className="w-full bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 rounded-lg shadow-sm transition-all">
+                          Értékelés írása
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3. LISTING EXPIRY (Placeholder UI) */}
+                  {notif.type === NotificationTypeEnum.LISING_EXPIRY && (
+                    <div className="flex gap-4">
+                      <div className="w-12 h-12 bg-slate-100 rounded-lg flex-shrink-0"></div>
+                      <div className="flex-1">
+                        <p className="text-sm text-slate-600">
+                          A hirdetésed lejárt:{" "}
+                          <span className="font-bold">
+                            {notif.data.listingTitle}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}
           </div>
         </div>
+      )}
+
+      {/* --- REVIEW MODAL --- */}
+      {reviewModalData && (
+        <CreateReviewModal
+          isOpen={reviewModalData.isOpen}
+          onClose={() => setReviewModalData(null)}
+          purchaseRequestId={reviewModalData.purchaseRequestId}
+          listingTitle={reviewModalData.listingTitle}
+          recipientName={reviewModalData.recipientName}
+        />
       )}
     </div>
   );
