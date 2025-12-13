@@ -15,3 +15,8 @@ export interface Review {
   reviewerUser: User;
   reviewType: ReviewTypeEnum;
 }
+
+export interface ReviewCreationRequest {
+  stars: number;
+  reviewText: string;
+}

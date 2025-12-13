@@ -10,17 +10,17 @@ export enum NotificationTypeEnum {
   REVIEW_REQUEST = "REVIEW_REQUEST",
 }
 
-interface PurchaseRequestNotification extends BaseNotification {
+export interface PurchaseRequestNotificationType extends BaseNotification {
   type: NotificationTypeEnum.PURCHASE_REQUEST;
   data: PurchaseRequestData;
 }
 
-interface CommentNotification extends BaseNotification {
+interface CommentNotificationType extends BaseNotification {
   type: NotificationTypeEnum.LISING_EXPIRY;
   data: ListingExpiryData;
 }
 
-interface ReviewRequestNotification extends BaseNotification {
+export interface ReviewRequestNotificationType extends BaseNotification {
   type: NotificationTypeEnum.REVIEW_REQUEST;
   data: ReviewRequestData;
 }
@@ -45,6 +45,6 @@ interface ListingExpiryData {
 }
 
 export type Notification =
-  | PurchaseRequestNotification
-  | CommentNotification
-  | ReviewRequestNotification;
+  | PurchaseRequestNotificationType
+  | CommentNotificationType
+  | ReviewRequestNotificationType;
