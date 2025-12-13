@@ -13,6 +13,6 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
   Optional<FavoriteEntity> findByListingEntity_IdAndUserEntity_Id(
       Long listingEntityId, Long userEntityId);
 
-  @EntityGraph(attributePaths = {"listingEntity"})
+  @EntityGraph(attributePaths = {"listingEntity", "userEntity"})
   List<FavoriteEntity> findAllByUserEntityId(Long userEntityId, Sort createdAt);
 }

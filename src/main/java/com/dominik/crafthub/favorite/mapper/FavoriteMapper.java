@@ -1,7 +1,6 @@
 package com.dominik.crafthub.favorite.mapper;
 
 import com.dominik.crafthub.favorite.dto.FavoriteDto;
-import com.dominik.crafthub.favorite.dto.FavoriteNoUserDto;
 import com.dominik.crafthub.favorite.entity.FavoriteEntity;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
@@ -27,6 +26,7 @@ public interface FavoriteMapper {
   @Mapping(target = "listing", source = "listingEntity")
   FavoriteDto toDto(FavoriteEntity favorite);
 
+  @Mapping(target = "user", source = "userEntity")
   @Mapping(target = "listing", source = "listingEntity")
-  FavoriteNoUserDto toListDto(FavoriteEntity favorite);
+  FavoriteDto toListDto(FavoriteEntity favorite);
 }

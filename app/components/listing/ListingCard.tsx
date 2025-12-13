@@ -1,15 +1,17 @@
 import React from "react";
 import {Listing} from "@/app/types/listing";
-import FavoriteSVG from "@/app/components/global/FavoriteSVG";
+import FavoriteSVG from "/public/svgs/favorite.svg";
 
 export default function ListingCard({
   listing,
   showFooter = true,
   isManageFavoritePending,
   handleManageFavorite,
+  isFavoritesPage = false,
 }: {
   listing: Listing;
   showFooter?: boolean;
+  isFavoritesPage?: boolean;
   isManageFavoritePending: boolean;
   handleManageFavorite: (listingId: number, isCurrentlyLiked: boolean) => void;
 }) {
@@ -35,20 +37,25 @@ export default function ListingCard({
           </span>
         )}
 
-        {/* Favorite Button */}
+        {/* Like Button */}
         <button
           disabled={isManageFavoritePending}
-          className={`absolute top-3 right-3 p-2 rounded-full shadow-sm transition-all duration-300
-    ${
-      listing.isLiked
-        ? "opacity-100 bg-white/60 text-[#f55e53] hover:bg-white backdrop-blur-md" // Liked: ALWAYS VISIBLE, Red Icon
-        : "opacity-0 group-hover:opacity-100 bg-white/60 text-slate-600 hover:bg-white hover:text-[#f55e53] backdrop-blur-md" // Not Liked: Hidden until hover, Gray Icon
-    }`}
           onClick={e => {
             e.preventDefault();
+            e.stopPropagation();
             handleManageFavorite(listing.id, listing.isLiked);
-          }}>
-          <FavoriteSVG filled={listing.isLiked} />
+          }}
+          title={listing.isLiked || isFavoritesPage ? "Eltávolítás" : "Mentés"}
+          className={`
+            absolute top-2 right-2 p-2 rounded-full shadow-sm backdrop-blur-sm z-10 
+            transition-all duration-200 hover:scale-110 active:scale-95 flex items-center justify-center
+            ${
+              listing.isLiked || isFavoritesPage
+                ? "bg-white text-red-500 opacity-100"
+                : "bg-white/80 text-slate-400 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-slate-400"
+            }
+          `}>
+          <FavoriteSVG className={`w-5 h-5 transition-colors`} />
         </button>
       </div>
 

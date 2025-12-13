@@ -2,7 +2,6 @@ package com.dominik.crafthub.favorite.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.favorite.dto.FavoriteDto;
-import com.dominik.crafthub.favorite.dto.FavoriteNoUserDto;
 import com.dominik.crafthub.favorite.exception.FavoriteExistsException;
 import com.dominik.crafthub.favorite.exception.FavoriteNotFoundException;
 import com.dominik.crafthub.favorite.mapper.FavoriteMapper;
@@ -55,7 +54,7 @@ public class FavoriteService {
     favoriteRepository.delete(favoriteEntity);
   }
 
-  public List<FavoriteNoUserDto> getUserFavorites() {
+  public List<FavoriteDto> getUserFavorites() {
     var user = authService.getCurrentUser();
     var favoriteList =
         favoriteRepository.findAllByUserEntityId(
