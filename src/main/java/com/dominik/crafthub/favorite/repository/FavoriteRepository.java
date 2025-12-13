@@ -3,6 +3,7 @@ package com.dominik.crafthub.favorite.repository;
 import com.dominik.crafthub.favorite.entity.FavoriteEntity;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,5 +14,5 @@ public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> 
       Long listingEntityId, Long userEntityId);
 
   @EntityGraph(attributePaths = {"listingEntity"})
-  List<FavoriteEntity> findAllByUserEntityId(Long userEntityId);
+  List<FavoriteEntity> findAllByUserEntityId(Long userEntityId, Sort createdAt);
 }

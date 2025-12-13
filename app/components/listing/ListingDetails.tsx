@@ -190,12 +190,12 @@ export default function ListingDetails({
               <button
                 onClick={() => setIsSaved(!isSaved)}
                 className={`flex-shrink-0 p-3 rounded-xl transition-all ${
-                  isSaved
+                  listingData.liked
                     ? "text-red-500 bg-red-50"
                     : "text-slate-400 bg-slate-50 hover:bg-slate-100"
                 }`}>
                 <FavoriteSVG
-                  className={`w-6 h-6 ${isSaved ? "fill-current" : ""}`}
+                  className={`w-6 h-6 ${listingData.liked ? "fill-current" : ""}`}
                 />
               </button>
             </div>

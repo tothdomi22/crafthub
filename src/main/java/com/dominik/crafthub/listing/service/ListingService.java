@@ -2,6 +2,7 @@ package com.dominik.crafthub.listing.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.conversation.repository.ConversationRepository;
+import com.dominik.crafthub.favorite.repository.FavoriteRepository;
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingDto;
 import com.dominik.crafthub.listing.dto.ListingSingleViewDto;
@@ -31,6 +32,7 @@ public class ListingService {
   private final UserService userService;
   private final ConversationRepository conversationRepository;
   private final PurchaseRequestRepostitory purchaseRequestRepostitory;
+  private final FavoriteRepository favoriteRepository;
 
   public ListingDto createListing(ListingCreateRequest request) {
     var user = authService.getCurrentUser();
@@ -73,7 +75,8 @@ public class ListingService {
     var purchaseRequestExists =
         purchaseRequestRepostitory.existsByRequesterUser_IdAndListing_IdAndStatus(
             user.getId(), id, PurchaseRequestStatusEnum.PENDING);
-    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists);
+    var favorite = favoriteRepository.existsByListingEntity_IdAndUserEntity_Id(id, user.getId());
+    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists, favorite);
   }
 
   public ListingDto updateListing(Long id, ListingUpdateRequest request) {

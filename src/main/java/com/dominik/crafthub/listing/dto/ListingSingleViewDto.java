@@ -17,4 +17,5 @@ public record ListingSingleViewDto(
     SubCategoryDto subCategory,
     UserDto user,
     Long conversationId,
+    Boolean liked,
     Boolean pendingRequestExists) {}

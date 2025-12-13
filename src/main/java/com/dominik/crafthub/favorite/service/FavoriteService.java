@@ -12,6 +12,7 @@ import com.dominik.crafthub.listing.repository.ListingRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -56,7 +57,9 @@ public class FavoriteService {
 
   public List<FavoriteNoUserDto> getUserFavorites() {
     var user = authService.getCurrentUser();
-    var favoriteList = favoriteRepository.findAllByUserEntityId(user.getId());
+    var favoriteList =
+        favoriteRepository.findAllByUserEntityId(
+            user.getId(), Sort.by(Sort.Direction.DESC, "createdAt"));
     return favoriteList.stream().map(favoriteMapper::toListDto).toList();
   }
 }

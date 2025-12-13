@@ -38,5 +38,8 @@ public interface ListingMapper {
   @Mapping(source = "listingEntity.shippable", target = "canShip")
   @Mapping(source = "listingEntity.userEntity", target = "user")
   ListingSingleViewDto toSingleViewDto(
-      ListingEntity listingEntity, Long conversationId, Boolean pendingRequestExists);
+      ListingEntity listingEntity,
+      Long conversationId,
+      Boolean pendingRequestExists,
+      Boolean liked);
 }
