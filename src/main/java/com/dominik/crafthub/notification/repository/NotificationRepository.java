@@ -34,4 +34,14 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
         """,
       nativeQuery = true)
   void markAllReadByListingId(@Param("listingId") Long listingId);
+
+  @Query(
+      value =
+          """
+        SELECT * FROM notification n
+        WHERE (CAST(n.data ->> 'purchaseRequestId' AS bigint) = :purchaseRequestId AND n.user_id = :userId)
+        """,
+      nativeQuery = true)
+  NotificationEntity findByUserIdAndPurchaseRequestId(
+      @Param("userId") Long userId, @Param("purchaseRequestId") Long purchaseRequestId);
 }

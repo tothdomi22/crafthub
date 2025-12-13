@@ -2,6 +2,8 @@ package com.dominik.crafthub.review.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
 import com.dominik.crafthub.listing.service.ListingService;
+import com.dominik.crafthub.notification.repository.NotificationRepository;
+import com.dominik.crafthub.notification.service.NotificationService;
 import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestStatusEnum;
 import com.dominik.crafthub.purchaserequest.exception.PurchaseRequestNotFoundException;
 import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
@@ -27,6 +29,8 @@ public class ReviewService {
   private final ReviewMapper reviewMapper;
   private final ReviewRepository reviewRepository;
   private final PurchaseRequestRepostitory purchaseRequestRepostitory;
+  private final NotificationService notificationService;
+  private final NotificationRepository notificationRepository;
 
   public ReviewDto createReview(Long purchaseRequestId, ReviewCreateRequest request) {
     var user = authService.getCurrentUser();
@@ -57,6 +61,9 @@ public class ReviewService {
         reviewMapper.toEntity(
             request, user, listing, OffsetDateTime.now(), reviewType, purchaseRequestEntity);
     reviewRepository.save(review);
+    var notification =
+        notificationRepository.findByUserIdAndPurchaseRequestId(user.getId(), purchaseRequestId);
+    notificationService.markNotificationRead(notification.getId());
     return reviewMapper.toDto(review);
   }
 
