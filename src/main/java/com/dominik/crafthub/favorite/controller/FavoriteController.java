@@ -1,6 +1,7 @@
 package com.dominik.crafthub.favorite.controller;
 
 import com.dominik.crafthub.favorite.exception.FavoriteExistsException;
+import com.dominik.crafthub.favorite.exception.FavoriteNotFoundException;
 import com.dominik.crafthub.favorite.service.FavoriteService;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.user.exceptions.UserNotFoundException;
@@ -22,6 +23,12 @@ public class FavoriteController {
     return ResponseEntity.status(HttpStatus.CREATED).body(favoriteDto);
   }
 
+  @DeleteMapping("/{listingId}")
+  public ResponseEntity<?> deleteFavorite(@PathVariable Long listingId) {
+    favoriteService.deleteFavorite(listingId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
   @ExceptionHandler(ListingNotFoundException.class)
   public ResponseEntity<Map<String, String>> listingNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Listing not found"));
@@ -36,5 +43,11 @@ public class FavoriteController {
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<Map<String, String>> userNotFoud() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "User not found"));
+  }
+
+  @ExceptionHandler(FavoriteNotFoundException.class)
+  public ResponseEntity<Map<String, String>> favoriteNotFoud() {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("message", "Favorite record not found"));
   }
 }
