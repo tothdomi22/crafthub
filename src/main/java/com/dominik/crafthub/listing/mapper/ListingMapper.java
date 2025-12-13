@@ -21,7 +21,10 @@ public interface ListingMapper {
   @Mapping(source = "subCategoryEntity", target = "subCategory")
   @Mapping(target = "canShip", source = "shippable")
   @Mapping(source = "userEntity", target = "user")
+  @Mapping(source = "city", target = "city")
   ListingDto toDto(ListingEntity listingEntity);
+
+  ListingsWithLikesDto toListingWithLikesDto(ListingEntity listingEntity);
 
   @Mapping(target = "subCategoryEntity.id", source = "subCategoryId")
   @Mapping(source = "canShip", target = "shippable")
@@ -41,5 +44,5 @@ public interface ListingMapper {
       ListingEntity listingEntity,
       Long conversationId,
       Boolean pendingRequestExists,
-      Boolean liked);
+      Boolean isLiked);
 }

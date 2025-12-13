@@ -6,9 +6,12 @@ export default function useManageFavorite() {
     mutationFn: async ({
       listingId,
       isCurrentlyLiked,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      userId,
     }: {
       listingId: number;
       isCurrentlyLiked: boolean;
+      userId?: string;
     }) => {
       const url = isCurrentlyLiked
         ? `/api/favorite/delete?listingId=${listingId}`
@@ -33,6 +36,11 @@ export default function useManageFavorite() {
       await queryClient.invalidateQueries({
         queryKey: ["listing" + variables.listingId],
       });
+      if (variables.userId) {
+        await queryClient.invalidateQueries({
+          queryKey: ["listings" + variables.userId],
+        });
+      }
     },
   });
 }

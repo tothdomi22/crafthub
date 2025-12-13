@@ -44,5 +44,5 @@ export interface Listing extends ListingNoCategoryAndUser {
   user: User;
   conversationId: number | null;
   pendingRequestExists: boolean;
-  liked: boolean;
+  isLiked: boolean;
 }

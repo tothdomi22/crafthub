@@ -1,13 +1,17 @@
 import React from "react";
 import {Listing} from "@/app/types/listing";
-import FavoriteSVG from "/public/svgs/favorite.svg";
+import FavoriteSVG from "@/app/components/global/FavoriteSVG";
 
 export default function ListingCard({
   listing,
   showFooter = true,
+  isManageFavoritePending,
+  handleManageFavorite,
 }: {
   listing: Listing;
   showFooter?: boolean;
+  isManageFavoritePending: boolean;
+  handleManageFavorite: (listingId: number, isCurrentlyLiked: boolean) => void;
 }) {
   const isNew = (itemCreatedDate: string) => {
     const createdDate = new Date(itemCreatedDate).getTime();
@@ -33,12 +37,18 @@ export default function ListingCard({
 
         {/* Favorite Button */}
         <button
-          className="absolute top-3 right-3 p-2 bg-white/60 backdrop-blur-md rounded-full text-slate-600 hover:bg-white hover:text-red-500 transition-all opacity-0 group-hover:opacity-100 shadow-sm"
+          disabled={isManageFavoritePending}
+          className={`absolute top-3 right-3 p-2 rounded-full shadow-sm transition-all duration-300
+    ${
+      listing.isLiked
+        ? "opacity-100 bg-white/60 text-[#f55e53] hover:bg-white backdrop-blur-md" // Liked: ALWAYS VISIBLE, Red Icon
+        : "opacity-0 group-hover:opacity-100 bg-white/60 text-slate-600 hover:bg-white hover:text-[#f55e53] backdrop-blur-md" // Not Liked: Hidden until hover, Gray Icon
+    }`}
           onClick={e => {
             e.preventDefault();
-            // TODO: Add favorite logic
+            handleManageFavorite(listing.id, listing.isLiked);
           }}>
-          <FavoriteSVG />
+          <FavoriteSVG filled={listing.isLiked} />
         </button>
       </div>
 

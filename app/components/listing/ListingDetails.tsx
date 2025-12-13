@@ -200,15 +200,15 @@ export default function ListingDetails({
               <button
                 disabled={isManageFavoritePending}
                 onClick={() =>
-                  handleManageFavorite(listingData.id, listingData.liked)
+                  handleManageFavorite(listingData.id, listingData.isLiked)
                 }
                 className={`flex-shrink-0 p-3 rounded-xl transition-all ${
-                  listingData.liked
+                  listingData.isLiked
                     ? "text-red-500 bg-red-50"
                     : "text-slate-400 bg-slate-50 hover:bg-slate-100"
                 }`}>
                 <FavoriteSVG
-                  className={`w-6 h-6 ${listingData.liked ? "fill-current" : ""}`}
+                  className={`w-6 h-6 ${listingData.isLiked ? "fill-current" : ""}`}
                 />
               </button>
             </div>
