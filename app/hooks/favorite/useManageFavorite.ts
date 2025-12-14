@@ -32,6 +32,7 @@ export default function useManageFavorite() {
     },
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({queryKey: ["listings"]});
+      await queryClient.invalidateQueries({queryKey: ["listings-infinite"]});
       await queryClient.invalidateQueries({queryKey: ["my-listings"]});
       await queryClient.invalidateQueries({queryKey: ["favorites"]});
       await queryClient.invalidateQueries({

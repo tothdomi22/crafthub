@@ -26,8 +26,10 @@ public class ListingController {
   }
 
   @GetMapping({"/list", "/list/{id}"})
-  public ResponseEntity<?> listListings(@PathVariable(required = false) Long id) {
-    var listings = listingService.listListings(id);
+  public ResponseEntity<?> listListings(
+      @PathVariable(required = false) Long id, @RequestParam(defaultValue = "0") int page) {
+    int size = 12;
+    var listings = listingService.listListings(id, page, size);
     return ResponseEntity.ok(listings);
   }
 

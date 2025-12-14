@@ -17,6 +17,10 @@ import com.dominik.crafthub.user.service.UserService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,9 +47,11 @@ public class ListingService {
     return listingMapper.toDto(listing);
   }
 
-  public List<ListingsWithLikesDto> listListings(Long id) {
+  public Page<ListingsWithLikesDto> listListings(Long id, int page, int size) {
     var user = authService.getCurrentUser();
-    return listingRepository.findAllListingsWithIsLiked(user.getId());
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+    return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
     //    return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
     //        .map(listingMapper::toListingWithLikesDto)
     //        .toList();

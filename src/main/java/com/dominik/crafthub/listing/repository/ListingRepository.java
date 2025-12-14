@@ -3,6 +3,8 @@ package com.dominik.crafthub.listing.repository;
 import com.dominik.crafthub.listing.dto.ListingsWithLikesDto;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,7 +24,8 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
   List<ListingEntity> findAllListings();
 
   @Query(
-      """
+      value =
+          """
         SELECT new com.dominik.crafthub.listing.dto.ListingsWithLikesDto(
         l.id,
         l.name,
@@ -59,6 +62,13 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+        """,
+      countQuery =
+          """
+        SELECT COUNT(l)
+        FROM ListingEntity l
+        WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
         """)
-  List<ListingsWithLikesDto> findAllListingsWithIsLiked(@Param("userId") Long userId);
+  Page<ListingsWithLikesDto> findAllListingsWithIsLiked(
+      @Param("userId") Long userId, Pageable pageable);
 }
