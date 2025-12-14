@@ -58,6 +58,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN l.userEntity u
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
+        WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
         """)
   List<ListingsWithLikesDto> findAllListingsWithIsLiked(@Param("userId") Long userId);
 }
