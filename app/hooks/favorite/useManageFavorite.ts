@@ -31,6 +31,7 @@ export default function useManageFavorite() {
       return responseJson;
     },
     onSuccess: async (_data, variables) => {
+      // FIXME: this make is refetch every listing, thats 3 fetches per page. fix with optimistic update and dont refetch
       await queryClient.invalidateQueries({queryKey: ["listings"]});
       await queryClient.invalidateQueries({queryKey: ["listings-infinite"]});
       await queryClient.invalidateQueries({queryKey: ["my-listings"]});
