@@ -45,7 +45,8 @@ public class UserService {
 
   public ResponseCookie deleteUser() {
     var user = authService.getCurrentUser();
-    var profile = profileRepository.findByUserEntity_Id(user.getId()).orElse(null);
+
+    var profile = profileRepository.findProfileByUserId(user.getId()).orElse(null);
     if (profile != null) {
       profile.setBio(null);
       profile.setBirthDate(LocalDate.of(1900, 1, 1));

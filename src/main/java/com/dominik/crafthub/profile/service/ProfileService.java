@@ -11,7 +11,6 @@ import com.dominik.crafthub.profile.mapper.ProfileMapper;
 import com.dominik.crafthub.profile.repository.ProfileRepository;
 import com.dominik.crafthub.review.entity.ReviewEntity;
 import com.dominik.crafthub.review.repository.ReviewRepository;
-import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import com.dominik.crafthub.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class ProfileService {
 
   public ProfileDto updateProfile(ProfileUpdateRequest request) {
     var user = authService.getCurrentUser();
-    var profile = profileRepository.findByUserEntity_Id(user.getId()).orElse(null);
+    var profile = profileRepository.findProfileByUserId(user.getId()).orElse(null);
     if (profile == null) {
       throw new ProfileNotFoundException();
     }
@@ -49,15 +48,10 @@ public class ProfileService {
   }
 
   public ProfilePageDto getProfile(Long id) {
-    var profile = profileRepository.findByUserEntity_Id(id).orElse(null);
+    var profile = profileRepository.findProfileByUserId(id).orElse(null);
     if (profile == null) {
       throw new ProfileNotFoundException();
     }
-    var user = userRepository.findById(id).orElse(null);
-    if (user == null) {
-      throw new UserNotFoundException();
-    }
-    profile.setUserEntity(user);
     var reviews = reviewRepository.findAllReviewsOfUser(id);
     var reviewCount = reviews.size();
     var reviewAverage = reviews.stream().mapToInt(ReviewEntity::getStars).average().orElse(0);
