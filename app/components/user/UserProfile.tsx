@@ -1,7 +1,7 @@
 "use client";
 import React, {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
-import {Listing} from "@/app/types/listing";
+import {ListingPagination} from "@/app/types/listing";
 import useListListingById from "@/app/hooks/listing/useListListingById";
 import {Review, ReviewTypeEnum} from "@/app/types/review";
 import useListReviewsById from "@/app/hooks/review/useListReviewsById";
@@ -17,14 +17,9 @@ import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 
 export default function UserProfile({id}: {id: string}) {
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
-  const {data: listingData} = useQuery<Listing[]>({
+  const {data: listingData} = useQuery<ListingPagination>({
     queryFn: () => useListListingById(id),
     queryKey: ["listings" + id],
-    select: data =>
-      [...data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
   });
   const {data: reviewData} = useQuery<Review[]>({
     queryFn: () => useListReviewsById(id),
@@ -93,7 +88,7 @@ export default function UserProfile({id}: {id: string}) {
                     ))}
                   </div>
                   <span className="text-sm font-bold text-slate-700">
-                    {profileData.review}
+                    {profileData.review.toFixed(1)}
                   </span>
                   <span className="text-xs text-slate-400 font-medium border-l border-slate-200 pl-2 ml-1">
                     {profileData.reviewCount} értékelés
@@ -139,7 +134,7 @@ export default function UserProfile({id}: {id: string}) {
               ? "text-primary"
               : "text-slate-500 hover:text-slate-800"
           }`}>
-          Hirdetései ({listingData && listingData.length})
+          Hirdetései ({listingData && listingData.totalElements})
           {activeTab === "shop" && (
             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></span>
           )}
@@ -164,7 +159,7 @@ export default function UserProfile({id}: {id: string}) {
         /* ACTIVE LISTINGS GRID (Unified with Home Page) */
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {listingData &&
-            listingData.map(item => (
+            listingData.content.map(item => (
               <Link key={item.id} href={`/listing/${item.id}`}>
                 <ListingCard
                   listing={item}
@@ -217,7 +212,14 @@ export default function UserProfile({id}: {id: string}) {
                     <div className="flex text-[#00B894]">
                       {/*FIXME: fix the filling of stars*/}
                       {[1, 2, 3, 4, 5].map(i => (
-                        <StarSvg key={i} />
+                        <StarSvg
+                          key={i}
+                          className={
+                            i <= Math.round(review.stars)
+                              ? "fill-current"
+                              : "text-slate-200"
+                          }
+                        />
                       ))}
                     </div>
                   </div>

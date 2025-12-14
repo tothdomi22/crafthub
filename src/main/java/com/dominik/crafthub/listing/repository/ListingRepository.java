@@ -85,6 +85,55 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
   @Query(
       value =
           """
+                  SELECT new com.dominik.crafthub.listing.dto.ListingsWithLikesDto(
+                  l.id,
+                  l.name,
+                  l.price,
+                  l.shippable,
+                  l.city,
+                  l.description,
+                  l.createdAt,
+                  l.status,
+                  new com.dominik.crafthub.subcategory.dto.SubCategoryDto(
+                          sc.id,
+                          sc.description,
+                          sc.uniqueName,
+                          sc.displayName,
+                          new com.dominik.crafthub.maincategory.dto.MainCategoryDto(
+                              mc.id,
+                              mc.description,
+                              mc.uniqueName,
+                              mc.displayName
+                          )
+                      ),
+                      new com.dominik.crafthub.user.dto.UserDto(
+                          u.id,
+                          u.name,
+                          u.email,
+                          u.role,
+                          u.createdAt),
+                  CASE WHEN f.id IS NOT NULL THEN true ELSE false END
+                  )
+                  FROM ListingEntity l
+                  LEFT JOIN l.subCategoryEntity sc
+                  LEFT JOIN sc.mainCategoryEntity mc
+                  LEFT JOIN l.userEntity u
+                  LEFT JOIN FavoriteEntity f
+                      ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
+                  WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED  AND l.userEntity.id = :searchUserId
+                  """,
+      countQuery =
+          """
+                  SELECT COUNT(l)
+                  FROM ListingEntity l
+                  WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED AND l.userEntity.id = :searchUserId
+                  """)
+  Page<ListingsWithLikesDto> findAllUseresListingsWithIsLiked(
+      @Param("userId") Long userId, @Param("searchUserId") Long searchUserId, Pageable pageable);
+
+  @Query(
+      value =
+          """
         SELECT new com.dominik.crafthub.listing.dto.ListingSingleViewDto(
         l.id,
         l.name,

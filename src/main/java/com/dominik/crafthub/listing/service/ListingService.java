@@ -50,20 +50,12 @@ public class ListingService {
   public Page<ListingsWithLikesDto> listListings(Long id, int page, int size) {
     var user = authService.getCurrentUser();
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-    return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
-    //    return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
-    //        .map(listingMapper::toListingWithLikesDto)
-    //        .toList();
-    //    if (id != null) {
-    //      return listingRepository.findAllByUserEntityId(id).stream()
-    //          .map(listingMapper::toDto)
-    //          .toList();
-    //    } else {
-    //      return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
-    //          .map(listingMapper::toListingWithLikesDto)
-    //          .toList();
-    //    }
+    if (id == null) {
+      return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
+    } else {
+      System.out.println(id);
+      return listingRepository.findAllUseresListingsWithIsLiked(user.getId(), id, pageable);
+    }
   }
 
   public List<ListingDto> listMyListings() {
