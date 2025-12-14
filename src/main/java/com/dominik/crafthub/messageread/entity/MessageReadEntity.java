@@ -1,4 +1,4 @@
-package com.dominik.crafthub.messageread;
+package com.dominik.crafthub.messageread.entity;
 
 import com.dominik.crafthub.message.entity.MessageEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
