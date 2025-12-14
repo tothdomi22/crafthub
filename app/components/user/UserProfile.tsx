@@ -235,11 +235,7 @@ export default function UserProfile({id}: {id: string}) {
             {!hasNextPage &&
               listingData?.pages[0]?.content.length !== 0 &&
               !isListingsLoading && (
-                <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
-                  <span className="w-12 h-px bg-slate-200"></span>
-                  Vége a hirdetéseknek
-                  <span className="w-12 h-px bg-slate-200"></span>
-                </div>
+                <div className="flex items-center gap-2 text-slate-300 text-sm font-medium"></div>
               )}
           </div>
         </>
