@@ -6,6 +6,7 @@ import com.dominik.crafthub.favorite.repository.FavoriteRepository;
 import com.dominik.crafthub.listing.dto.*;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
+import com.dominik.crafthub.listing.exception.CantReviveArchiedListingException;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
@@ -99,6 +100,12 @@ public class ListingService {
       var subCategory = subCategoryService.findSubCategoryById(request.subCategoryId());
       listing.setSubCategoryEntity(subCategory);
     }
+    if ((request.status().equals(ListingStatusEnum.FROZEN)
+            || request.status().equals(ListingStatusEnum.ACTIVE))
+        && listing.getStatus().equals(ListingStatusEnum.ARCHIVED)) {
+      throw new CantReviveArchiedListingException();
+    }
+
     listingMapper.update(request, listing);
     listingRepository.save(listing);
     return listingMapper.toDto(listing);

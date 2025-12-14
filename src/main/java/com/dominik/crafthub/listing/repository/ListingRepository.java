@@ -11,17 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
-  List<ListingEntity> findAllByUserEntityId(Long userEntityId);
-
   @EntityGraph(
       attributePaths = {
         "subCategoryEntity",
         "userEntity",
         "subCategoryEntity.mainCategoryEntity",
-        "userEntity.profiles"
       })
-  @Query("SELECT l FROM ListingEntity l")
-  List<ListingEntity> findAllListings();
+  List<ListingEntity> findAllByUserEntityId(Long userEntityId);
 
   @Query(
       value =

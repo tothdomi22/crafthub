@@ -33,7 +33,6 @@ export default function MyListings() {
   const {mutate: updateListingMutation} = useUpdateListing();
 
   const handleStatusChange = (id: string, newStatus: ListingStatusEnum) => {
-    console.log("Change status to", newStatus);
     const data: ListingUpdateRequest = {status: newStatus};
     updateListingMutation({id, data});
   };
