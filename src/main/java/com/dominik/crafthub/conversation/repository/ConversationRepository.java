@@ -56,7 +56,7 @@ public interface ConversationRepository extends JpaRepository<ConversationEntity
             ),
             m.createdAt
         ),
-        CASE WHEN mr.id IS NOT NULL THEN true ELSE false END
+        CASE WHEN mr.readAt IS NULL AND mr.userEntity.id = :userId THEN false ELSE true END
                 )
         FROM ConversationEntity c
         LEFT JOIN MessageEntity m

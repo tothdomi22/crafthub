@@ -33,7 +33,9 @@ public class MessageService {
       throw new NotPartOfThisConversationException();
     }
     var recipient =
-        conversation.getUserEntity1().equals(user) ? conversation.getUserEntity2() : user;
+        conversation.getUserEntity1().equals(user)
+            ? conversation.getUserEntity2()
+            : conversation.getUserEntity1();
     var messageEntity =
         messageMapper.toEntity(request.textContent(), OffsetDateTime.now(), conversation, user);
     var messageReadEntity = messageReadMapper.toEntity(messageEntity, recipient);

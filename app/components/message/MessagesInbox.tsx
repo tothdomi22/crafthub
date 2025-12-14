@@ -3,15 +3,17 @@ import Link from "next/link";
 import {formatDate} from "@/app/components/utils";
 import React from "react";
 import {useQuery} from "@tanstack/react-query";
-import {Conversation} from "@/app/types/conversation";
+import {ConvoWithLastMessageAndUnreadList} from "@/app/types/conversation";
 import useListConversation from "@/app/hooks/conversation/useListConversation";
 import {User} from "@/app/types/user";
 
 export default function MessagesInbox({user}: {user: User}) {
-  const {data: conversationsData} = useQuery<Conversation[]>({
-    queryFn: useListConversation,
-    queryKey: ["conversations"],
-  });
+  const {data: conversationsData} = useQuery<ConvoWithLastMessageAndUnreadList>(
+    {
+      queryFn: useListConversation,
+      queryKey: ["conversations"],
+    },
+  );
 
   if (!conversationsData) {
     return (
@@ -40,19 +42,20 @@ export default function MessagesInbox({user}: {user: User}) {
           {/* List */}
           <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
             <div className="flex flex-col gap-3">
-              {conversationsData.map(conv => {
+              {conversationsData.conversations.map(conv => {
                 // const isUnread =
                 //   !conv.lastMessage.isRead && !conv.lastMessage.isMine;
-                const isUnread = false;
                 const otherUser =
-                  conv.userOne.id == user.id ? conv.userTwo : conv.userOne;
+                  conv.conversation.userOne.id == user.id
+                    ? conv.conversation.userTwo
+                    : conv.conversation.userOne;
 
                 return (
                   <Link
-                    key={conv.id}
-                    href={`/messages/${conv.id}`}
+                    key={conv.conversation.id}
+                    href={`/messages/${conv.conversation.id}`}
                     className={`group flex gap-4 p-4 rounded-xl border transition-all hover:shadow-md ${
-                      isUnread
+                      !conv.isRead
                         ? "bg-indigo-50/50 border-indigo-100"
                         : "bg-white border-slate-100 hover:border-primary/30"
                     }`}>
@@ -67,28 +70,28 @@ export default function MessagesInbox({user}: {user: User}) {
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <div className="flex justify-between items-baseline mb-1">
                         <h3
-                          className={`text-base truncate ${isUnread ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`}>
+                          className={`text-base truncate ${!conv.isRead ? "font-bold text-slate-900" : "font-semibold text-slate-700"}`}>
                           {otherUser.name}
                         </h3>
                         <span
-                          className={`text-xs whitespace-nowrap ml-2 ${isUnread ? "text-primary font-bold" : "text-slate-400"}`}>
-                          {formatDate(conv.updatedAt)}
+                          className={`text-xs whitespace-nowrap ml-2 ${!conv.isRead ? "text-primary font-bold" : "text-slate-400"}`}>
+                          {formatDate(conv.conversation.updatedAt)}
                         </span>
                       </div>
 
                       <div className="flex items-center justify-between gap-4">
                         <p
                           className={`text-sm truncate leading-relaxed max-w-[80%] ${
-                            isUnread
+                            !conv.isRead
                               ? "font-bold text-slate-800"
                               : "text-slate-500"
                           }`}>
-                          {/*{conv.lastMessage.isMine && (*/}
-                          {/*  <span className="font-normal text-slate-400">*/}
-                          {/*    Te:{" "}*/}
-                          {/*  </span>*/}
-                          {/*)}*/}
-                          {/*{conv.lastMessage.text}*/}
+                          {conv.lastMessage.sender.id == user.id && (
+                            <span className="font-normal text-slate-400">
+                              Te:{" "}
+                            </span>
+                          )}
+                          {conv.lastMessage.textContent}
                         </p>
 
                         {/* Listing Pill */}
@@ -99,7 +102,7 @@ export default function MessagesInbox({user}: {user: User}) {
                             className="w-4 h-4 rounded object-cover"
                           />
                           <span className="text-[10px] font-bold text-slate-600 truncate">
-                            {conv.listing.name}
+                            {conv.conversation.listing.name}
                           </span>
                         </div>
                       </div>
@@ -108,7 +111,7 @@ export default function MessagesInbox({user}: {user: User}) {
                 );
               })}
 
-              {conversationsData.length === 0 && (
+              {conversationsData.conversations.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-center opacity-60 mt-20">
                   <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-3xl mb-4">
                     📭
@@ -147,16 +150,18 @@ export default function MessagesInbox({user}: {user: User}) {
             <div className="w-full h-px bg-slate-100 mb-6"></div>
 
             {/*TODO: set to cols-2 once we have unread*/}
-            <div className="grid grid-cols-1 gap-4 w-full">
-              {/*<div className="bg-slate-50 rounded-xl p-3 border border-slate-100">*/}
-              {/*  <div className="text-2xl font-bold text-primary">1</div>*/}
-              {/*  <div className="text-[10px] font-bold text-slate-400 uppercase">*/}
-              {/*    Olvasatlan*/}
-              {/*  </div>*/}
-              {/*</div>*/}
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                <div className="text-2xl font-bold text-primary">
+                  {conversationsData.unread}
+                </div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase">
+                  Olvasatlan
+                </div>
+              </div>
               <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
                 <div className="text-2xl font-bold text-slate-700">
-                  {conversationsData.length}
+                  {conversationsData.conversations.length}
                 </div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase">
                   Összes

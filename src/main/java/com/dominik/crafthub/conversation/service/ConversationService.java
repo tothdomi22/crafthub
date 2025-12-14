@@ -19,7 +19,6 @@ import com.dominik.crafthub.user.mapper.UserMapper;
 import com.dominik.crafthub.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -62,9 +61,11 @@ public class ConversationService {
     return conversationMapper.toDto(conversation);
   }
 
-  public List<ConversationWithLastMessageDto> getAllConversationsofUser() {
+  public ConversationsWithLastMessageDtosList getAllConversationsofUser() {
     var user = authService.getCurrentUser();
-    return conversationRepository.findAllConversationsWithLastMessage(user.getId());
+    var conversations = conversationRepository.findAllConversationsWithLastMessage(user.getId());
+    int unreadCount = (int) conversations.stream().filter(c -> c.isRead().equals(false)).count();
+    return conversationMapper.toConversationsWithLastMessageDtoList(conversations, unreadCount);
   }
 
   @Transactional

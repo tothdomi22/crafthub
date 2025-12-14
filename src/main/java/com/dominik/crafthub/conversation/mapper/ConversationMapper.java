@@ -1,8 +1,6 @@
 package com.dominik.crafthub.conversation.mapper;
 
-import com.dominik.crafthub.conversation.dto.ConversationDto;
-import com.dominik.crafthub.conversation.dto.ConversationListDto;
-import com.dominik.crafthub.conversation.dto.ConversationWithMessagesDto;
+import com.dominik.crafthub.conversation.dto.*;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
@@ -25,12 +23,10 @@ public interface ConversationMapper {
   @Mapping(source = "listingEntity", target = "listing")
   ConversationDto toDto(ConversationEntity conversationEntity);
 
-  @Mapping(target = "listing", source = "listingEntity")
-  @Mapping(source = "userEntity1", target = "userOne")
-  @Mapping(source = "userEntity2", target = "userTwo")
-  ConversationListDto toListDto(ConversationEntity conversationEntity);
-
   @Mapping(target = "id", source = "id")
   ConversationWithMessagesDto toConversationWithMessagesDto(
       Long id, List<MessageEntity> messages, ListingEntity listing, UserEntity recipient);
+
+  ConversationsWithLastMessageDtosList toConversationsWithLastMessageDtoList(
+      List<ConversationWithLastMessageDto> conversations, Integer unread);
 }
