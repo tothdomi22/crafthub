@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ConversationRepository extends JpaRepository<ConversationEntity, Long> {
   Boolean existsByUserEntity1_IdAndListingEntity_Id(Long userEntity1Id, Long listingEntityId);
@@ -14,6 +16,15 @@ public interface ConversationRepository extends JpaRepository<ConversationEntity
   List<ConversationEntity> findAllByUserEntity1_IdOrUserEntity2_Id(
       Long userEntity1Id, Long userEntity2Id, Sort updatedAt);
 
-  Optional<ConversationEntity> findByListingEntity_IdAndUserEntity1_IdAndUserEntity2_Id(
-      Long listingEntityId, Long userEntity1Id, Long userEntity2Id);
+  @Query(
+      value =
+          """
+            SELECT c
+            FROM ConversationEntity c
+            LEFT JOIN FETCH c.userEntity1 u1
+            LEFT JOIN FETCH c.userEntity2 u2
+            LEFT JOIN FETCH c.listingEntity l
+            WHERE c.id = :conversationId
+            """)
+  Optional<ConversationEntity> getConversationById(@Param("conversationId") Long conversationId);
 }

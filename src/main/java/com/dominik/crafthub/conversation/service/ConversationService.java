@@ -17,7 +17,9 @@ import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.message.mapper.MessageMapper;
 import com.dominik.crafthub.message.repository.MessageRepository;
+import com.dominik.crafthub.messageread.repository.MessageReadRepository;
 import com.dominik.crafthub.user.mapper.UserMapper;
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -37,6 +39,7 @@ public class ConversationService {
   private final ListingRepository listingRepository;
   private final ListingMapper listingMapper;
   private final UserMapper userMapper;
+  private final MessageReadRepository messageReadRepository;
 
   public ConversationDto createConversation(ConversationCreateRequest request) {
     var listing = listingService.findListingById(request.listingId());
@@ -68,6 +71,7 @@ public class ConversationService {
     return conversations.stream().map(conversationMapper::toListDto).toList();
   }
 
+  @Transactional
   public ConversationWithMessagesDto getConversationWithMessages(Long id) {
     var user = authService.getCurrentUser();
     var conversation = getConversationById(id);
@@ -75,26 +79,20 @@ public class ConversationService {
         && !conversation.getUserEntity2().getId().equals(user.getId())) {
       throw new NotPartOfThisConversationException();
     }
-    var listing = listingRepository.findById(conversation.getListingEntity().getId()).orElseThrow();
-    var listingDto = listingMapper.toNoCategoriesNoUserDto(listing);
     var recipient =
         conversation.getUserEntity1().getId().equals(user.getId())
             ? conversation.getUserEntity2()
             : conversation.getUserEntity1();
-    var recipientDto = userMapper.toDto(recipient);
-
     var messages =
         messageRepository.findAllByConversationEntity_Id(
             id, Sort.by(Sort.Direction.ASC, "createdAt"));
-    return new ConversationWithMessagesDto(
-        conversation.getId(),
-        messages.stream().map(messageMapper::toDto).toList(),
-        listingDto,
-        recipientDto);
+    messageReadRepository.markConversationAsRead(conversation.getId(), user.getId());
+    return conversationMapper.toConversationWithMessagesDto(
+        conversation.getId(), messages, conversation.getListingEntity(), recipient);
   }
 
   public ConversationEntity getConversationById(Long id) {
-    var conversation = conversationRepository.findById(id).orElse(null);
+    var conversation = conversationRepository.getConversationById(id).orElse(null);
     if (conversation == null) {
       throw new ConversationNotFoundException();
     }
