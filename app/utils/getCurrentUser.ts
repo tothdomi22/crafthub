@@ -30,7 +30,7 @@ export default async (): Promise<User | null> => {
 
     if (!id || !role || !name || !email) return null;
 
-    return {id, role, name, email};
+    return {id, role, name, email, createdAt: ""};
   } catch {
     return null;
   }

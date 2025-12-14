@@ -251,7 +251,7 @@ export default function ListingDetails({
 
                 <div className="flex items-center gap-1.5 text-sm text-slate-500">
                   <span className="font-bold text-[#00B894]">
-                    {profileData.review != 0 && profileData.review}
+                    {profileData.review != 0 && profileData.review.toFixed(1)}
                   </span>
                   {profileData.review != 0 && <span>•</span>}
                   <span>{profileData.reviewCount} értékelés</span>

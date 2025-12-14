@@ -18,6 +18,12 @@ export default function ListingStatusDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Check if the listing is archived (Sold)
+  const isArchived = currentStatus === ListingStatusEnum.ARCHIVED;
+
+  // Disable interaction if loading OR archived
+  const isDisabled = isLoading || isArchived;
+
   // Configuration for each status
   const statusConfig = {
     [ListingStatusEnum.ACTIVE]: {
@@ -36,7 +42,7 @@ export default function ListingStatusDropdown({
     },
     [ListingStatusEnum.ARCHIVED]: {
       label: "Eladva",
-      color: "text-slate-600",
+      color: "text-slate-500",
       bg: "bg-slate-100",
       border: "border-slate-200",
       dot: "bg-slate-400",
@@ -69,38 +75,55 @@ export default function ListingStatusDropdown({
     <div className="relative w-full sm:w-auto min-w-[220px]" ref={dropdownRef}>
       {/* Trigger Button */}
       <button
-        onClick={() => !isLoading && setIsOpen(!isOpen)}
-        disabled={isLoading}
-        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 ${
-          isOpen
-            ? "ring-2 ring-primary/10 border-primary"
-            : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-        } bg-white`}>
+        onClick={() => !isDisabled && setIsOpen(!isOpen)}
+        disabled={isDisabled}
+        title={
+          isArchived
+            ? "Archivált hirdetés státusza nem módosítható"
+            : "Státusz módosítása"
+        }
+        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 
+          ${
+            isDisabled
+              ? "bg-slate-50 border-slate-100 cursor-not-allowed opacity-80" // Grayed out style
+              : isOpen
+                ? "ring-2 ring-primary/10 border-primary bg-white"
+                : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+          }
+        `}>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">
+          <span
+            className={`text-xs font-bold uppercase tracking-wider ${isDisabled ? "text-slate-300" : "text-slate-400"}`}>
             Státusz:
           </span>
 
           <div className="flex items-center gap-2">
             <span
-              className={`w-2 h-2 rounded-full ${currentConfig.dot}`}></span>
-            <span className={`text-sm font-bold ${currentConfig.color}`}>
+              className={`w-2 h-2 rounded-full ${isArchived ? "bg-slate-400" : currentConfig.dot}`}></span>
+            <span
+              className={`text-sm font-bold ${isArchived ? "text-slate-500" : currentConfig.color}`}>
               {currentConfig.label}
             </span>
           </div>
         </div>
 
-        <div
-          className={`text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
-          <KeyBoardArrowDownSVG className="w-4 h-4" />
-        </div>
+        {/* Hide arrow if archived to imply no interaction, or keep it gray */}
+        {!isArchived && (
+          <div
+            className={`text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+            <KeyBoardArrowDownSVG className="w-4 h-4" />
+          </div>
+        )}
       </button>
 
       {/* Dropdown Menu */}
-      {isOpen && (
+      {isOpen && !isDisabled && (
         <div className="absolute top-full mt-2 left-0 w-full bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-200 origin-top">
           <div className="p-1">
             {Object.values(ListingStatusEnum).map(status => {
+              // Don't show the option if it's the current one
+              // if (status === currentStatus) return null;
+
               const config = statusConfig[status];
               const isActive = currentStatus === status;
 

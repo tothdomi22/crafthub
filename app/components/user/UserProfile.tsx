@@ -1,7 +1,7 @@
 "use client";
-import React, {useState} from "react";
-import {useQuery} from "@tanstack/react-query";
-import {Listing} from "@/app/types/listing";
+import React, {useEffect, useRef, useState} from "react";
+import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
+import {ListingPagination} from "@/app/types/listing";
 import useListListingById from "@/app/hooks/listing/useListListingById";
 import {Review, ReviewTypeEnum} from "@/app/types/review";
 import useListReviewsById from "@/app/hooks/review/useListReviewsById";
@@ -12,24 +12,37 @@ import CalendarSvg from "/public/svgs/calendar.svg";
 import StarSvg from "/public/svgs/star.svg";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
+import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import the skeleton
 import {formatDate} from "@/app/components/utils";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 
 export default function UserProfile({id}: {id: string}) {
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
-  const {data: listingData} = useQuery<Listing[]>({
-    queryFn: () => useListListingById(id),
-    queryKey: ["listings" + id],
-    select: data =>
-      [...data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
+  const observerTarget = useRef(null);
+
+  // --- INFINITE QUERY FOR LISTINGS ---
+  const {
+    data: listingData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isListingsLoading,
+  } = useInfiniteQuery<ListingPagination>({
+    queryKey: ["listings-infinite", id],
+    queryFn: ({pageParam}) => useListListingById(id, pageParam as number),
+    initialPageParam: 0,
+    getNextPageParam: lastPage => {
+      if (lastPage.last) return undefined;
+      return lastPage.number + 1;
+    },
+    enabled: activeTab === "shop", // Only fetch if tab is active
   });
+
   const {data: reviewData} = useQuery<Review[]>({
     queryFn: () => useListReviewsById(id),
     queryKey: ["reviews" + id],
   });
+
   const {data: profileData} = useQuery<Profile>({
     queryFn: () => useGetProfile(id),
     queryKey: ["profile" + id],
@@ -45,6 +58,28 @@ export default function UserProfile({id}: {id: string}) {
     manageFavoriteMutation({listingId, isCurrentlyLiked, userId: id});
   };
 
+  // --- INFINITE SCROLL OBSERVER ---
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {threshold: 1.0},
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [observerTarget, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   if (!profileData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
@@ -55,6 +90,7 @@ export default function UserProfile({id}: {id: string}) {
       </div>
     );
   }
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* --- HERO PROFILE CARD --- */}
@@ -80,7 +116,6 @@ export default function UserProfile({id}: {id: string}) {
                 {/* Rating Badge */}
                 <div className="inline-flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">
                   <div className="flex text-[#00B894]">
-                    {/*FIXME: fix the filling of stars*/}
                     {[1, 2, 3, 4, 5].map(i => (
                       <StarSvg
                         key={i}
@@ -93,19 +128,13 @@ export default function UserProfile({id}: {id: string}) {
                     ))}
                   </div>
                   <span className="text-sm font-bold text-slate-700">
-                    {profileData.review}
+                    {profileData.review.toFixed(1)}
                   </span>
                   <span className="text-xs text-slate-400 font-medium border-l border-slate-200 pl-2 ml-1">
                     {profileData.reviewCount} értékelés
                   </span>
                 </div>
               </div>
-              {/*Action Buttons*/}
-              {/*<div className="flex gap-3 w-full md:w-auto">*/}
-              {/*  <button className="flex-1 md:flex-none bg-primary hover:bg-[#5b4cc4] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2">*/}
-              {/*    Üzenet*/}
-              {/*  </button>*/}
-              {/*</div>*/}
             </div>
 
             {/* Bio & Stats */}
@@ -139,7 +168,7 @@ export default function UserProfile({id}: {id: string}) {
               ? "text-primary"
               : "text-slate-500 hover:text-slate-800"
           }`}>
-          Hirdetései ({listingData && listingData.length})
+          Hirdetései ({listingData?.pages[0]?.totalElements || 0})
           {activeTab === "shop" && (
             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></span>
           )}
@@ -162,19 +191,54 @@ export default function UserProfile({id}: {id: string}) {
       {/* --- CONTENT AREA --- */}
       {activeTab === "shop" ? (
         /* ACTIVE LISTINGS GRID (Unified with Home Page) */
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {listingData &&
-            listingData.map(item => (
-              <Link key={item.id} href={`/listing/${item.id}`}>
-                <ListingCard
-                  listing={item}
-                  showFooter={false}
-                  handleManageFavorite={handleManageFavorite}
-                  isManageFavoritePending={isManageFavoritePending}
-                />
-              </Link>
-            ))}
-        </div>
+        <>
+          {isListingsLoading ? (
+            /* Initial Skeleton Load */
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {Array.from({length: 8}).map((_, i) => (
+                <ListingCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {/* Render Real Items */}
+              {listingData?.pages.map((page, i) => (
+                <React.Fragment key={i}>
+                  {page.content.map(item => (
+                    <Link key={item.id} href={`/listing/${item.id}`}>
+                      <ListingCard
+                        listing={item}
+                        showFooter={false}
+                        handleManageFavorite={handleManageFavorite}
+                        isManageFavoritePending={isManageFavoritePending}
+                      />
+                    </Link>
+                  ))}
+                </React.Fragment>
+              ))}
+
+              {/* Append Loading Skeletons when fetching next page */}
+              {isFetchingNextPage && (
+                <>
+                  {Array.from({length: 4}).map((_, i) => (
+                    <ListingCardSkeleton key={`skeleton-${i}`} />
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Observer / End of List Trigger */}
+          <div
+            ref={observerTarget}
+            className="py-10 flex justify-center w-full">
+            {!hasNextPage &&
+              listingData?.pages[0]?.content.length !== 0 &&
+              !isListingsLoading && (
+                <div className="flex items-center gap-2 text-slate-300 text-sm font-medium"></div>
+              )}
+          </div>
+        </>
       ) : (
         /* REVIEWS LIST (Unified Card Style) */
         <div className="flex flex-col gap-4 max-w-4xl">
@@ -215,9 +279,15 @@ export default function UserProfile({id}: {id: string}) {
                   {/* Rating */}
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex text-[#00B894]">
-                      {/*FIXME: fix the filling of stars*/}
                       {[1, 2, 3, 4, 5].map(i => (
-                        <StarSvg key={i} />
+                        <StarSvg
+                          key={i}
+                          className={
+                            i <= Math.round(review.stars)
+                              ? "fill-current"
+                              : "text-slate-200"
+                          }
+                        />
                       ))}
                     </div>
                   </div>

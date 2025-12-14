@@ -4,13 +4,14 @@ export async function GET(request: Request) {
   try {
     const {searchParams} = new URL(request.url);
     const id = Number(searchParams.get("id"));
-    if (!id) {
+    const page = searchParams.get("page");
+    if (!id || !page) {
       return NextResponse.json(
         {message: "Missing required query parameter"},
         {status: 400},
       );
     }
-    const backendUrl = `${process.env.API_BASE_URL}/listing/list/${id}`;
+    const backendUrl = `${process.env.API_BASE_URL}/listing/list/${id}?page=${page}`;
     const response = await fetch(backendUrl, {
       method: "GET",
       headers: {

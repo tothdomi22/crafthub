@@ -6,17 +6,21 @@ import com.dominik.crafthub.favorite.repository.FavoriteRepository;
 import com.dominik.crafthub.listing.dto.*;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
+import com.dominik.crafthub.listing.exception.CantReviveArchiedListingException;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
-import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestStatusEnum;
 import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
 import com.dominik.crafthub.user.service.UserService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,21 +47,15 @@ public class ListingService {
     return listingMapper.toDto(listing);
   }
 
-  public List<ListingsWithLikesDto> listListings(Long id) {
+  public Page<ListingsWithLikesDto> listListings(Long id, int page, int size) {
     var user = authService.getCurrentUser();
-    return listingRepository.findAllListingsWithIsLiked(user.getId());
-    //    return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
-    //        .map(listingMapper::toListingWithLikesDto)
-    //        .toList();
-    //    if (id != null) {
-    //      return listingRepository.findAllByUserEntityId(id).stream()
-    //          .map(listingMapper::toDto)
-    //          .toList();
-    //    } else {
-    //      return listingRepository.findAllListingsWithIsLiked(user.getId()).stream()
-    //          .map(listingMapper::toListingWithLikesDto)
-    //          .toList();
-    //    }
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    if (id == null) {
+      return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
+    } else {
+      System.out.println(id);
+      return listingRepository.findAllUseresListingsWithIsLiked(user.getId(), id, pageable);
+    }
   }
 
   public List<ListingDto> listMyListings() {
@@ -69,18 +67,11 @@ public class ListingService {
 
   public ListingSingleViewDto getListing(Long id) {
     var user = authService.getCurrentUser();
-    var listing = findListingById(id);
-    var conversation =
-        conversationRepository
-            .findByListingEntity_IdAndUserEntity1_IdAndUserEntity2_Id(
-                listing.getId(), user.getId(), listing.getUserEntity().getId())
-            .orElse(null);
-    Long conversationId = (conversation != null) ? conversation.getId() : null;
-    var purchaseRequestExists =
-        purchaseRequestRepostitory.existsByRequesterUser_IdAndListing_IdAndStatus(
-            user.getId(), id, PurchaseRequestStatusEnum.PENDING);
-    var favorite = favoriteRepository.existsByListingEntity_IdAndUserEntity_Id(id, user.getId());
-    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists, favorite);
+    var listing = listingRepository.findSingleViewListing(user.getId(), id).orElse(null);
+    if (listing == null) {
+      throw new ListingNotFoundException();
+    }
+    return listing;
   }
 
   public ListingDto updateListing(Long id, ListingUpdateRequest request) {
@@ -93,13 +84,17 @@ public class ListingService {
       var subCategory = subCategoryService.findSubCategoryById(request.subCategoryId());
       listing.setSubCategoryEntity(subCategory);
     }
+    if ((request.status() != null && !request.status().equals(ListingStatusEnum.ARCHIVED))
+        && listing.getStatus().equals(ListingStatusEnum.ARCHIVED)) {
+      throw new CantReviveArchiedListingException();
+    }
     listingMapper.update(request, listing);
     listingRepository.save(listing);
     return listingMapper.toDto(listing);
   }
 
   public ListingEntity findListingById(Long id) {
-    var listing = listingRepository.findById(id).orElse(null);
+    var listing = listingRepository.findListingById(id).orElse(null);
     if (listing == null) {
       throw new ListingNotFoundException();
     }

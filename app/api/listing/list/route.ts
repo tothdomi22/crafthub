@@ -2,7 +2,15 @@ import {NextResponse} from "next/server";
 
 export async function GET(request: Request) {
   try {
-    const backendUrl = `${process.env.API_BASE_URL}/listing/list`;
+    const {searchParams} = new URL(request.url);
+    const page = searchParams.get("page");
+    if (!page) {
+      return NextResponse.json(
+        {message: "Missing required query parameter"},
+        {status: 400},
+      );
+    }
+    const backendUrl = `${process.env.API_BASE_URL}/listing/list?page=${page}`;
     const response = await fetch(backendUrl, {
       method: "GET",
       headers: {

@@ -2,6 +2,7 @@ package com.dominik.crafthub.listing.controller;
 
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingUpdateRequest;
+import com.dominik.crafthub.listing.exception.CantReviveArchiedListingException;
 import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.service.ListingService;
@@ -26,8 +27,10 @@ public class ListingController {
   }
 
   @GetMapping({"/list", "/list/{id}"})
-  public ResponseEntity<?> listListings(@PathVariable(required = false) Long id) {
-    var listings = listingService.listListings(id);
+  public ResponseEntity<?> listListings(
+      @PathVariable(required = false) Long id, @RequestParam(defaultValue = "0") int page) {
+    int size = 12;
+    var listings = listingService.listListings(id, page, size);
     return ResponseEntity.ok(listings);
   }
 
@@ -65,5 +68,11 @@ public class ListingController {
   @ExceptionHandler(ListingNotFoundException.class)
   public ResponseEntity<Map<String, String>> listingNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Listing not found"));
+  }
+
+  @ExceptionHandler(CantReviveArchiedListingException.class)
+  public ResponseEntity<Map<String, String>> cantReviveArchived() {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(Map.of("message", "You can't revive an archived listing"));
   }
 }

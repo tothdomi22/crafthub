@@ -1,39 +1,52 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {MainCategory} from "@/app/types/admin/category/category";
-import {useQuery} from "@tanstack/react-query";
+import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
 import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
-import {Listing} from "@/app/types/listing";
-import useListListings from "@/app/hooks/listing/useListListing";
+import {ListingPagination} from "@/app/types/listing";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
+import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import Skeleton
 import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {User} from "@/app/types/user";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
+import {useListListings} from "@/app/hooks/listing/useListListing";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
     null,
   );
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+  const observerTarget = useRef(null);
 
   const {data: mainCategoriesData} = useQuery<MainCategory[]>({
     queryFn: useListMainCategory,
     queryKey: ["mainCategories"],
   });
 
-  const {data: listingData} = useQuery<Listing[]>({
-    queryFn: useListListings,
-    queryKey: ["listings"],
-    select: data =>
-      [...data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
+  const {
+    data: listingData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery<ListingPagination, Error>({
+    queryKey: ["listings-infinite", activeCategory?.id],
+    queryFn: ({pageParam}) =>
+      useListListings({
+        pageParam: pageParam as number,
+        categoryId: activeCategory?.id,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: lastPage => {
+      if (lastPage.last) return undefined;
+      return lastPage.number + 1;
+    },
   });
+
   const {data: profileData} = useQuery<Profile>({
     queryFn: () => useGetProfile(String(user?.id)),
     queryKey: ["profile" + user?.id],
@@ -62,22 +75,51 @@ export default function ListingsPage({user}: {user: User | null}) {
     }
   }, [profileData]);
 
-  if (!listingData) {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {threshold: 1.0},
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [observerTarget, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // --- INITIAL LOADING STATE ---
+  // If loading the *first* page, show a full grid of skeletons
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 bg-slate-200 rounded-full mb-4"></div>
-          <div className="h-4 w-32 bg-slate-200 rounded"></div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Skeleton Filters */}
+        <div className="flex gap-3 overflow-hidden pb-8">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div
+              key={i}
+              className="h-10 w-24 bg-slate-200 rounded-xl animate-pulse"
+            />
+          ))}
         </div>
-      </div>
+
+        {/* Skeleton Grid (8 items) */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({length: 8}).map((_, i) => (
+            <ListingCardSkeleton key={i} />
+          ))}
+        </div>
+      </main>
     );
   }
-
-  const filteredListings = listingData?.filter(listing =>
-    activeCategory
-      ? listing.subCategory.mainCategory.id === activeCategory.id
-      : true,
-  );
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -104,16 +146,50 @@ export default function ListingsPage({user}: {user: User | null}) {
 
       {/* Listings Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredListings.map(item => (
-          <Link key={item.id} href={`/listing/${item.id}`}>
-            <ListingCard
-              listing={item}
-              handleManageFavorite={handleManageFavorite}
-              isManageFavoritePending={isManageFavoritePending}
-            />
-          </Link>
+        {/* Render Real Items */}
+        {listingData?.pages.map((page, i) => (
+          <React.Fragment key={i}>
+            {page.content.map(item => (
+              <Link key={item.id} href={`/listing/${item.id}`}>
+                <ListingCard
+                  listing={item}
+                  handleManageFavorite={handleManageFavorite}
+                  isManageFavoritePending={isManageFavoritePending}
+                />
+              </Link>
+            ))}
+          </React.Fragment>
         ))}
+
+        {/* --- INFINITE SCROLL LOADING STATE --- */}
+        {/* If fetching next page, append a row of skeletons directly into the grid */}
+        {isFetchingNextPage && (
+          <>
+            {Array.from({length: 4}).map((_, i) => (
+              <ListingCardSkeleton key={`skeleton-${i}`} />
+            ))}
+          </>
+        )}
       </div>
+
+      {/* Empty State */}
+      {listingData?.pages[0].content.length === 0 && (
+        <div className="py-20 text-center">
+          <p className="text-slate-500">Nincs találat ebben a kategóriában.</p>
+        </div>
+      )}
+
+      {/* Observer Trigger */}
+      <div ref={observerTarget} className="py-10 flex justify-center w-full">
+        {!hasNextPage && listingData?.pages[0].content.length !== 0 && (
+          <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
+            <span className="w-12 h-px bg-slate-200"></span>
+            Vége a találatoknak
+            <span className="w-12 h-px bg-slate-200"></span>
+          </div>
+        )}
+      </div>
+
       {user && (
         <ProfileOnboardingModal
           isOpen={isOnboardingOpen}
