@@ -92,19 +92,17 @@ public class ListingService {
       var subCategory = subCategoryService.findSubCategoryById(request.subCategoryId());
       listing.setSubCategoryEntity(subCategory);
     }
-    if ((request.status().equals(ListingStatusEnum.FROZEN)
-            || request.status().equals(ListingStatusEnum.ACTIVE))
+    if ((request.status() != null && !request.status().equals(ListingStatusEnum.ARCHIVED))
         && listing.getStatus().equals(ListingStatusEnum.ARCHIVED)) {
       throw new CantReviveArchiedListingException();
     }
-
     listingMapper.update(request, listing);
     listingRepository.save(listing);
     return listingMapper.toDto(listing);
   }
 
   public ListingEntity findListingById(Long id) {
-    var listing = listingRepository.findById(id).orElse(null);
+    var listing = listingRepository.findListingById(id).orElse(null);
     if (listing == null) {
       throw new ListingNotFoundException();
     }

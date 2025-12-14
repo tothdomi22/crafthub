@@ -24,6 +24,18 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
   @Query(
       value =
           """
+            SELECT l
+            FROM ListingEntity l
+            LEFT JOIN FETCH l.userEntity u
+            LEFT JOIN FETCH l.subCategoryEntity sc
+            LEFT JOIN FETCH sc.mainCategoryEntity mc
+            WHERE l.id = :listingId
+        """)
+  Optional<ListingEntity> findListingById(@Param("listingId") Long listingId);
+
+  @Query(
+      value =
+          """
         SELECT new com.dominik.crafthub.listing.dto.ListingsWithLikesDto(
         l.id,
         l.name,
