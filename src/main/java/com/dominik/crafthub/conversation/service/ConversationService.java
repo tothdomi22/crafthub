@@ -1,10 +1,7 @@
 package com.dominik.crafthub.conversation.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
-import com.dominik.crafthub.conversation.dto.ConversationCreateRequest;
-import com.dominik.crafthub.conversation.dto.ConversationDto;
-import com.dominik.crafthub.conversation.dto.ConversationListDto;
-import com.dominik.crafthub.conversation.dto.ConversationWithMessagesDto;
+import com.dominik.crafthub.conversation.dto.*;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.conversation.exception.ConversationAlreadyExistsException;
 import com.dominik.crafthub.conversation.exception.ConversationNotFoundException;
@@ -19,6 +16,7 @@ import com.dominik.crafthub.message.mapper.MessageMapper;
 import com.dominik.crafthub.message.repository.MessageRepository;
 import com.dominik.crafthub.messageread.repository.MessageReadRepository;
 import com.dominik.crafthub.user.mapper.UserMapper;
+import com.dominik.crafthub.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -40,6 +38,7 @@ public class ConversationService {
   private final ListingMapper listingMapper;
   private final UserMapper userMapper;
   private final MessageReadRepository messageReadRepository;
+  private final UserRepository userRepository;
 
   public ConversationDto createConversation(ConversationCreateRequest request) {
     var listing = listingService.findListingById(request.listingId());
@@ -63,12 +62,9 @@ public class ConversationService {
     return conversationMapper.toDto(conversation);
   }
 
-  public List<ConversationListDto> getAllConversationsofUser() {
+  public List<ConversationWithLastMessageDto> getAllConversationsofUser() {
     var user = authService.getCurrentUser();
-    var conversations =
-        conversationRepository.findAllByUserEntity1_IdOrUserEntity2_Id(
-            user.getId(), user.getId(), Sort.by(Sort.Direction.DESC, "updatedAt"));
-    return conversations.stream().map(conversationMapper::toListDto).toList();
+    return conversationRepository.findAllConversationsWithLastMessage(user.getId());
   }
 
   @Transactional
