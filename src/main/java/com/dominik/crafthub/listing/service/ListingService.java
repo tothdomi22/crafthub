@@ -11,7 +11,6 @@ import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
-import com.dominik.crafthub.purchaserequest.entity.PurchaseRequestStatusEnum;
 import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
 import com.dominik.crafthub.user.service.UserService;
@@ -76,18 +75,11 @@ public class ListingService {
 
   public ListingSingleViewDto getListing(Long id) {
     var user = authService.getCurrentUser();
-    var listing = findListingById(id);
-    var conversation =
-        conversationRepository
-            .findByListingEntity_IdAndUserEntity1_IdAndUserEntity2_Id(
-                listing.getId(), user.getId(), listing.getUserEntity().getId())
-            .orElse(null);
-    Long conversationId = (conversation != null) ? conversation.getId() : null;
-    var purchaseRequestExists =
-        purchaseRequestRepostitory.existsByRequesterUser_IdAndListing_IdAndStatus(
-            user.getId(), id, PurchaseRequestStatusEnum.PENDING);
-    var favorite = favoriteRepository.existsByListingEntity_IdAndUserEntity_Id(id, user.getId());
-    return listingMapper.toSingleViewDto(listing, conversationId, purchaseRequestExists, favorite);
+    var listing = listingRepository.findSingleViewListing(user.getId(), id).orElse(null);
+    if (listing == null) {
+      throw new ListingNotFoundException();
+    }
+    return listing;
   }
 
   public ListingDto updateListing(Long id, ListingUpdateRequest request) {
