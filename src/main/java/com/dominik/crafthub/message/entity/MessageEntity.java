@@ -1,12 +1,12 @@
 package com.dominik.crafthub.message.entity;
 
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
+import com.dominik.crafthub.messageread.MessageReadEntity;
 import com.dominik.crafthub.user.entity.UserEntity;
 import jakarta.persistence.*;
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -31,5 +31,8 @@ public class MessageEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private UserEntity sender;
+
+    @OneToOne(mappedBy = "messageEntity")
+    private MessageReadEntity messageReadEntity;
 
 }
