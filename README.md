@@ -28,4 +28,4 @@ npm run dev
 
 The front end will be available at `http://localhost:3000/`
 
-<img width="1265" height="504" alt="image" src="https://github.com/user-attachments/assets/5e89c46f-8cfd-4bb7-9bfc-17671db95a5b" />
+<img width="1468" height="1053" alt="image" src="https://github.com/user-attachments/assets/b1a0bd82-a797-4c3d-9b1c-a43673db456e" />
