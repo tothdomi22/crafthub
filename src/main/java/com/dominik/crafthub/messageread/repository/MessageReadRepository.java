@@ -21,4 +21,13 @@ public interface MessageReadRepository extends JpaRepository<MessageReadEntity, 
             """)
   void markConversationAsRead(
       @Param("conversationId") Long conversationId, @Param("userId") Long userId);
+
+  @Query(
+      value =
+          """
+            SELECT CASE WHEN COUNT(mr) > 0 THEN true ELSE false END
+            FROM MessageReadEntity mr
+            WHERE (mr.userEntity.id = :userId AND mr.readAt IS null)
+        """)
+  Boolean doesUnreadExists(@Param("userId") Long userId);
 }

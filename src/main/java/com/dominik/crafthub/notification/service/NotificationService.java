@@ -1,7 +1,10 @@
 package com.dominik.crafthub.notification.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
+import com.dominik.crafthub.conversation.repository.ConversationRepository;
+import com.dominik.crafthub.messageread.repository.MessageReadRepository;
 import com.dominik.crafthub.notification.dto.NotificationDto;
+import com.dominik.crafthub.notification.dto.NotificationsWIthMessageUnread;
 import com.dominik.crafthub.notification.entity.NotificationPayload;
 import com.dominik.crafthub.notification.entity.NotificationTypeEnum;
 import com.dominik.crafthub.notification.exception.NotTheOwnerOfNotificationException;
@@ -21,6 +24,8 @@ public class NotificationService {
   private final AuthService authService;
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
+  private final MessageReadRepository messageReadRepository;
+  private ConversationRepository conversationRepository;
 
   public List<NotificationDto> listUserAllNotifications() {
     var user = authService.getCurrentUser();
@@ -30,12 +35,13 @@ public class NotificationService {
     return notifications.stream().map(notificationMapper::toDo).toList();
   }
 
-  public List<NotificationDto> listUserUnreadNotifications() {
+  public NotificationsWIthMessageUnread listUserUnreadNotifications() {
     var user = authService.getCurrentUser();
     var notifications =
         notificationRepository.findAllByUser_IdAndIsRead(
             user.getId(), false, Sort.by(Sort.Direction.DESC, "createdAt"));
-    return notifications.stream().map(notificationMapper::toDo).toList();
+    var unreadMessageExists = messageReadRepository.doesUnreadExists(user.getId());
+    return notificationMapper.toNotificationsWithUnreadDto(notifications, unreadMessageExists);
   }
 
   public void markNotificationRead(Long notificationId) {
