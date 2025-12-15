@@ -1,6 +1,9 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {PurchaseRequestPatchRequest} from "@/app/types/purchaseRequest";
-import {Notification, NotificationTypeEnum} from "@/app/types/notification";
+import {
+  NotificationTypeEnum,
+  NotificationWithUnreadMessage,
+} from "@/app/types/notification";
 
 export default function usePatchPurchaseRequest() {
   const queryClient = useQueryClient();
@@ -38,34 +41,42 @@ export default function usePatchPurchaseRequest() {
     onMutate: async purchaseRequestData => {
       await queryClient.cancelQueries({queryKey});
 
-      const previousData = queryClient.getQueryData<Notification[]>(queryKey);
+      const previousData =
+        queryClient.getQueryData<NotificationWithUnreadMessage>(queryKey);
 
-      // Find the matching notification BEFORE removal
-      const deletedNotification = previousData?.find(
+      if (!previousData) {
+        return {previousData: undefined, deletedNotification: undefined};
+      }
+
+      const deletedNotification = previousData.notifications.find(
         n =>
           n.type === NotificationTypeEnum.PURCHASE_REQUEST &&
           String(n.data.requestId) === purchaseRequestData.purchaseRequestId,
       );
 
-      // Remove it optimistically
-      queryClient.setQueryData<Notification[]>(
-        queryKey,
-        old =>
-          old?.filter(
-            n =>
-              !(
-                n.type === NotificationTypeEnum.PURCHASE_REQUEST &&
-                String(n.data.requestId) ===
-                  purchaseRequestData.purchaseRequestId
-              ),
-          ) || [],
-      );
+      queryClient.setQueryData<NotificationWithUnreadMessage>(queryKey, old => {
+        if (!old) return old;
+
+        const updatedNotifications = old.notifications.filter(
+          n =>
+            !(
+              n.type === NotificationTypeEnum.PURCHASE_REQUEST &&
+              String(n.data.requestId) === purchaseRequestData.purchaseRequestId
+            ),
+        );
+
+        return {
+          ...old,
+          notifications: updatedNotifications,
+          unreadMessage: updatedNotifications.some(n => !n.isRead),
+        };
+      });
 
       return {previousData, deletedNotification};
     },
 
     // Rollback on error
-    onError: (err, newMessage, context) => {
+    onError: (_err, _vars, context) => {
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);
       }
@@ -74,6 +85,7 @@ export default function usePatchPurchaseRequest() {
     // Refetch on success to get real data from server
     onSuccess: async (_data, _variables, context) => {
       await queryClient.invalidateQueries({queryKey});
+
       if (
         context?.deletedNotification &&
         context.deletedNotification.type ===
@@ -82,7 +94,7 @@ export default function usePatchPurchaseRequest() {
         const listingId = context.deletedNotification.data.listingId;
 
         await queryClient.invalidateQueries({
-          queryKey: ["listing" + listingId],
+          queryKey: ["listing", listingId],
         });
       }
     },

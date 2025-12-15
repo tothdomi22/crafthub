@@ -48,3 +48,8 @@ export type Notification =
   | PurchaseRequestNotificationType
   | CommentNotificationType
   | ReviewRequestNotificationType;
+
+export interface NotificationWithUnreadMessage {
+  notifications: Notification[];
+  unreadMessage: boolean;
+}
