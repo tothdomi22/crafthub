@@ -8,7 +8,7 @@ public record ListingUpdateRequest(
     String name,
     @Min(value = 0, message = "Price cannot be negative") Integer price,
     Boolean canShip,
-    String city,
+    Integer city_id,
     ListingStatusEnum status,
     @Size(min = 10, max = 5000, message = "Description must be between 10 and 5000 characters")
         String description,

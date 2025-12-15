@@ -50,7 +50,7 @@ public class UserService {
     if (profile != null) {
       profile.setBio(null);
       profile.setBirthDate(LocalDate.of(1900, 1, 1));
-      profile.setCity("city_hidden");
+      profile.setCityEntity(null);
       profileRepository.save(profile);
     }
     var email = UUID.randomUUID() + "@deleted.com";

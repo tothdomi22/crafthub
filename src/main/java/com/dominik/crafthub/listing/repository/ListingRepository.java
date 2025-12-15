@@ -41,7 +41,10 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         l.name,
         l.price,
         l.shippable,
-        l.city,
+            new com.dominik.crafthub.city.dto.CityDto(
+                            c.id,
+                            c.name
+            ),
         l.description,
         l.createdAt,
         l.status,
@@ -69,6 +72,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN l.subCategoryEntity sc
         LEFT JOIN sc.mainCategoryEntity mc
         LEFT JOIN l.userEntity u
+        LEFT JOIN l.cityEntity c
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
@@ -90,7 +94,10 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
                   l.name,
                   l.price,
                   l.shippable,
-                  l.city,
+                    new com.dominik.crafthub.city.dto.CityDto(
+                        c.id,
+                        c.name
+                    ),
                   l.description,
                   l.createdAt,
                   l.status,
@@ -118,6 +125,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
                   LEFT JOIN l.subCategoryEntity sc
                   LEFT JOIN sc.mainCategoryEntity mc
                   LEFT JOIN l.userEntity u
+                  LEFT JOIN l.cityEntity c
                   LEFT JOIN FavoriteEntity f
                       ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
                   WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED  AND l.userEntity.id = :searchUserId
@@ -139,7 +147,10 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         l.name,
         l.price,
         l.shippable,
-        l.city,
+            new com.dominik.crafthub.city.dto.CityDto(
+                            ct.id,
+                            ct.name
+                        ),
         l.description,
         l.createdAt,
         l.status,
@@ -169,6 +180,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN l.subCategoryEntity sc
         LEFT JOIN sc.mainCategoryEntity mc
         LEFT JOIN l.userEntity u
+        LEFT JOIN l.cityEntity ct
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
         LEFT JOIN ConversationEntity c

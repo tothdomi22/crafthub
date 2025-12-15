@@ -1,5 +1,6 @@
 package com.dominik.crafthub.listing.mapper;
 
+import com.dominik.crafthub.city.mapper.CityMapper;
 import com.dominik.crafthub.listing.dto.*;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.subcategory.mapper.SubCategoryMapper;
@@ -11,7 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = "spring",
-    uses = {SubCategoryMapper.class, UserMapper.class},
+    uses = {SubCategoryMapper.class, UserMapper.class, CityMapper.class},
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ListingMapper {
   @Mapping(source = "subCategoryId", target = "subCategoryEntity.id")
@@ -21,10 +22,8 @@ public interface ListingMapper {
   @Mapping(source = "subCategoryEntity", target = "subCategory")
   @Mapping(target = "canShip", source = "shippable")
   @Mapping(source = "userEntity", target = "user")
-  @Mapping(source = "city", target = "city")
+  @Mapping(source = "cityEntity", target = "city")
   ListingDto toDto(ListingEntity listingEntity);
-
-  ListingsWithLikesDto toListingWithLikesDto(ListingEntity listingEntity);
 
   @Mapping(target = "subCategoryEntity.id", source = "subCategoryId")
   @Mapping(source = "canShip", target = "shippable")
