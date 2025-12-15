@@ -1,11 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import ChatSVG from "/public/svgs/chat.svg";
 import SearchSVG from "/public/svgs/search.svg";
-import ProfileDropdown from "@/app/components/global/ProfileDropdown";
-import NotificationDropdown from "@/app/components/global/NotificationDropdown"; // <--- Import
 import getCurrentUser from "@/app/utils/getCurrentUser";
 import {User} from "@/app/types/user";
+import HeaderRightActions from "@/app/components/global/HeaderRightActions";
 
 export default async function Header() {
   const user: User | null = await getCurrentUser();
@@ -40,45 +38,7 @@ export default async function Header() {
         </div>
 
         {/* --- RIGHT: ACTIONS --- */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-          {user ? (
-            <>
-              {/* Create Listing CTA (Desktop) */}
-              <Link href={"/create-listing"} className="hidden lg:block mr-2">
-                <button className="bg-primary hover:bg-[#5b4cc4] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
-                  Termék eladása
-                </button>
-              </Link>
-
-              {/* Messages Button */}
-              <Link href="/messages">
-                <button className="relative p-2.5 text-slate-500 hover:text-primary hover:bg-slate-50 rounded-xl transition-all">
-                  <ChatSVG className="w-6 h-6" />
-                </button>
-              </Link>
-
-              {/* Notifications Dropdown (New) */}
-              <NotificationDropdown />
-
-              {/* Profile Dropdown */}
-              <ProfileDropdown user={user} />
-            </>
-          ) : (
-            /* Logged Out State */
-            <div className="flex items-center gap-2">
-              <Link href="/login">
-                <button className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:text-primary transition-colors">
-                  Belépés
-                </button>
-              </Link>
-              <Link href="/register">
-                <button className="hidden sm:block px-4 py-2.5 text-sm font-bold bg-primary hover:bg-[#5b4cc4] text-white rounded-xl transition-colors shadow-sm">
-                  Regisztráció
-                </button>
-              </Link>
-            </div>
-          )}
-        </div>
+        <HeaderRightActions user={user} />
       </div>
     </header>
   );

@@ -5,11 +5,9 @@ import BellSVG from "/public/svgs/bell.svg";
 import {
   Notification,
   NotificationTypeEnum,
+  NotificationWithUnreadMessage,
   ReviewRequestNotificationType,
 } from "@/app/types/notification";
-import {useQuery} from "@tanstack/react-query";
-import useListUnread from "@/app/hooks/notification/useListUnread";
-import usePatchPurchaseRequest from "@/app/hooks/purchase-request/usePatchPurchaseRequest";
 import {
   PurchaseRequestPatchRequest,
   PurchaseRequestStatusEnum,
@@ -17,18 +15,18 @@ import {
 import CreateReviewModal from "@/app/components/notification/CreateReviewModal";
 import ReviewNotification from "@/app/components/notification/ReviewNotification";
 import PurchaseRequestNotification from "@/app/components/notification/PurchaseRequestNotification";
+import usePatchPurchaseRequest from "@/app/hooks/purchase-request/usePatchPurchaseRequest";
 
-export default function NotificationDropdown() {
+export default function NotificationDropdown({
+  notificationsData,
+}: {
+  notificationsData: NotificationWithUnreadMessage | undefined;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
   const [reviewModalData, setReviewModalData] =
     useState<ReviewRequestNotificationType | null>(null);
-
-  const {data: notificationsData} = useQuery<Notification[]>({
-    queryFn: useListUnread,
-    queryKey: ["unread-notification"],
-  });
 
   const {
     mutate: patchPurchaseRequestMutation,
@@ -49,7 +47,8 @@ export default function NotificationDropdown() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const unreadCount = notificationsData?.filter(n => !n.isRead).length || 0;
+  const unreadCount =
+    notificationsData?.notifications.filter(n => !n.isRead).length || 0;
 
   const handlePurchaseSelection = (
     e: React.MouseEvent,
@@ -109,12 +108,12 @@ export default function NotificationDropdown() {
           </div>
 
           <div className="max-h-[400px] overflow-y-auto">
-            {notificationsData.length === 0 ? (
+            {notificationsData.notifications.length === 0 ? (
               <div className="p-8 text-center text-slate-400 text-sm">
                 Nincs új értesítésed.
               </div>
             ) : (
-              notificationsData.map(notif => (
+              notificationsData.notifications.map(notif => (
                 <div
                   key={notif.id}
                   className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors relative ${!notif.isRead ? "bg-indigo-50/30" : ""}`}>

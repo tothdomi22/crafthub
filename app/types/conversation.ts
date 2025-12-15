@@ -21,3 +21,14 @@ export interface SingleConversation {
 export interface ConversationRequest {
   listingId: number;
 }
+
+export interface ConversationWithLastMessage {
+  conversation: Conversation;
+  lastMessage: Message;
+  isRead: boolean;
+}
+
+export interface ConvoWithLastMessageAndUnreadList {
+  conversations: ConversationWithLastMessage[];
+  unread: number;
+}

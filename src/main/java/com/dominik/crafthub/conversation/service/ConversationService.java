@@ -1,10 +1,7 @@
 package com.dominik.crafthub.conversation.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
-import com.dominik.crafthub.conversation.dto.ConversationCreateRequest;
-import com.dominik.crafthub.conversation.dto.ConversationDto;
-import com.dominik.crafthub.conversation.dto.ConversationListDto;
-import com.dominik.crafthub.conversation.dto.ConversationWithMessagesDto;
+import com.dominik.crafthub.conversation.dto.*;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.conversation.exception.ConversationAlreadyExistsException;
 import com.dominik.crafthub.conversation.exception.ConversationNotFoundException;
@@ -17,9 +14,11 @@ import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.message.mapper.MessageMapper;
 import com.dominik.crafthub.message.repository.MessageRepository;
+import com.dominik.crafthub.messageread.repository.MessageReadRepository;
 import com.dominik.crafthub.user.mapper.UserMapper;
+import com.dominik.crafthub.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -37,6 +36,8 @@ public class ConversationService {
   private final ListingRepository listingRepository;
   private final ListingMapper listingMapper;
   private final UserMapper userMapper;
+  private final MessageReadRepository messageReadRepository;
+  private final UserRepository userRepository;
 
   public ConversationDto createConversation(ConversationCreateRequest request) {
     var listing = listingService.findListingById(request.listingId());
@@ -60,14 +61,14 @@ public class ConversationService {
     return conversationMapper.toDto(conversation);
   }
 
-  public List<ConversationListDto> getAllConversationsofUser() {
+  public ConversationsWithLastMessageDtosList getAllConversationsofUser() {
     var user = authService.getCurrentUser();
-    var conversations =
-        conversationRepository.findAllByUserEntity1_IdOrUserEntity2_Id(
-            user.getId(), user.getId(), Sort.by(Sort.Direction.DESC, "updatedAt"));
-    return conversations.stream().map(conversationMapper::toListDto).toList();
+    var conversations = conversationRepository.findAllConversationsWithLastMessage(user.getId());
+    int unreadCount = (int) conversations.stream().filter(c -> c.isRead().equals(false)).count();
+    return conversationMapper.toConversationsWithLastMessageDtoList(conversations, unreadCount);
   }
 
+  @Transactional
   public ConversationWithMessagesDto getConversationWithMessages(Long id) {
     var user = authService.getCurrentUser();
     var conversation = getConversationById(id);
@@ -75,26 +76,20 @@ public class ConversationService {
         && !conversation.getUserEntity2().getId().equals(user.getId())) {
       throw new NotPartOfThisConversationException();
     }
-    var listing = listingRepository.findById(conversation.getListingEntity().getId()).orElseThrow();
-    var listingDto = listingMapper.toNoCategoriesNoUserDto(listing);
     var recipient =
         conversation.getUserEntity1().getId().equals(user.getId())
             ? conversation.getUserEntity2()
             : conversation.getUserEntity1();
-    var recipientDto = userMapper.toDto(recipient);
-
     var messages =
         messageRepository.findAllByConversationEntity_Id(
             id, Sort.by(Sort.Direction.ASC, "createdAt"));
-    return new ConversationWithMessagesDto(
-        conversation.getId(),
-        messages.stream().map(messageMapper::toDto).toList(),
-        listingDto,
-        recipientDto);
+    messageReadRepository.markConversationAsRead(conversation.getId(), user.getId());
+    return conversationMapper.toConversationWithMessagesDto(
+        conversation.getId(), messages, conversation.getListingEntity(), recipient);
   }
 
   public ConversationEntity getConversationById(Long id) {
-    var conversation = conversationRepository.findById(id).orElse(null);
+    var conversation = conversationRepository.getConversationById(id).orElse(null);
     if (conversation == null) {
       throw new ConversationNotFoundException();
     }

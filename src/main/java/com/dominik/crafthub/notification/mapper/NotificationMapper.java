@@ -1,11 +1,13 @@
 package com.dominik.crafthub.notification.mapper;
 
 import com.dominik.crafthub.notification.dto.NotificationDto;
+import com.dominik.crafthub.notification.dto.NotificationsWIthMessageUnread;
 import com.dominik.crafthub.notification.entity.NotificationEntity;
 import com.dominik.crafthub.notification.entity.NotificationPayload;
 import com.dominik.crafthub.notification.entity.NotificationTypeEnum;
 import com.dominik.crafthub.user.entity.UserEntity;
 import java.time.OffsetDateTime;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -24,4 +26,8 @@ public interface NotificationMapper {
       NotificationPayload data,
       Boolean isRead,
       UserEntity user);
+
+  @Mapping(target = "notifications", source = "notificationEntities")
+  NotificationsWIthMessageUnread toNotificationsWithUnreadDto(
+      List<NotificationEntity> notificationEntities, Boolean unreadMessage);
 }
