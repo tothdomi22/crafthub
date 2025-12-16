@@ -1,5 +1,6 @@
 package com.dominik.crafthub.listing.controller;
 
+import com.dominik.crafthub.city.exception.CityNotFoundException;
 import com.dominik.crafthub.listing.dto.ListingCreateRequest;
 import com.dominik.crafthub.listing.dto.ListingUpdateRequest;
 import com.dominik.crafthub.listing.exception.CantReviveArchiedListingException;
@@ -74,5 +75,10 @@ public class ListingController {
   public ResponseEntity<Map<String, String>> cantReviveArchived() {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(Map.of("message", "You can't revive an archived listing"));
+  }
+
+  @ExceptionHandler(CityNotFoundException.class)
+  public ResponseEntity<Map<String, String>> cityNotFound() {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "City not found"));
   }
 }

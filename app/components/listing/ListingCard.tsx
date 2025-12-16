@@ -84,7 +84,7 @@ export default function ListingCard({
               </span>
             </div>
             <span className="text-[10px] text-slate-400 font-medium">
-              {listing.city}
+              {listing.city.name}
             </span>
           </div>
         )}

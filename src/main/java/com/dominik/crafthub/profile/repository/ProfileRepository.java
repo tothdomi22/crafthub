@@ -12,9 +12,19 @@ public interface ProfileRepository extends JpaRepository<ProfileEntity, Long> {
   @Query(
       value =
           """
+            SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END
+            FROM ProfileEntity p
+            WHERE (p.userEntity.id = :userId AND (p.birthDate IS NOT NULL or p.cityEntity IS NOT NULL))
+            """)
+  Boolean isProfileAlreadyFilled(@Param("userId") Long userId);
+
+  @Query(
+      value =
+          """
         SELECT p
         FROM ProfileEntity p
         LEFT JOIN FETCH p.userEntity u
+        LEFT JOIN FETCH p.cityEntity c
         WHERE p.userEntity.id = :userId
         """)
   Optional<ProfileEntity> findProfileByUserId(@Param("userId") Long userId);

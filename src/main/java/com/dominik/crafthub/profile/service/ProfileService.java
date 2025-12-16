@@ -1,11 +1,12 @@
 package com.dominik.crafthub.profile.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
+import com.dominik.crafthub.city.exception.CityNotFoundException;
+import com.dominik.crafthub.city.repository.CityRepository;
 import com.dominik.crafthub.profile.dto.ProfileCreateRequest;
 import com.dominik.crafthub.profile.dto.ProfileDto;
 import com.dominik.crafthub.profile.dto.ProfilePageDto;
 import com.dominik.crafthub.profile.dto.ProfileUpdateRequest;
-import com.dominik.crafthub.profile.exception.ProfileAlreadyExistsException;
 import com.dominik.crafthub.profile.exception.ProfileNotFoundException;
 import com.dominik.crafthub.profile.mapper.ProfileMapper;
 import com.dominik.crafthub.profile.repository.ProfileRepository;
@@ -21,17 +22,21 @@ public class ProfileService {
   private final AuthService authService;
   private final ReviewRepository reviewRepository;
   private final UserRepository userRepository;
+  private final CityRepository cityRepository;
   private ProfileRepository profileRepository;
   private ProfileMapper profileMapper;
 
   public ProfileDto createProfile(ProfileCreateRequest request) {
     var user = authService.getCurrentUser();
-    var profileExists = profileRepository.existsByUserEntity_Id(user.getId());
-    if (profileExists) {
-      throw new ProfileAlreadyExistsException();
+    var profile = profileRepository.findProfileByUserId(user.getId()).orElse(null);
+    if (profile == null) {
+      throw new ProfileNotFoundException();
     }
-    var profile = profileMapper.toEntity(request);
-    profile.setUserEntity(user);
+    var city = cityRepository.findById(request.cityId()).orElse(null);
+    if (city == null) {
+      throw new CityNotFoundException();
+    }
+    profileMapper.firstCreate(request, city, user, profile);
     profileRepository.save(profile);
     return profileMapper.toDto(profile);
   }

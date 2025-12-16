@@ -4,6 +4,6 @@ import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
 
 public record ProfileUpdateRequest(
-    String city,
+    Short cityId,
     String bio,
     @Past(message = "Birthdate must be in the past") LocalDate birthDate) {}

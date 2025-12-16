@@ -5,7 +5,6 @@ import ArrowBackSVG from "/public/svgs/arrow-back.svg";
 import BinSVG from "/public/svgs/bin.svg";
 import AddPhotoSVG from "/public/svgs/add-photo.svg";
 import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
-import LocationSVG from "/public/svgs/location.svg";
 import TruckSVG from "/public/svgs/truck.svg";
 import CheckSVG from "/public/svgs/check.svg";
 import {useRouter} from "next/navigation";
@@ -16,6 +15,9 @@ import {ListingRequest} from "@/app/types/listing";
 import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
 import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
+import CityDropdown from "@/app/components/city/CityDropdown";
+import {City} from "@/app/types/city";
+import useListCity from "@/app/hooks/city/useListCity";
 
 export default function CreateListing() {
   const router = useRouter();
@@ -26,7 +28,7 @@ export default function CreateListing() {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number | "">(""); // Allow empty string for input
-  const [city, setCity] = useState<string>("");
+  const [city, setCity] = useState<City | null>(null);
   const [selectedSubCategory, setSelectedSubCategory] =
     useState<SubCategory | null>(null);
 
@@ -37,6 +39,10 @@ export default function CreateListing() {
   const {data: subCategoriesData} = useQuery<SubCategory[]>({
     queryFn: useListSubCategory,
     queryKey: ["subCategories"],
+  });
+  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
+    queryFn: useListCity,
+    queryKey: ["cities"],
   });
   const {
     mutate: createListingMutation,
@@ -76,7 +82,7 @@ export default function CreateListing() {
   };
 
   const handleCreateListing = () => {
-    if (!selectedSubCategory?.id) {
+    if (!selectedSubCategory?.id || !city) {
       return;
     }
     const request: ListingRequest = {
@@ -308,18 +314,13 @@ export default function CreateListing() {
             {/* Location */}
             <div>
               <label className={labelClass}>Termék helye</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400">
-                  <LocationSVG />
-                </div>
-                <input
-                  value={city}
-                  onChange={e => setCity(e.target.value)}
-                  type="text"
-                  placeholder="Város, kerület"
-                  className={`${inputClass} pl-11`}
-                />
-              </div>
+              <CityDropdown
+                value={city}
+                onChange={selectedCity => setCity(selectedCity)}
+                citiesData={citiesData}
+                isLoading={isCitiesDataPending}
+                placeholder="Pl. Budapest"
+              />
             </div>
 
             {/* Shipping Toggle */}

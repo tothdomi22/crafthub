@@ -4,9 +4,11 @@ import {ListingRequest} from "@/app/types/listing";
 export default function useCreateListing() {
   return useMutation({
     mutationFn: async (data: ListingRequest) => {
+      const {city, ...rest} = data;
+      const body = {...rest, cityId: city.id};
       const response = await fetch("/api/listing/create", {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
         headers: {
           "Content-Type": "application/json",
         },

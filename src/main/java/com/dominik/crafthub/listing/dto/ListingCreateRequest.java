@@ -11,7 +11,7 @@ public record ListingCreateRequest(
         @Min(value = 0, message = "Price cannot be negative")
         Integer price,
     @NotNull(message = "You must device if you can ship or not") Boolean canShip,
-    @NotBlank(message = "You must provide a city") String city,
+    @NotNull(message = "You must provide a city") Short cityId,
     @NotBlank(message = "You must provide a description")
         @Size(min = 10, max = 5000, message = "Description must be between 10 and 5000 characters")
         String description,

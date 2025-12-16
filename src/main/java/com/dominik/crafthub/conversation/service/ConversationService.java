@@ -9,14 +9,9 @@ import com.dominik.crafthub.conversation.exception.NotPartOfThisConversationExce
 import com.dominik.crafthub.conversation.exception.YourConversationException;
 import com.dominik.crafthub.conversation.mapper.ConversationMapper;
 import com.dominik.crafthub.conversation.repository.ConversationRepository;
-import com.dominik.crafthub.listing.mapper.ListingMapper;
-import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.listing.service.ListingService;
-import com.dominik.crafthub.message.mapper.MessageMapper;
 import com.dominik.crafthub.message.repository.MessageRepository;
 import com.dominik.crafthub.messageread.repository.MessageReadRepository;
-import com.dominik.crafthub.user.mapper.UserMapper;
-import com.dominik.crafthub.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
@@ -31,13 +26,8 @@ public class ConversationService {
   private final AuthService authService;
   private final ConversationRepository conversationRepository;
   private final ConversationMapper conversationMapper;
-  private final MessageMapper messageMapper;
   private final MessageRepository messageRepository;
-  private final ListingRepository listingRepository;
-  private final ListingMapper listingMapper;
-  private final UserMapper userMapper;
   private final MessageReadRepository messageReadRepository;
-  private final UserRepository userRepository;
 
   public ConversationDto createConversation(ConversationCreateRequest request) {
     var listing = listingService.findListingById(request.listingId());

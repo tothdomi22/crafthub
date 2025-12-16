@@ -1,5 +1,6 @@
 package com.dominik.crafthub.listing.dto;
 
+import com.dominik.crafthub.city.dto.CityDto;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
 import java.time.OffsetDateTime;
 
@@ -8,7 +9,7 @@ public record ListingNoCategoriesNoUserDto(
     String name,
     Integer price,
     boolean canShip,
-    String city,
+    CityDto city,
     String description,
     OffsetDateTime createdAt,
     ListingStatusEnum status) {}

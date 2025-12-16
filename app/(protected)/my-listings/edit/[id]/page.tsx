@@ -5,7 +5,6 @@ import ArrowBackSVG from "/public/svgs/arrow-back.svg";
 import BinSVG from "/public/svgs/bin.svg";
 import AddPhotoSVG from "/public/svgs/add-photo.svg";
 import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
-import LocationSVG from "/public/svgs/location.svg";
 import TruckSVG from "/public/svgs/truck.svg";
 import CheckSVG from "/public/svgs/check.svg";
 import {useRouter} from "next/navigation";
@@ -17,6 +16,9 @@ import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
 import useGetListing from "@/app/hooks/listing/useGetListing";
 import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
+import {City} from "@/app/types/city";
+import CityDropdown from "@/app/components/city/CityDropdown";
+import useListCity from "@/app/hooks/city/useListCity";
 
 export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const {id} = use(params);
@@ -30,7 +32,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [price, setPrice] = useState<number | "">("");
-  const [city, setCity] = useState<string>("");
+  const [city, setCity] = useState<City | null>(null);
 
   const {data: mainCategoriesData} = useQuery<MainCategory[]>({
     queryFn: useListMainCategory,
@@ -46,6 +48,11 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
     queryFn: () => useGetListing(id),
     queryKey: ["listing", id],
     enabled: !!id,
+  });
+
+  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
+    queryFn: useListCity,
+    queryKey: ["cities"],
   });
 
   const {mutate: updateListingMutation, isPending: isUpdating} =
@@ -107,7 +114,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
   };
 
   const handleUpdateListing = () => {
-    if (!selectedSubCategory?.id) return;
+    if (!selectedSubCategory?.id || !city) return;
 
     const request: ListingRequest = {
       canShip: canShip,
@@ -305,15 +312,13 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
 
             <div>
               <label className={labelClass}>Termék helye</label>
-              <div className="relative">
-                <LocationSVG className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  value={city}
-                  onChange={e => setCity(e.target.value)}
-                  type="text"
-                  className={`${inputClass} pl-11`}
-                />
-              </div>
+              <CityDropdown
+                value={city}
+                onChange={selectedCity => setCity(selectedCity)}
+                citiesData={citiesData}
+                isLoading={isCitiesDataPending}
+                placeholder="Pl. Budapest"
+              />
             </div>
 
             <div

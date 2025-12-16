@@ -1,5 +1,6 @@
 package com.dominik.crafthub.listing.entity;
 
+import com.dominik.crafthub.city.entity.CityEntity;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.favorite.entity.FavoriteEntity;
 import com.dominik.crafthub.subcategory.entity.SubCategoryEntity;
@@ -30,9 +31,6 @@ public class ListingEntity {
   @Column(name = "shippable")
   private Boolean shippable = false;
 
-  @Column(name = "city")
-  private String city;
-
   @Column(name = "created_at")
   private OffsetDateTime createdAt;
 
@@ -42,6 +40,10 @@ public class ListingEntity {
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
   private ListingStatusEnum status;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "city_id")
+  private CityEntity cityEntity;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")

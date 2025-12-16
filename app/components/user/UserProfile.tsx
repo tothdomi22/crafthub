@@ -80,6 +80,8 @@ export default function UserProfile({id}: {id: string}) {
     };
   }, [observerTarget, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  console.log(profileData);
+
   if (!profileData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
@@ -146,7 +148,7 @@ export default function UserProfile({id}: {id: string}) {
               {profileData.city && (
                 <div className="flex items-center gap-2">
                   <LocationSVG />
-                  {profileData.city}
+                  {profileData.city.name}
                 </div>
               )}
 

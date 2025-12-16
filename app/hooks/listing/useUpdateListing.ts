@@ -11,9 +11,11 @@ export default function useUpdateListing() {
       data: ListingUpdateRequest;
       id: string;
     }) => {
+      const {city, ...rest} = data;
+      const body = {cityId: city ? city.id : null, ...rest};
       const response = await fetch(`/api/listing/update?id=${id}`, {
         method: "PUT",
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
         headers: {
           "Content-Type": "application/json",
         },
