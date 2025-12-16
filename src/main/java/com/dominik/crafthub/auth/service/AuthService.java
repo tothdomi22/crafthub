@@ -84,7 +84,12 @@ public class AuthService {
 
   public UserEntity getCurrentUser() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
-    var userId = (Long) authentication.getPrincipal();
+    var principal = authentication.getPrincipal();
+    // FIXME: this is questionable
+    if (principal.equals("anonymousUser")) {
+      return null;
+    }
+    var userId = (Long) principal;
     var user = userRepository.findById(userId).orElse(null);
     if (user == null || user.getIsDeleted()) {
       throw new UserNotFoundException();

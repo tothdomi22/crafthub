@@ -1,8 +1,8 @@
 package com.dominik.crafthub.listing.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
-import com.dominik.crafthub.conversation.repository.ConversationRepository;
-import com.dominik.crafthub.favorite.repository.FavoriteRepository;
+import com.dominik.crafthub.city.exception.CityNotFoundException;
+import com.dominik.crafthub.city.repository.CityRepository;
 import com.dominik.crafthub.listing.dto.*;
 import com.dominik.crafthub.listing.entity.ListingEntity;
 import com.dominik.crafthub.listing.entity.ListingStatusEnum;
@@ -11,9 +11,7 @@ import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
-import com.dominik.crafthub.purchaserequest.repository.PurchaseRequestRepostitory;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
-import com.dominik.crafthub.user.service.UserService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,19 +28,18 @@ public class ListingService {
   private final ListingMapper listingMapper;
   private final SubCategoryService subCategoryService;
   private final ListingRepository listingRepository;
-  private final UserService userService;
-  private final ConversationRepository conversationRepository;
-  private final PurchaseRequestRepostitory purchaseRequestRepostitory;
-  private final FavoriteRepository favoriteRepository;
+  private final CityRepository cityRepository;
 
   public ListingDto createListing(ListingCreateRequest request) {
     var user = authService.getCurrentUser();
     var subCategory = subCategoryService.findSubCategoryById(request.subCategoryId());
-    var listing = listingMapper.toEntity(request);
-    listing.setUserEntity(user);
-    listing.setSubCategoryEntity(subCategory);
-    listing.setStatus(ListingStatusEnum.ACTIVE);
-    listing.setCreatedAt(OffsetDateTime.now());
+    var city = cityRepository.findById(request.cityId()).orElse(null);
+    if (city == null) {
+      throw new CityNotFoundException();
+    }
+    var listing =
+        listingMapper.toEntity(
+            request, city, user, subCategory, ListingStatusEnum.ACTIVE, OffsetDateTime.now());
     listingRepository.save(listing);
     return listingMapper.toDto(listing);
   }
@@ -51,9 +48,13 @@ public class ListingService {
     var user = authService.getCurrentUser();
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     if (id == null) {
-      return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
+      // FIXME: this is questionable
+      if (user != null) {
+        return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
+      } else {
+        return listingRepository.findALlListingsWithNullLikes(pageable);
+      }
     } else {
-      System.out.println(id);
       return listingRepository.findAllUseresListingsWithIsLiked(user.getId(), id, pageable);
     }
   }

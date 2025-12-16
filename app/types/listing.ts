@@ -1,11 +1,12 @@
 import {SubCategory} from "@/app/types/admin/category/category";
 import {User} from "@/app/types/user";
+import {City} from "@/app/types/city";
 
 export interface ListingRequest {
   name: string;
   price: number;
   canShip: boolean;
-  city: string;
+  city: City;
   description: string;
   subCategoryId: number;
 }
@@ -13,7 +14,7 @@ export interface ListingUpdateRequest {
   name?: string;
   price?: number;
   canShip?: boolean;
-  city?: string;
+  cityId?: number;
   description?: string;
   subCategoryId?: number;
   status?: ListingStatusEnum;
@@ -33,7 +34,7 @@ export interface ListingReview {
 export interface ListingNoCategoryAndUser extends ListingReview {
   price: number;
   canShip: boolean;
-  city: string;
+  city: City;
   description: string;
   createdAt: string;
   status: ListingStatusEnum;

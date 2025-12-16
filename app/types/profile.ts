@@ -1,9 +1,10 @@
 import {User} from "@/app/types/user";
+import {City} from "@/app/types/city";
 
 export interface Profile {
   bio: string | null;
   birthDate: string | null;
-  city: string | null;
+  city: City | null;
   id: number;
   review: number;
   reviewCount: number;
@@ -11,8 +12,13 @@ export interface Profile {
 }
 
 export interface ProfileUpdateRequest {
+  birthDate?: string;
+  cityId?: number;
+  bio?: string;
+}
+export interface ProfileCreateRequest {
   birthDate: string;
-  city: string;
+  city: City;
   bio: string;
 }
 

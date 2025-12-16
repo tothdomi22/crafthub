@@ -1,9 +1,13 @@
 "use client";
 
 import React, {useState} from "react";
-import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {User} from "@/app/types/user";
+import {useQuery} from "@tanstack/react-query";
+import useListCity from "@/app/hooks/city/useListCity";
+import {City} from "@/app/types/city";
+import CityDropdown from "@/app/components/city/CityDropdown";
+import useCreateProfile from "@/app/hooks/profile/useCreateProfile";
 
 export default function ProfileOnboardingModal({
   isOpen,
@@ -15,11 +19,20 @@ export default function ProfileOnboardingModal({
   user: User;
 }) {
   const {mutate: createProfileMutation, isPending: isMutationPending} =
-    useUpdateProfile({userId: String(user.id)});
+    useCreateProfile({userId: String(user.id)});
+
+  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
+    queryFn: useListCity,
+    queryKey: ["cities"],
+  });
 
   // Schema fields based on your diagram
-  const [formData, setFormData] = useState({
-    city: "",
+  const [formData, setFormData] = useState<{
+    city: City | null;
+    bio: string;
+    birthDate: string;
+  }>({
+    city: null,
     bio: "",
     birthDate: "",
   });
@@ -66,17 +79,20 @@ export default function ProfileOnboardingModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-5">
-          {/* CITY INPUT */}
+          {/* CITY SELECTOR */}
           <div className="space-y-1.5">
             <label className="text-sm font-bold text-slate-700 ml-1">
-              Város / Lakhely
+              Lakhely
             </label>
-            <input
-              type="text"
-              placeholder="Pl. Budapest"
+
+            <CityDropdown
               value={formData.city}
-              onChange={e => setFormData({...formData, city: e.target.value})}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium"
+              onChange={selectedCity =>
+                setFormData({...formData, city: selectedCity})
+              }
+              citiesData={citiesData}
+              isLoading={isCitiesDataPending}
+              placeholder="Pl. Budapest"
             />
           </div>
 

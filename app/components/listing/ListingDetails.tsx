@@ -262,7 +262,7 @@ export default function ListingDetails({
             <div className="mt-4 pt-4 border-t border-slate-50 flex items-center gap-4 text-xs font-medium text-slate-500">
               <div className="flex items-center gap-1.5">
                 <LocationSVG className="w-4 h-4 text-slate-400" />
-                <span>{listingData.city}</span>
+                <span>{listingData.city.name}</span>
               </div>
             </div>
           </div>
@@ -276,7 +276,7 @@ export default function ListingDetails({
           </div>
 
           {/* --- STICKY ACTION BAR --- */}
-          <div className="sticky bottom-4 z-40 pt-2 pb-4">
+          <div className="pt-2 pb-4">
             {!isOwner ? (
               // --- BUYER VIEW ---
               listingData.status === ListingStatusEnum.ACTIVE ? (
