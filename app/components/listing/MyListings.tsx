@@ -151,7 +151,7 @@ export default function MyListings() {
                     </span>
                     <div className="flex items-center gap-1 font-medium text-slate-700 text-sm">
                       <LocationSVG className="w-3.5 h-3.5 text-slate-400" />
-                      {listing.city}
+                      {listing.city.name}
                     </div>
                   </div>
 

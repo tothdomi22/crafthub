@@ -1,6 +1,7 @@
 package com.dominik.crafthub.listing.service;
 
 import com.dominik.crafthub.auth.service.AuthService;
+import com.dominik.crafthub.city.entity.CityEntity;
 import com.dominik.crafthub.city.exception.CityNotFoundException;
 import com.dominik.crafthub.city.repository.CityRepository;
 import com.dominik.crafthub.listing.dto.*;
@@ -33,10 +34,7 @@ public class ListingService {
   public ListingDto createListing(ListingCreateRequest request) {
     var user = authService.getCurrentUser();
     var subCategory = subCategoryService.findSubCategoryById(request.subCategoryId());
-    var city = cityRepository.findById(request.cityId()).orElse(null);
-    if (city == null) {
-      throw new CityNotFoundException();
-    }
+    var city = findCityById(request.cityId());
     var listing =
         listingMapper.toEntity(
             request, city, user, subCategory, ListingStatusEnum.ACTIVE, OffsetDateTime.now());
@@ -89,7 +87,12 @@ public class ListingService {
         && listing.getStatus().equals(ListingStatusEnum.ARCHIVED)) {
       throw new CantReviveArchiedListingException();
     }
-    listingMapper.update(request, listing);
+    CityEntity city = new CityEntity();
+    if (request.cityId() != null) {
+      city = findCityById(request.cityId());
+    }
+    listingMapper.update(request, city, listing);
+    System.out.println(listing.getCityEntity().getId());
     listingRepository.save(listing);
     return listingMapper.toDto(listing);
   }
@@ -100,5 +103,13 @@ public class ListingService {
       throw new ListingNotFoundException();
     }
     return listing;
+  }
+
+  public CityEntity findCityById(Short id) {
+    var city = cityRepository.findById(id).orElse(null);
+    if (city == null) {
+      throw new CityNotFoundException();
+    }
+    return city;
   }
 }

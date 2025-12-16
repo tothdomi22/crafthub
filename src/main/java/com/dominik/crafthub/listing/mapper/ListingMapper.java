@@ -41,9 +41,15 @@ public interface ListingMapper {
   @Mapping(source = "cityEntity", target = "city")
   ListingDto toDto(ListingEntity listingEntity);
 
-  @Mapping(target = "subCategoryEntity.id", source = "subCategoryId")
-  @Mapping(source = "canShip", target = "shippable")
-  void update(ListingUpdateRequest request, @MappingTarget ListingEntity listingEntity);
+  @Mapping(target = "subCategoryEntity.id", source = "request.subCategoryId")
+  @Mapping(target = "shippable", source = "request.canShip")
+  @Mapping(target = "cityEntity", source = "cityEntity")
+  @Mapping(target = "name", source = "request.name")
+  @Mapping(target = "id", ignore = true)
+  void update(
+      ListingUpdateRequest request,
+      CityEntity cityEntity,
+      @MappingTarget ListingEntity listingEntity);
 
   @Mapping(target = "canShip", source = "shippable")
   ListingNoCategoriesNoUserDto toNoCategoriesNoUserDto(ListingEntity listing);

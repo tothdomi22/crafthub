@@ -14,7 +14,7 @@ export interface ListingUpdateRequest {
   name?: string;
   price?: number;
   canShip?: boolean;
-  cityId?: number;
+  city?: City;
   description?: string;
   subCategoryId?: number;
   status?: ListingStatusEnum;
