@@ -1,5 +1,6 @@
 package com.dominik.crafthub.favorite.mapper;
 
+import com.dominik.crafthub.city.mapper.CityMapper;
 import com.dominik.crafthub.favorite.dto.FavoriteDto;
 import com.dominik.crafthub.favorite.entity.FavoriteEntity;
 import com.dominik.crafthub.listing.entity.ListingEntity;
@@ -14,7 +15,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(
     componentModel = "spring",
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-    uses = {UserMapper.class, ListingMapper.class})
+    uses = {UserMapper.class, ListingMapper.class, CityMapper.class})
 public interface FavoriteMapper {
   @Mapping(target = "listingEntity", source = "listing")
   @Mapping(target = "id", ignore = true)

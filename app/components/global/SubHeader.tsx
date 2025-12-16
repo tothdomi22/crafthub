@@ -5,16 +5,12 @@ import ArrowBackSVG from "/public/svgs/arrow-back.svg";
 import ShareSVG from "/public/svgs/share.svg";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
-import ProfileDropdown from "@/app/components/global/ProfileDropdown";
-import NotificationDropdown from "@/app/components/global/NotificationDropdown"; // <--- Import
 import {User} from "@/app/types/user";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
+import HeaderRightActions from "@/app/components/global/HeaderRightActions";
 
 export default function SubHeader({user}: {user: User}) {
   const router = useRouter();
-
-  // Use the user prop to check auth status
-  const isLoggedIn = !!user;
 
   const copyURL = () => {
     const url = window.location.href;
@@ -61,19 +57,7 @@ export default function SubHeader({user}: {user: User}) {
           {/* Divider */}
           <div className="h-6 w-px bg-slate-200 mx-1"></div>
 
-          {isLoggedIn ? (
-            <>
-              {/* NotificationEntity Dropdown (New) */}
-              <NotificationDropdown />
-
-              {/* Profile Dropdown */}
-              <ProfileDropdown user={user} />
-            </>
-          ) : (
-            <Link href="/login" className="text-sm font-bold text-primary px-3">
-              Belépés
-            </Link>
-          )}
+          <HeaderRightActions user={user} />
         </div>
       </div>
     </nav>
