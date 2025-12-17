@@ -17,8 +17,8 @@ import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {City} from "@/app/types/city";
 import CityDropdown from "@/app/components/city/CityDropdown";
-import useListCity from "@/app/hooks/city/useListCity";
 import {listingDetailQuery} from "@/app/queries/list.queries";
+import {cityListQuery} from "@/app/queries/city.queries";
 
 export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const {id} = use(params);
@@ -48,10 +48,8 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
     listingDetailQuery(id),
   );
 
-  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
-    queryFn: useListCity,
-    queryKey: ["cities"],
-  });
+  const {data: citiesData, isPending: isCitiesDataPending} =
+    useQuery(cityListQuery());
 
   const {mutate: updateListingMutation, isPending: isUpdating} =
     useUpdateListing();

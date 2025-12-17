@@ -17,7 +17,7 @@ import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import CityDropdown from "@/app/components/city/CityDropdown";
 import {City} from "@/app/types/city";
-import useListCity from "@/app/hooks/city/useListCity";
+import {cityListQuery} from "@/app/queries/city.queries";
 
 export default function CreateListing() {
   const router = useRouter();
@@ -40,10 +40,8 @@ export default function CreateListing() {
     queryFn: useListSubCategory,
     queryKey: ["subCategories"],
   });
-  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
-    queryFn: useListCity,
-    queryKey: ["cities"],
-  });
+  const {data: citiesData, isPending: isCitiesDataPending} =
+    useQuery(cityListQuery());
   const {
     mutate: createListingMutation,
     isPending: isCreateListingMutationPending,
