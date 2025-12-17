@@ -6,13 +6,12 @@ import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
 import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import Skeleton
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {User} from "@/app/types/user";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 import {listingInfiniteQuery} from "@/app/queries/list.queries";
 import {mainCategoryListQuery} from "@/app/queries/category.queries";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
@@ -31,11 +30,7 @@ export default function ListingsPage({user}: {user: User | null}) {
     isLoading,
   } = useInfiniteQuery(listingInfiniteQuery());
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(String(user?.id)),
-    queryKey: ["profile" + user?.id],
-    enabled: !!user,
-  });
+  const {data: profileData} = useQuery(profileUserQuery(user?.id));
 
   const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
     useManageFavorite();

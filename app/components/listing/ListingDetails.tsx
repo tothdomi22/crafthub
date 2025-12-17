@@ -3,8 +3,6 @@
 import React, {useState} from "react";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {Listing, ListingStatusEnum} from "@/app/types/listing";
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {formatDate} from "@/app/components/utils";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -25,6 +23,7 @@ import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
 import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 import {listingDetailQuery} from "@/app/queries/list.queries";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function ListingDetails({
   listingId,
@@ -44,11 +43,7 @@ export default function ListingDetails({
   // --- Queries ---
   const {data: listingData} = useQuery(listingDetailQuery(listingId));
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(String(listingData?.user.id)),
-    queryKey: ["profile" + listingId],
-    enabled: !!listingData,
-  });
+  const {data: profileData} = useQuery(profileUserQuery(listingData?.user.id));
 
   const {mutateAsync: createConversation} = useCreateConversation();
   const {mutateAsync: createMessage} = useCreateFirstMessage();

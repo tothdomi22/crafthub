@@ -2,8 +2,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
 import {ReviewTypeEnum} from "@/app/types/review";
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import LocationSVG from "/public/svgs/location.svg";
 import CalendarSvg from "/public/svgs/calendar.svg";
 import StarSvg from "/public/svgs/star.svg";
@@ -14,6 +12,7 @@ import {formatDate} from "@/app/components/utils";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 import {listingInfiniteUserQuery} from "@/app/queries/list.queries";
 import {reviewUserQuery} from "@/app/queries/review.queries";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function UserProfile({id}: {id: string}) {
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
@@ -30,10 +29,7 @@ export default function UserProfile({id}: {id: string}) {
 
   const {data: reviewData} = useQuery(reviewUserQuery(id));
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(id),
-    queryKey: ["profile" + id],
-  });
+  const {data: profileData} = useQuery(profileUserQuery(id));
 
   const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
     useManageFavorite();

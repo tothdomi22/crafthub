@@ -13,7 +13,7 @@ export interface Profile {
 
 export interface ProfileUpdateRequest {
   birthDate?: string;
-  cityId?: number;
+  city?: City;
   bio?: string;
 }
 export interface ProfileCreateRequest {
@@ -26,6 +26,6 @@ export interface ProfileAndUserUpdateProps {
   name: string;
   email: string;
   bio: string;
-  city: string;
+  city: City | null;
   birthDate: string;
 }
