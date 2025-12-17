@@ -10,15 +10,17 @@ import CheckSVG from "/public/svgs/check.svg";
 import {useRouter} from "next/navigation";
 import {useQuery} from "@tanstack/react-query";
 import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
-import {Listing, ListingRequest} from "@/app/types/listing";
-import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
-import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
-import useGetListing from "@/app/hooks/listing/useGetListing";
+import {ListingRequest} from "@/app/types/listing";
 import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {City} from "@/app/types/city";
 import CityDropdown from "@/app/components/city/CityDropdown";
-import useListCity from "@/app/hooks/city/useListCity";
+import {listingDetailQuery} from "@/app/queries/list.queries";
+import {cityListQuery} from "@/app/queries/city.queries";
+import {
+  mainCategoryListQuery,
+  subCategoryListQuery,
+} from "@/app/queries/category.queries";
 
 export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const {id} = use(params);
@@ -34,26 +36,16 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const [price, setPrice] = useState<number | "">("");
   const [city, setCity] = useState<City | null>(null);
 
-  const {data: mainCategoriesData} = useQuery<MainCategory[]>({
-    queryFn: useListMainCategory,
-    queryKey: ["mainCategories"],
-  });
+  const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
 
-  const {data: subCategoriesData} = useQuery<SubCategory[]>({
-    queryFn: useListSubCategory,
-    queryKey: ["subCategories"],
-  });
+  const {data: subCategoriesData} = useQuery(subCategoryListQuery());
 
-  const {data: existingListing, isLoading: isFetching} = useQuery<Listing>({
-    queryFn: () => useGetListing(id),
-    queryKey: ["listing", id],
-    enabled: !!id,
-  });
+  const {data: existingListing, isLoading: isFetching} = useQuery(
+    listingDetailQuery(id),
+  );
 
-  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
-    queryFn: useListCity,
-    queryKey: ["cities"],
-  });
+  const {data: citiesData, isPending: isCitiesDataPending} =
+    useQuery(cityListQuery());
 
   const {mutate: updateListingMutation, isPending: isUpdating} =
     useUpdateListing();

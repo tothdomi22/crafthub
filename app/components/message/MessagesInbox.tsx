@@ -3,17 +3,11 @@ import Link from "next/link";
 import {formatDate} from "@/app/components/utils";
 import React from "react";
 import {useQuery} from "@tanstack/react-query";
-import {ConvoWithLastMessageAndUnreadList} from "@/app/types/conversation";
-import useListConversation from "@/app/hooks/conversation/useListConversation";
 import {User} from "@/app/types/user";
+import {conversationListQuery} from "@/app/queries/conversation.queries";
 
 export default function MessagesInbox({user}: {user: User}) {
-  const {data: conversationsData} = useQuery<ConvoWithLastMessageAndUnreadList>(
-    {
-      queryFn: useListConversation,
-      queryKey: ["conversations"],
-    },
-  );
+  const {data: conversationsData} = useQuery(conversationListQuery());
 
   if (!conversationsData) {
     return (
@@ -34,17 +28,12 @@ export default function MessagesInbox({user}: {user: User}) {
           {/* Header */}
           <div className="flex-shrink-0 px-6 py-5 border-b border-slate-100 flex items-center justify-between">
             <h1 className="text-xl font-bold text-slate-900">Üzenetek</h1>
-            {/*<div className="text-xs font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">*/}
-            {/*  {conversationsData.length} aktív beszélgetés*/}
-            {/*</div>*/}
           </div>
 
           {/* List */}
           <div className="flex-1 overflow-y-auto p-4 scroll-smooth">
             <div className="flex flex-col gap-3">
               {conversationsData.conversations.map(conv => {
-                // const isUnread =
-                //   !conv.lastMessage.isRead && !conv.lastMessage.isMine;
                 const otherUser =
                   conv.conversation.userOne.id == user.id
                     ? conv.conversation.userTwo

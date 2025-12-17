@@ -1,14 +1,16 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {Profile, ProfileUpdateRequest} from "@/app/types/profile";
+import {profileKeys} from "@/app/queries/profile.queries";
 
 export default function useUpdateProfile({userId}: {userId: string}) {
   const queryClient = useQueryClient();
-  const queryKey = ["conversation" + userId];
   return useMutation({
     mutationFn: async (data: ProfileUpdateRequest) => {
+      const {city, ...rest} = data;
+      const body = {...rest, cityId: city?.id};
       const response = await fetch("/api/profile/update", {
         method: "PUT",
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
         headers: {
           "Content-Type": "application/json",
         },
@@ -23,25 +25,30 @@ export default function useUpdateProfile({userId}: {userId: string}) {
       return responseJson;
     },
     onMutate: async data => {
-      await queryClient.cancelQueries({queryKey});
-      const previousData = queryClient.getQueryData<Profile>(queryKey);
+      await queryClient.cancelQueries({queryKey: profileKeys.user(userId)});
+      const previousData = queryClient.getQueryData<Profile>(
+        profileKeys.user(userId),
+      );
       if (previousData) {
-        queryClient.setQueryData<Profile>(queryKey, {
+        queryClient.setQueryData<Profile>(profileKeys.user(userId), {
           ...previousData,
-          bio: data.bio,
-          birthDate: data.birthDate,
-          city: data.city,
+          bio: data.bio ?? previousData.bio,
+          birthDate: data.birthDate ?? previousData.birthDate,
+          city: data.city ?? previousData.city,
         });
       }
       return {previousData};
     },
     onError: (err, newMessage, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+        queryClient.setQueryData(
+          profileKeys.user(userId),
+          context.previousData,
+        );
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({queryKey});
+      await queryClient.invalidateQueries({queryKey: profileKeys.user(userId)});
     },
   });
 }

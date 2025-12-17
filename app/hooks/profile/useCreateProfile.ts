@@ -1,9 +1,9 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {Profile, ProfileCreateRequest} from "@/app/types/profile";
+import {profileKeys} from "@/app/queries/profile.queries";
 
 export default function useCreateProfile({userId}: {userId: string}) {
   const queryClient = useQueryClient();
-  const queryKey = ["conversation" + userId];
   return useMutation({
     mutationFn: async (data: ProfileCreateRequest) => {
       const body = {
@@ -28,10 +28,12 @@ export default function useCreateProfile({userId}: {userId: string}) {
       return responseJson;
     },
     onMutate: async data => {
-      await queryClient.cancelQueries({queryKey});
-      const previousData = queryClient.getQueryData<Profile>(queryKey);
+      await queryClient.cancelQueries({queryKey: profileKeys.all});
+      const previousData = queryClient.getQueryData<Profile>(
+        profileKeys.user(userId),
+      );
       if (previousData) {
-        queryClient.setQueryData<Profile>(queryKey, {
+        queryClient.setQueryData<Profile>(profileKeys.user(userId), {
           ...previousData,
           bio: data.bio,
           birthDate: data.birthDate,
@@ -42,11 +44,14 @@ export default function useCreateProfile({userId}: {userId: string}) {
     },
     onError: (err, newMessage, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+        queryClient.setQueryData(
+          profileKeys.user(userId),
+          context.previousData,
+        );
       }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({queryKey});
+      await queryClient.invalidateQueries({queryKey: profileKeys.user(userId)});
     },
   });
 }

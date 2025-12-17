@@ -7,8 +7,7 @@ import useLogout from "@/app/hooks/auth/useLogout";
 import {notifyError} from "@/app/utils/toastHelper";
 import KeyBoardArrowDownSVG from "/public/svgs/keyboard-arrow-down.svg";
 import {useQuery} from "@tanstack/react-query";
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function ProfileDropdown({user}: {user: User}) {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,10 +15,7 @@ export default function ProfileDropdown({user}: {user: User}) {
 
   const {mutate: logoutMutation} = useLogout();
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(String(user.id)),
-    queryKey: ["profile" + user.id],
-  });
+  const {data: profileData} = useQuery(profileUserQuery(user.id));
 
   // Close dropdown when clicking outside
   useEffect(() => {

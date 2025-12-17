@@ -7,14 +7,10 @@ import NotificationDropdown from "@/app/components/global/NotificationDropdown";
 import ProfileDropdown from "@/app/components/global/ProfileDropdown";
 import {User} from "@/app/types/user";
 import {useQuery} from "@tanstack/react-query";
-import {NotificationWithUnreadMessage} from "@/app/types/notification";
-import useListUnread from "@/app/hooks/notification/useListUnread";
+import {notificationListQuery} from "@/app/queries/notification.queries";
 
 export default function HeaderRightActions({user}: {user: User | null}) {
-  const {data: notificationsData} = useQuery<NotificationWithUnreadMessage>({
-    queryFn: useListUnread,
-    queryKey: ["unread-notification"],
-  });
+  const {data: notificationsData} = useQuery(notificationListQuery());
   return (
     <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
       {user ? (

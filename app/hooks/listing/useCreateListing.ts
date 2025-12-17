@@ -1,7 +1,9 @@
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ListingRequest} from "@/app/types/listing";
+import {listingKeys} from "@/app/queries/list.queries";
 
 export default function useCreateListing() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: ListingRequest) => {
       const {city, ...rest} = data;
@@ -21,6 +23,9 @@ export default function useCreateListing() {
         throw new Error(responseJson.message || "Listing creation failed");
       }
       return responseJson;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: listingKeys.all});
     },
   });
 }

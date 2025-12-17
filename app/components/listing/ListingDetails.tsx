@@ -1,11 +1,8 @@
 "use client";
 
 import React, {useState} from "react";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {Listing, ListingStatusEnum} from "@/app/types/listing";
-import useGetListing from "@/app/hooks/listing/useGetListing";
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {formatDate} from "@/app/components/utils";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -25,6 +22,8 @@ import EditSVG from "/public/svgs/edit.svg";
 import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
 import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
+import {listingDetailQuery} from "@/app/queries/list.queries";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function ListingDetails({
   listingId,
@@ -34,7 +33,6 @@ export default function ListingDetails({
   user: User;
 }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   // --- States ---
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -42,19 +40,11 @@ export default function ListingDetails({
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
   // --- Queries ---
-  const {data: listingData} = useQuery<Listing>({
-    queryFn: () => useGetListing(listingId),
-    queryKey: ["listing" + listingId],
-  });
-
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(String(listingData?.user.id)),
-    queryKey: ["profile" + listingId],
-    enabled: !!listingData,
-  });
+  const {data: listingData} = useQuery(listingDetailQuery(listingId));
+  const {data: profileData} = useQuery(profileUserQuery(listingData?.user.id));
 
   const {mutateAsync: createConversation} = useCreateConversation();
-  const {mutateAsync: createMessage} = useCreateFirstMessage();
+  const {mutateAsync: createMessage} = useCreateFirstMessage(listingId);
 
   const {
     mutate: createPurchaseRequestMutation,
@@ -76,27 +66,16 @@ export default function ListingDetails({
       const createConversationResponse: Listing = await createConversation({
         listingId: Number(listingId),
       });
-      const queryKey = ["listing" + listingId];
-
       await createMessage({
         textContent: message,
         conversationId: createConversationResponse.id,
       });
-      await queryClient.cancelQueries({queryKey});
-      const previousData = queryClient.getQueryData<Listing>(queryKey);
-      if (previousData) {
-        queryClient.setQueryData<Listing>(queryKey, {
-          ...previousData,
-          conversationId: createConversationResponse.id,
-        });
-        notifySuccess("Üzenet sikeresen elküldve!");
-      }
     } catch (e) {
       console.error(e);
       notifyError("Hiba történt, Kérem próbálkozzon később!");
-      setIsMessageModalOpen(false);
     }
     setIsMessagePending(false);
+    setIsMessageModalOpen(false);
   };
 
   const handleManageFavorite = (
@@ -202,7 +181,7 @@ export default function ListingDetails({
                 onClick={() =>
                   handleManageFavorite(listingData.id, listingData.isLiked)
                 }
-                className={`flex-shrink-0 p-3 rounded-xl transition-all ${
+                className={`flex-shrink-0 p-3 rounded-xl cursor-pointer transition-all ${
                   listingData.isLiked
                     ? "text-red-500 bg-red-50"
                     : "text-slate-400 bg-slate-50 hover:bg-slate-100"

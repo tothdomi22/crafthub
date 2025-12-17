@@ -1,13 +1,13 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {Message, MessageRequest} from "@/app/types/message";
 import {SingleConversation} from "@/app/types/conversation";
+import {conversationKeys} from "@/app/queries/conversation.queries";
 
 export default function useCreateMessage(
   conversationId: string,
   userId: string,
 ) {
   const queryClient = useQueryClient();
-  const queryKey = ["conversation" + conversationId];
 
   return useMutation({
     mutationFn: async (data: MessageRequest) => {
@@ -31,11 +31,12 @@ export default function useCreateMessage(
     // Optimistic update
     onMutate: async newMessageData => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({queryKey});
+      await queryClient.cancelQueries({queryKey: conversationKeys.all});
 
       // Snapshot previous value
-      const previousData =
-        queryClient.getQueryData<SingleConversation>(queryKey);
+      const previousData = queryClient.getQueryData<SingleConversation>(
+        conversationKeys.detail(conversationId),
+      );
 
       // Optimistically update cache
       if (previousData) {
@@ -52,10 +53,13 @@ export default function useCreateMessage(
           },
         };
 
-        queryClient.setQueryData<SingleConversation>(queryKey, {
-          ...previousData,
-          messages: [...previousData.messages, optimisticMessage],
-        });
+        queryClient.setQueryData<SingleConversation>(
+          conversationKeys.detail(conversationId),
+          {
+            ...previousData,
+            messages: [...previousData.messages, optimisticMessage],
+          },
+        );
       }
 
       // Return context for rollback
@@ -65,13 +69,18 @@ export default function useCreateMessage(
     // Rollback on error
     onError: (err, newMessage, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+        queryClient.setQueryData(
+          conversationKeys.detail(conversationId),
+          context.previousData,
+        );
       }
     },
 
     // Refetch on success to get real data from server
     onSuccess: async () => {
-      await queryClient.invalidateQueries({queryKey});
+      await queryClient.invalidateQueries({
+        queryKey: conversationKeys.detail(conversationId),
+      });
     },
   });
 }

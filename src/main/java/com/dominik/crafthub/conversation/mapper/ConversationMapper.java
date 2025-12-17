@@ -1,5 +1,6 @@
 package com.dominik.crafthub.conversation.mapper;
 
+import com.dominik.crafthub.city.mapper.CityMapper;
 import com.dominik.crafthub.conversation.dto.*;
 import com.dominik.crafthub.conversation.entity.ConversationEntity;
 import com.dominik.crafthub.listing.entity.ListingEntity;
@@ -15,7 +16,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(
     componentModel = "spring",
-    uses = {UserMapper.class, ListingMapper.class, MessageMapper.class},
+    uses = {UserMapper.class, ListingMapper.class, MessageMapper.class, CityMapper.class},
     nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ConversationMapper {
   @Mapping(source = "userEntity1", target = "userOne")

@@ -3,17 +3,15 @@
 import React, {useEffect, useRef, useState} from "react";
 import {MainCategory} from "@/app/types/admin/category/category";
 import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
-import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
-import {ListingPagination} from "@/app/types/listing";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
 import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import Skeleton
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {User} from "@/app/types/user";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
-import {useListListings} from "@/app/hooks/listing/useListListing";
+import {listingInfiniteQuery} from "@/app/queries/list.queries";
+import {mainCategoryListQuery} from "@/app/queries/category.queries";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
@@ -22,10 +20,7 @@ export default function ListingsPage({user}: {user: User | null}) {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
   const observerTarget = useRef(null);
 
-  const {data: mainCategoriesData} = useQuery<MainCategory[]>({
-    queryFn: useListMainCategory,
-    queryKey: ["mainCategories"],
-  });
+  const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
 
   const {
     data: listingData,
@@ -33,25 +28,9 @@ export default function ListingsPage({user}: {user: User | null}) {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useInfiniteQuery<ListingPagination, Error>({
-    queryKey: ["listings-infinite", activeCategory?.id],
-    queryFn: ({pageParam}) =>
-      useListListings({
-        pageParam: pageParam as number,
-        categoryId: activeCategory?.id,
-      }),
-    initialPageParam: 0,
-    getNextPageParam: lastPage => {
-      if (lastPage.last) return undefined;
-      return lastPage.number + 1;
-    },
-  });
+  } = useInfiniteQuery(listingInfiniteQuery());
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(String(user?.id)),
-    queryKey: ["profile" + user?.id],
-    enabled: !!user,
-  });
+  const {data: profileData} = useQuery(profileUserQuery(user?.id));
 
   const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
     useManageFavorite();

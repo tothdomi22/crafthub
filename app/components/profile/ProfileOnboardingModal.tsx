@@ -4,10 +4,10 @@ import React, {useState} from "react";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {User} from "@/app/types/user";
 import {useQuery} from "@tanstack/react-query";
-import useListCity from "@/app/hooks/city/useListCity";
 import {City} from "@/app/types/city";
 import CityDropdown from "@/app/components/city/CityDropdown";
 import useCreateProfile from "@/app/hooks/profile/useCreateProfile";
+import {cityListQuery} from "@/app/queries/city.queries";
 
 export default function ProfileOnboardingModal({
   isOpen,
@@ -21,10 +21,8 @@ export default function ProfileOnboardingModal({
   const {mutate: createProfileMutation, isPending: isMutationPending} =
     useCreateProfile({userId: String(user.id)});
 
-  const {data: citiesData, isPending: isCitiesDataPending} = useQuery<City[]>({
-    queryFn: useListCity,
-    queryKey: ["cities"],
-  });
+  const {data: citiesData, isPending: isCitiesDataPending} =
+    useQuery(cityListQuery());
 
   // Schema fields based on your diagram
   const [formData, setFormData] = useState<{

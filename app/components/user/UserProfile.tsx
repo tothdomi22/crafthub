@@ -1,12 +1,7 @@
 "use client";
 import React, {useEffect, useRef, useState} from "react";
 import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
-import {ListingPagination} from "@/app/types/listing";
-import useListListingById from "@/app/hooks/listing/useListListingById";
-import {Review, ReviewTypeEnum} from "@/app/types/review";
-import useListReviewsById from "@/app/hooks/review/useListReviewsById";
-import {Profile} from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
+import {ReviewTypeEnum} from "@/app/types/review";
 import LocationSVG from "/public/svgs/location.svg";
 import CalendarSvg from "/public/svgs/calendar.svg";
 import StarSvg from "/public/svgs/star.svg";
@@ -15,6 +10,9 @@ import ListingCard from "@/app/components/listing/ListingCard";
 import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import the skeleton
 import {formatDate} from "@/app/components/utils";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
+import {listingInfiniteUserQuery} from "@/app/queries/list.queries";
+import {reviewUserQuery} from "@/app/queries/review.queries";
+import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function UserProfile({id}: {id: string}) {
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
@@ -27,26 +25,11 @@ export default function UserProfile({id}: {id: string}) {
     hasNextPage,
     isFetchingNextPage,
     isLoading: isListingsLoading,
-  } = useInfiniteQuery<ListingPagination>({
-    queryKey: ["listings-infinite", id],
-    queryFn: ({pageParam}) => useListListingById(id, pageParam as number),
-    initialPageParam: 0,
-    getNextPageParam: lastPage => {
-      if (lastPage.last) return undefined;
-      return lastPage.number + 1;
-    },
-    enabled: activeTab === "shop", // Only fetch if tab is active
-  });
+  } = useInfiniteQuery(listingInfiniteUserQuery(id, activeTab));
 
-  const {data: reviewData} = useQuery<Review[]>({
-    queryFn: () => useListReviewsById(id),
-    queryKey: ["reviews" + id],
-  });
+  const {data: reviewData} = useQuery(reviewUserQuery(id));
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(id),
-    queryKey: ["profile" + id],
-  });
+  const {data: profileData} = useQuery(profileUserQuery(id));
 
   const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
     useManageFavorite();

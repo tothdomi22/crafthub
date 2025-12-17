@@ -12,17 +12,18 @@ import {useRouter} from "next/navigation";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {useQuery} from "@tanstack/react-query";
 import {
-  Profile,
   ProfileAndUserUpdateProps,
   ProfileUpdateRequest,
 } from "@/app/types/profile";
-import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {ChangePasswordRequest, User, UserUpdateRequest} from "@/app/types/user";
 import useUpdateUser from "@/app/hooks/user/useUpdateUser";
 import useUpdateProfile from "@/app/hooks/profile/useUpdateProfile";
 import useChangePassword from "@/app/hooks/auth/useChangePassword";
 import DeleteAccountModal from "@/app/components/settings/DeleteAccountModal";
 import useDeleteUser from "@/app/hooks/user/useDeleteUser";
+import {profileUserQuery} from "@/app/queries/profile.queries";
+import CityDropdown from "@/app/components/city/CityDropdown";
+import {cityListQuery} from "@/app/queries/city.queries";
 
 export default function Settings({user}: {user: User}) {
   const [darkMode, setDarkMode] = useState(false);
@@ -33,7 +34,7 @@ export default function Settings({user}: {user: User}) {
     name: "",
     email: "",
     bio: "",
-    city: "",
+    city: null,
     birthDate: "",
   });
   const [passwords, setPasswords] = useState({
@@ -42,10 +43,9 @@ export default function Settings({user}: {user: User}) {
     confirm: "",
   });
 
-  const {data: profileData} = useQuery<Profile>({
-    queryFn: () => useGetProfile(String(user.id)),
-    queryKey: ["profile" + user.id],
-  });
+  const {data: profileData} = useQuery(profileUserQuery(user.id));
+  const {data: citiesData, isPending: isCitiesDataPending} =
+    useQuery(cityListQuery());
 
   const {mutateAsync: userUpdateMutation} = useUpdateUser();
   const {mutateAsync: profileUpdateMutation} = useUpdateProfile({
@@ -61,7 +61,7 @@ export default function Settings({user}: {user: User}) {
         name: profileData.user.name,
         email: profileData.user.email,
         bio: profileData.bio || "",
-        city: profileData.city || "",
+        city: profileData.city || null,
         birthDate: profileData.birthDate || "",
       });
     }
@@ -91,7 +91,7 @@ export default function Settings({user}: {user: User}) {
       }
       if (hasProfileChanged) {
         const profileUpdateData: ProfileUpdateRequest = {
-          city: profile.city,
+          city: profile.city ?? undefined,
           bio: profile.bio,
           birthDate: profile.birthDate,
         };
@@ -246,11 +246,14 @@ export default function Settings({user}: {user: User}) {
             </div>
             <div>
               <label className={labelClass}>Lakhely (Város)</label>
-              <input
-                type="text"
+              <CityDropdown
                 value={profile.city}
-                onChange={e => setProfile({...profile, city: e.target.value})}
-                className={inputClass}
+                onChange={selectedCity =>
+                  setProfile({...profile, city: selectedCity})
+                }
+                citiesData={citiesData}
+                isLoading={isCitiesDataPending}
+                placeholder="Pl. Budapest"
               />
             </div>
           </div>

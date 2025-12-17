@@ -2,6 +2,7 @@ package com.dominik.crafthub.conversation.controller;
 
 import com.dominik.crafthub.conversation.dto.ConversationCreateRequest;
 import com.dominik.crafthub.conversation.exception.ConversationAlreadyExistsException;
+import com.dominik.crafthub.conversation.exception.ConversationNotFoundException;
 import com.dominik.crafthub.conversation.exception.NotPartOfThisConversationException;
 import com.dominik.crafthub.conversation.exception.YourConversationException;
 import com.dominik.crafthub.conversation.service.ConversationService;
@@ -43,25 +44,30 @@ public class ConversationController {
 
   @ExceptionHandler(ListingNotFoundException.class)
   public ResponseEntity<Map<String, String>> listingNotFound() {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Listing not found"));
+  }
+
+  @ExceptionHandler(ConversationNotFoundException.class)
+  public ResponseEntity<Map<String, String>> conversationNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(Map.of("message:", "Listing not found"));
+        .body(Map.of("message", "Conversation not found"));
   }
 
   @ExceptionHandler(ConversationAlreadyExistsException.class)
   public ResponseEntity<Map<String, String>> conversationExists() {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(Map.of("message:", "Conversation already exists"));
+        .body(Map.of("message", "Conversation already exists"));
   }
 
   @ExceptionHandler(NotPartOfThisConversationException.class)
   public ResponseEntity<Map<String, String>> notPartOfConversation() {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
-        .body(Map.of("message:", "You are not part of this conversation"));
+        .body(Map.of("message", "You are not part of this conversation"));
   }
 
   @ExceptionHandler(YourConversationException.class)
   public ResponseEntity<Map<String, String>> yourConversation() {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(Map.of("message:", "You cannot send a message to your own conversation"));
+        .body(Map.of("message", "You cannot send a message to your own conversation"));
   }
 }

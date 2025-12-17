@@ -1,7 +1,9 @@
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {MessageRequest} from "@/app/types/message";
+import {listingKeys} from "@/app/queries/list.queries";
 
-export default function useCreateFirstMessage() {
+export default function useCreateFirstMessage(listingId: number | string) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: MessageRequest) => {
       const response = await fetch("/api/message/create", {
@@ -19,6 +21,11 @@ export default function useCreateFirstMessage() {
         throw new Error(responseJson.message || "Message creation failed");
       }
       return responseJson;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: listingKeys.detail(listingId),
+      });
     },
   });
 }
