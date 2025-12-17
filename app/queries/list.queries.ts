@@ -6,7 +6,7 @@ import {useListListings} from "@/app/hooks/listing/useListListing";
 import useListListingById from "@/app/hooks/listing/useListListingById";
 
 export const listingKeys = {
-  all: ["listings"] as const,
+  all: ["listing"] as const,
   myLists: () => [...listingKeys.all, "my"] as const,
   details: () => [...listingKeys.all, "detail"] as const,
   detail: (id: number | string) => [...listingKeys.details(), id] as const,

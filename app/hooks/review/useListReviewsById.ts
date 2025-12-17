@@ -1,4 +1,4 @@
-export default async function useListReviewsById(id: string) {
+export default async function useListReviewsById(id: string | number) {
   const response = await fetch(`/api/review/list-by-id?id=${id}`, {
     method: "GET",
     credentials: "include",

@@ -3,7 +3,7 @@ import useListCity from "@/app/hooks/city/useListCity";
 import {City} from "@/app/types/city";
 
 export const citiesKey = {
-  all: ["cities"] as const,
+  all: ["city"] as const,
 };
 
 export const cityListQuery = () =>

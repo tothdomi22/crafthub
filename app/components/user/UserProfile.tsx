@@ -1,8 +1,7 @@
 "use client";
 import React, {useEffect, useRef, useState} from "react";
 import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
-import {Review, ReviewTypeEnum} from "@/app/types/review";
-import useListReviewsById from "@/app/hooks/review/useListReviewsById";
+import {ReviewTypeEnum} from "@/app/types/review";
 import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import LocationSVG from "/public/svgs/location.svg";
@@ -14,6 +13,7 @@ import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; 
 import {formatDate} from "@/app/components/utils";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 import {listingInfiniteUserQuery} from "@/app/queries/list.queries";
+import {reviewUserQuery} from "@/app/queries/review.queries";
 
 export default function UserProfile({id}: {id: string}) {
   const [activeTab, setActiveTab] = useState<"shop" | "reviews">("shop");
@@ -28,10 +28,7 @@ export default function UserProfile({id}: {id: string}) {
     isLoading: isListingsLoading,
   } = useInfiniteQuery(listingInfiniteUserQuery(id, activeTab));
 
-  const {data: reviewData} = useQuery<Review[]>({
-    queryFn: () => useListReviewsById(id),
-    queryKey: ["reviews" + id],
-  });
+  const {data: reviewData} = useQuery(reviewUserQuery(id));
 
   const {data: profileData} = useQuery<Profile>({
     queryFn: () => useGetProfile(id),
