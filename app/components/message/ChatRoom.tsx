@@ -1,21 +1,16 @@
 "use client";
 import React, {useEffect, useRef, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
-import {SingleConversation} from "@/app/types/conversation";
-import getConversation from "@/app/hooks/conversation/useGetConversation";
 import Link from "next/link";
 import {formatDate} from "@/app/components/utils";
 import useCreateMessage from "@/app/hooks/message/useCreateMessage";
 import SendSVG from "/public/svgs/send.svg";
 import {notifyError} from "@/app/utils/toastHelper";
 import {User} from "@/app/types/user";
+import {conversationDetailQuery} from "@/app/queries/conversation.queries";
 
 export function ChatRoom({messageId, user}: {messageId: string; user: User}) {
-  const {data: conversationData} = useQuery<SingleConversation>({
-    queryFn: () => getConversation(messageId),
-    queryKey: ["conversation" + messageId],
-    enabled: !!messageId,
-  });
+  const {data: conversationData} = useQuery(conversationDetailQuery(messageId));
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [newMessage, setNewMessage] = useState("");
@@ -202,7 +197,8 @@ export function ChatRoom({messageId, user}: {messageId: string; user: User}) {
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                 </svg>
               </div>
-              {conversationData.listing.city}
+              {/*FIXME: city is null*/}
+              {/*{conversationData.listing.city.name || ""}*/}
             </div>
 
             <Link

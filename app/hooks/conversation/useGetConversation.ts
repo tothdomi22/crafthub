@@ -1,4 +1,4 @@
-export default async function getConversation(id: string) {
+export default async function getConversation(id: string | number) {
   const response = await fetch(`/api/conversation/get?id=${id}`, {
     method: "GET",
     credentials: "include",
