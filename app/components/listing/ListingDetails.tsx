@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useState} from "react";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {Listing, ListingStatusEnum} from "@/app/types/listing";
 import {formatDate} from "@/app/components/utils";
 import Link from "next/link";
@@ -33,7 +33,6 @@ export default function ListingDetails({
   user: User;
 }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   // --- States ---
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -46,7 +45,7 @@ export default function ListingDetails({
   const {data: profileData} = useQuery(profileUserQuery(listingData?.user.id));
 
   const {mutateAsync: createConversation} = useCreateConversation();
-  const {mutateAsync: createMessage} = useCreateFirstMessage();
+  const {mutateAsync: createMessage} = useCreateFirstMessage(listingId);
 
   const {
     mutate: createPurchaseRequestMutation,
@@ -68,27 +67,16 @@ export default function ListingDetails({
       const createConversationResponse: Listing = await createConversation({
         listingId: Number(listingId),
       });
-      const queryKey = ["listing" + listingId];
-
       await createMessage({
         textContent: message,
         conversationId: createConversationResponse.id,
       });
-      await queryClient.cancelQueries({queryKey});
-      const previousData = queryClient.getQueryData<Listing>(queryKey);
-      if (previousData) {
-        queryClient.setQueryData<Listing>(queryKey, {
-          ...previousData,
-          conversationId: createConversationResponse.id,
-        });
-        notifySuccess("Üzenet sikeresen elküldve!");
-      }
     } catch (e) {
       console.error(e);
       notifyError("Hiba történt, Kérem próbálkozzon később!");
-      setIsMessageModalOpen(false);
     }
     setIsMessagePending(false);
+    setIsMessageModalOpen(false);
   };
 
   const handleManageFavorite = (

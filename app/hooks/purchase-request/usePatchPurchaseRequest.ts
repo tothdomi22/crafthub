@@ -4,10 +4,10 @@ import {
   NotificationTypeEnum,
   NotificationWithUnreadMessage,
 } from "@/app/types/notification";
+import {notificationKeys} from "@/app/queries/notification.queries";
 
 export default function usePatchPurchaseRequest() {
   const queryClient = useQueryClient();
-  const queryKey = ["unread-notification"];
   return useMutation({
     mutationFn: async ({
       purchaseRequestId,
@@ -39,10 +39,12 @@ export default function usePatchPurchaseRequest() {
     },
     // Optimistic update
     onMutate: async purchaseRequestData => {
-      await queryClient.cancelQueries({queryKey});
+      await queryClient.cancelQueries({queryKey: notificationKeys.all});
 
       const previousData =
-        queryClient.getQueryData<NotificationWithUnreadMessage>(queryKey);
+        queryClient.getQueryData<NotificationWithUnreadMessage>(
+          notificationKeys.all,
+        );
 
       if (!previousData) {
         return {previousData: undefined, deletedNotification: undefined};
@@ -54,23 +56,27 @@ export default function usePatchPurchaseRequest() {
           String(n.data.requestId) === purchaseRequestData.purchaseRequestId,
       );
 
-      queryClient.setQueryData<NotificationWithUnreadMessage>(queryKey, old => {
-        if (!old) return old;
+      queryClient.setQueryData<NotificationWithUnreadMessage>(
+        notificationKeys.all,
+        old => {
+          if (!old) return old;
 
-        const updatedNotifications = old.notifications.filter(
-          n =>
-            !(
-              n.type === NotificationTypeEnum.PURCHASE_REQUEST &&
-              String(n.data.requestId) === purchaseRequestData.purchaseRequestId
-            ),
-        );
+          const updatedNotifications = old.notifications.filter(
+            n =>
+              !(
+                n.type === NotificationTypeEnum.PURCHASE_REQUEST &&
+                String(n.data.requestId) ===
+                  purchaseRequestData.purchaseRequestId
+              ),
+          );
 
-        return {
-          ...old,
-          notifications: updatedNotifications,
-          unreadMessage: updatedNotifications.some(n => !n.isRead),
-        };
-      });
+          return {
+            ...old,
+            notifications: updatedNotifications,
+            unreadMessage: updatedNotifications.some(n => !n.isRead),
+          };
+        },
+      );
 
       return {previousData, deletedNotification};
     },
@@ -78,13 +84,13 @@ export default function usePatchPurchaseRequest() {
     // Rollback on error
     onError: (_err, _vars, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+        queryClient.setQueryData(notificationKeys.all, context.previousData);
       }
     },
 
     // Refetch on success to get real data from server
     onSuccess: async (_data, _variables, context) => {
-      await queryClient.invalidateQueries({queryKey});
+      await queryClient.invalidateQueries({queryKey: notificationKeys.all});
 
       if (
         context?.deletedNotification &&
