@@ -7,6 +7,7 @@ import useCreateMessage from "@/app/hooks/message/useCreateMessage";
 import SendSVG from "/public/svgs/send.svg";
 import {notifyError} from "@/app/utils/toastHelper";
 import {User} from "@/app/types/user";
+import LocationSvg from "/public/svgs/location.svg";
 import {conversationDetailQuery} from "@/app/queries/conversation.queries";
 
 export function ChatRoom({messageId, user}: {messageId: string; user: User}) {
@@ -131,7 +132,7 @@ export function ChatRoom({messageId, user}: {messageId: string; user: User}) {
           {/* Input Footer */}
           <div className="flex-shrink-0 p-4 border-t border-slate-100 bg-white">
             <form onSubmit={handleSend} className="flex items-end gap-3">
-              <div className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl focus-within:bg-white focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all">
+              <div className="flex-1 bg-slate-50 border border-slate-200 rounded-2xl focus-within:bg-white focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all flex">
                 <textarea
                   rows={1}
                   value={newMessage}
@@ -192,13 +193,8 @@ export function ChatRoom({messageId, user}: {messageId: string; user: User}) {
             </div>
 
             <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-              <div className="w-4 h-4 text-slate-400">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                </svg>
-              </div>
-              {/*FIXME: city is null*/}
-              {/*{conversationData.listing.city.name || ""}*/}
+              <LocationSvg />
+              {conversationData.listing.city.name}
             </div>
 
             <Link

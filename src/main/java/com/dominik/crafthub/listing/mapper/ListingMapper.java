@@ -51,6 +51,7 @@ public interface ListingMapper {
       CityEntity cityEntity,
       @MappingTarget ListingEntity listingEntity);
 
+  @Mapping(target = "city", source = "cityEntity")
   @Mapping(target = "canShip", source = "shippable")
   ListingNoCategoriesNoUserDto toNoCategoriesNoUserDto(ListingEntity listing);
 

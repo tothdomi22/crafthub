@@ -90,6 +90,7 @@ public interface ConversationRepository extends JpaRepository<ConversationEntity
             LEFT JOIN FETCH c.userEntity1 u1
             LEFT JOIN FETCH c.userEntity2 u2
             LEFT JOIN FETCH c.listingEntity l
+            LEFT JOIN FETCH l.cityEntity ct
             WHERE c.id = :conversationId
             """)
   Optional<ConversationEntity> getConversationById(@Param("conversationId") Long conversationId);

@@ -183,6 +183,7 @@ export default function LoginPage() {
                 </label>
                 <Link
                   href="/forgot-password"
+                  tabIndex={-1}
                   className="text-xs font-bold text-primary hover:text-[#5b4cc4] transition-colors">
                   Elfelejtetted?
                 </Link>
