@@ -3,7 +3,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {MainCategory} from "@/app/types/admin/category/category";
 import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
-import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
 import Link from "next/link";
 import ListingCard from "@/app/components/listing/ListingCard";
 import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import Skeleton
@@ -13,6 +12,7 @@ import {User} from "@/app/types/user";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 import {listingInfiniteQuery} from "@/app/queries/list.queries";
+import {mainCategoryListQuery} from "@/app/queries/category.queries";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
@@ -21,10 +21,7 @@ export default function ListingsPage({user}: {user: User | null}) {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
   const observerTarget = useRef(null);
 
-  const {data: mainCategoriesData} = useQuery<MainCategory[]>({
-    queryFn: useListMainCategory,
-    queryKey: ["mainCategories"],
-  });
+  const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
 
   const {
     data: listingData,

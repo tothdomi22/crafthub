@@ -11,14 +11,16 @@ import {useRouter} from "next/navigation";
 import {useQuery} from "@tanstack/react-query";
 import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
 import {ListingRequest} from "@/app/types/listing";
-import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
-import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
 import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {City} from "@/app/types/city";
 import CityDropdown from "@/app/components/city/CityDropdown";
 import {listingDetailQuery} from "@/app/queries/list.queries";
 import {cityListQuery} from "@/app/queries/city.queries";
+import {
+  mainCategoryListQuery,
+  subCategoryListQuery,
+} from "@/app/queries/category.queries";
 
 export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const {id} = use(params);
@@ -34,15 +36,9 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
   const [price, setPrice] = useState<number | "">("");
   const [city, setCity] = useState<City | null>(null);
 
-  const {data: mainCategoriesData} = useQuery<MainCategory[]>({
-    queryFn: useListMainCategory,
-    queryKey: ["mainCategories"],
-  });
+  const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
 
-  const {data: subCategoriesData} = useQuery<SubCategory[]>({
-    queryFn: useListSubCategory,
-    queryKey: ["subCategories"],
-  });
+  const {data: subCategoriesData} = useQuery(subCategoryListQuery());
 
   const {data: existingListing, isLoading: isFetching} = useQuery(
     listingDetailQuery(id),

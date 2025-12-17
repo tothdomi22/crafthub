@@ -1,4 +1,4 @@
-const useListMainCategory = async () => {
+export default async function useListMainCategory() {
   const response = await fetch("/api/main-category/list", {
     method: "GET",
     credentials: "include",
@@ -7,6 +7,4 @@ const useListMainCategory = async () => {
     throw new Error(`Error: ${response.statusText}`);
   }
   return response.json();
-};
-
-export default useListMainCategory;
+}

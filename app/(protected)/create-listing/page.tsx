@@ -12,12 +12,14 @@ import {useQuery} from "@tanstack/react-query";
 import {MainCategory, SubCategory} from "@/app/types/admin/category/category";
 import useCreateListing from "@/app/hooks/listing/useCreateListing";
 import {ListingRequest} from "@/app/types/listing";
-import useListMainCategory from "@/app/hooks/main-category/useListMainCategory";
-import useListSubCategory from "@/app/hooks/sub-category/useListSubCategory";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import CityDropdown from "@/app/components/city/CityDropdown";
 import {City} from "@/app/types/city";
 import {cityListQuery} from "@/app/queries/city.queries";
+import {
+  mainCategoryListQuery,
+  subCategoryListQuery,
+} from "@/app/queries/category.queries";
 
 export default function CreateListing() {
   const router = useRouter();
@@ -32,14 +34,8 @@ export default function CreateListing() {
   const [selectedSubCategory, setSelectedSubCategory] =
     useState<SubCategory | null>(null);
 
-  const {data: mainCategoriesData} = useQuery<MainCategory[]>({
-    queryFn: useListMainCategory,
-    queryKey: ["mainCategories"],
-  });
-  const {data: subCategoriesData} = useQuery<SubCategory[]>({
-    queryFn: useListSubCategory,
-    queryKey: ["subCategories"],
-  });
+  const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
+  const {data: subCategoriesData} = useQuery(subCategoryListQuery());
   const {data: citiesData, isPending: isCitiesDataPending} =
     useQuery(cityListQuery());
   const {
