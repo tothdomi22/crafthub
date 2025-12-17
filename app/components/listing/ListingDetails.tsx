@@ -41,7 +41,6 @@ export default function ListingDetails({
 
   // --- Queries ---
   const {data: listingData} = useQuery(listingDetailQuery(listingId));
-
   const {data: profileData} = useQuery(profileUserQuery(listingData?.user.id));
 
   const {mutateAsync: createConversation} = useCreateConversation();
@@ -182,7 +181,7 @@ export default function ListingDetails({
                 onClick={() =>
                   handleManageFavorite(listingData.id, listingData.isLiked)
                 }
-                className={`flex-shrink-0 p-3 rounded-xl transition-all ${
+                className={`flex-shrink-0 p-3 rounded-xl cursor-pointer transition-all ${
                   listingData.isLiked
                     ? "text-red-500 bg-red-50"
                     : "text-slate-400 bg-slate-50 hover:bg-slate-100"

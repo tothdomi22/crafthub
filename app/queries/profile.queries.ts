@@ -4,7 +4,8 @@ import {Profile} from "@/app/types/profile";
 
 export const profileKeys = {
   all: ["profile"] as const,
-  user: (userId: string | number) => [...profileKeys.all, userId] as const,
+  user: (userId: string | number) =>
+    [...profileKeys.all, String(userId)] as const,
 };
 
 export const profileUserQuery = (userId: string | number | undefined) =>

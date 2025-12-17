@@ -11,7 +11,7 @@ export const conversationKeys = {
   list: () => [...conversationKeys.all, "list"] as const,
   details: () => [...conversationKeys.all, "detail"] as const,
   detail: (conversationId: string | number) =>
-    [...conversationKeys.details(), conversationId] as const,
+    [...conversationKeys.details(), String(conversationId)] as const,
 };
 
 export const conversationListQuery = () =>

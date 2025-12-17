@@ -1,4 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {listingKeys} from "@/app/queries/list.queries";
+import {favoriteKeys} from "@/app/queries/favorite.queries";
 
 export default function useManageFavorite() {
   const queryClient = useQueryClient();
@@ -6,8 +8,6 @@ export default function useManageFavorite() {
     mutationFn: async ({
       listingId,
       isCurrentlyLiked,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      userId,
     }: {
       listingId: number;
       isCurrentlyLiked: boolean;
@@ -31,19 +31,11 @@ export default function useManageFavorite() {
       return responseJson;
     },
     onSuccess: async (_data, variables) => {
-      // FIXME: this make is refetch every listing, thats 3 fetches per page. fix with optimistic update and dont refetch
-      await queryClient.invalidateQueries({queryKey: ["listings"]});
-      await queryClient.invalidateQueries({queryKey: ["listings-infinite"]});
-      await queryClient.invalidateQueries({queryKey: ["my-listings"]});
-      await queryClient.invalidateQueries({queryKey: ["favorites"]});
+      await queryClient.invalidateQueries({queryKey: listingKeys.infinite()});
       await queryClient.invalidateQueries({
-        queryKey: ["listing" + variables.listingId],
+        queryKey: listingKeys.detail(variables.listingId),
       });
-      if (variables.userId) {
-        await queryClient.invalidateQueries({
-          queryKey: ["listings" + variables.userId],
-        });
-      }
+      await queryClient.invalidateQueries({queryKey: favoriteKeys.all});
     },
   });
 }

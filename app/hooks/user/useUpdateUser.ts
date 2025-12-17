@@ -1,5 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {UserUpdateRequest} from "@/app/types/user";
+import {profileKeys} from "@/app/queries/profile.queries";
 
 export default function useUpdateUser() {
   const queryClient = useQueryClient();
@@ -24,7 +25,7 @@ export default function useUpdateUser() {
     },
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({
-        queryKey: ["profile" + variables.id],
+        queryKey: profileKeys.user(variables.id),
       });
     },
   });

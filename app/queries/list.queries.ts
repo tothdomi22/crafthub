@@ -9,17 +9,17 @@ export const listingKeys = {
   all: ["listing"] as const,
   myLists: () => [...listingKeys.all, "my"] as const,
   details: () => [...listingKeys.all, "detail"] as const,
-  detail: (id: number | string) => [...listingKeys.details(), id] as const,
+  detail: (id: number | string) =>
+    [...listingKeys.details(), String(id)] as const,
   infinite: () => [...listingKeys.all, "infinite"] as const,
   infiniteUser: (userId: number | string) =>
-    [...listingKeys.infinite(), userId] as const,
+    [...listingKeys.infinite(), String(userId)] as const,
 };
 
-export const listingDetailQuery = (id?: number | string) =>
+export const listingDetailQuery = (id: number | string) =>
   queryOptions<Listing>({
-    queryKey: listingKeys.detail(id!),
-    queryFn: () => useGetListing(id!),
-    enabled: !!id,
+    queryKey: listingKeys.detail(id),
+    queryFn: () => useGetListing(id),
   });
 
 export const listingMyListingsQuery = () =>

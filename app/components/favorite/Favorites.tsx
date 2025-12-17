@@ -4,21 +4,12 @@ import React from "react";
 import Link from "next/link";
 import FavoriteSVG from "/public/svgs/favorite.svg";
 import {useQuery} from "@tanstack/react-query";
-import {Favorite} from "@/app/types/favorite";
-import useListFavorite from "@/app/hooks/favorite/useListFavorite";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
 import ListingCard from "@/app/components/listing/ListingCard";
+import {favoriteListQuery} from "@/app/queries/favorite.queries";
 
 export default function Favorites() {
-  const {data: favorites, isLoading} = useQuery<Favorite[]>({
-    queryFn: useListFavorite,
-    queryKey: ["favorites"],
-    select: data =>
-      [...data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-  });
+  const {data: favorites, isLoading} = useQuery(favoriteListQuery());
 
   const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
     useManageFavorite();
