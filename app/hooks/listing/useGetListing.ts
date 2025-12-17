@@ -1,4 +1,4 @@
-export default async function useGetListing(id: string) {
+export default async function useGetListing(id: string | number) {
   const response = await fetch(`/api/listing/get?id=${id}`, {
     method: "GET",
     credentials: "include",

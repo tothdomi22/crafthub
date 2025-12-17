@@ -1,5 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ListingUpdateRequest} from "@/app/types/listing";
+import {listingKeys} from "@/app/queries/list.queries";
 
 export default function useUpdateListing() {
   const queryClient = useQueryClient();
@@ -29,12 +30,8 @@ export default function useUpdateListing() {
       }
       return responseJson;
     },
-    onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({queryKey: ["listings"]});
-      await queryClient.invalidateQueries({queryKey: ["my-listings"]});
-      await queryClient.invalidateQueries({
-        queryKey: ["listing" + variables.id],
-      });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: listingKeys.all});
     },
   });
 }

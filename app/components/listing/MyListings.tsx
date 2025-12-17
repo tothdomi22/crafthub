@@ -3,12 +3,7 @@
 import React, {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import Link from "next/link";
-import {
-  Listing,
-  ListingStatusEnum,
-  ListingUpdateRequest,
-} from "@/app/types/listing";
-import useListMyListings from "@/app/hooks/listing/useListMyListings";
+import {ListingStatusEnum, ListingUpdateRequest} from "@/app/types/listing";
 import {formatDate} from "@/app/components/utils";
 import ListingStatusDropdown from "@/app/components/listing/ListingStatusDropdown";
 import LocationSVG from "/public/svgs/location.svg";
@@ -16,19 +11,12 @@ import ShowCredentialsSVG from "/public/svgs/show-credentials.svg";
 import FavoriteSVG from "/public/svgs/favorite.svg";
 import EditSVG from "/public/svgs/edit.svg";
 import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
+import {listingMyListingsQuery} from "@/app/queries/list.queries";
 
 export default function MyListings() {
   const [activeTab, setActiveTab] = useState<ListingStatusEnum | "ALL">("ALL");
 
-  const {data: listings, isLoading} = useQuery<Listing[]>({
-    queryFn: useListMyListings,
-    queryKey: ["my-listings"],
-    select: data =>
-      [...data].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-  });
+  const {data: listings, isLoading} = useQuery(listingMyListingsQuery());
 
   const {mutate: updateListingMutation} = useUpdateListing();
 

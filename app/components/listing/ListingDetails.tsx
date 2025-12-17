@@ -3,7 +3,6 @@
 import React, {useState} from "react";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {Listing, ListingStatusEnum} from "@/app/types/listing";
-import useGetListing from "@/app/hooks/listing/useGetListing";
 import {Profile} from "@/app/types/profile";
 import useGetProfile from "@/app/hooks/profile/useGetProfile";
 import {formatDate} from "@/app/components/utils";
@@ -25,6 +24,7 @@ import EditSVG from "/public/svgs/edit.svg";
 import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
 import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
+import {listingDetailQuery} from "@/app/queries/list.queries";
 
 export default function ListingDetails({
   listingId,
@@ -42,10 +42,7 @@ export default function ListingDetails({
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
   // --- Queries ---
-  const {data: listingData} = useQuery<Listing>({
-    queryFn: () => useGetListing(listingId),
-    queryKey: ["listing" + listingId],
-  });
+  const {data: listingData} = useQuery(listingDetailQuery(listingId));
 
   const {data: profileData} = useQuery<Profile>({
     queryFn: () => useGetProfile(String(listingData?.user.id)),

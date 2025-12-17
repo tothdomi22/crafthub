@@ -1,5 +1,5 @@
 export default async function useListListingById(
-  id: string,
+  id: string | number,
   pageParam: number,
 ) {
   const response = await fetch(

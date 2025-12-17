@@ -1,7 +1,7 @@
 import React from "react";
 import SubHeader from "@/app/components/global/SubHeader";
 import getCurrentUser from "@/app/utils/getCurrentUser";
-import MyListings from "@/app/components/listing/MyListings"; // Assuming you have this from previous steps
+import MyListings from "@/app/components/listing/MyListings";
 
 export default async function MyListingsPage() {
   const user = await getCurrentUser();
