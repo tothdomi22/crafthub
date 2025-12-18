@@ -33,7 +33,7 @@ export default function CityDropdown({
   const safeCities = citiesData || [];
   const filteredCities = safeCities
     .filter(city => city.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .slice(0, 15);
+    .slice(0, 25);
 
   // Close dropdown when clicking outside
   useEffect(() => {

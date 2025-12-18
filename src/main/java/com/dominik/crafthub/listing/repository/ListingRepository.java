@@ -241,4 +241,61 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         """)
   Optional<ListingSingleViewDto> findSingleViewListing(
       @Param("userId") Long userId, @Param("listingId") Long listingId);
+
+  @Query(
+      value =
+          """
+            SELECT new com.dominik.crafthub.listing.dto.ListingsWithLikesDto(
+            l.id,
+            l.name,
+            l.price,
+            l.shippable,
+              new com.dominik.crafthub.city.dto.CityDto(
+                  c.id,
+                  c.name
+              ),
+            l.description,
+            l.createdAt,
+            l.status,
+            new com.dominik.crafthub.subcategory.dto.SubCategoryDto(
+                    sc.id,
+                    sc.description,
+                    sc.uniqueName,
+                    sc.displayName,
+                    new com.dominik.crafthub.maincategory.dto.MainCategoryDto(
+                        mc.id,
+                        mc.description,
+                        mc.uniqueName,
+                        mc.displayName
+                    )
+                ),
+                new com.dominik.crafthub.user.dto.UserDto(
+                    u.id,
+                    u.name,
+                    u.email,
+                    u.role,
+                    u.createdAt),
+            CASE
+                WHEN :userId IS NULL THEN null
+                WHEN f.id IS NOT NULL THEN true
+                ELSE false
+            END
+            )
+            FROM ListingEntity l
+            LEFT JOIN l.subCategoryEntity sc
+            LEFT JOIN sc.mainCategoryEntity mc
+            LEFT JOIN l.userEntity u
+            LEFT JOIN l.cityEntity c
+            LEFT JOIN FavoriteEntity f
+                ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
+            WHERE ((l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED) AND (FUNCTION('similarity', l.name, :searchTerm) > 0.4))
+            """,
+      countQuery =
+          """
+            SELECT COUNT(l)
+            FROM ListingEntity l
+            WHERE ((l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED) AND (FUNCTION('similarity', l.name, :searchTerm) > 0.4))
+            """)
+  Page<ListingsWithLikesDto> searchListing(
+      @Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);
 }

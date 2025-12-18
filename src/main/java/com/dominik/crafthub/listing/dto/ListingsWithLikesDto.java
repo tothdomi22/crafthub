@@ -10,11 +10,11 @@ public record ListingsWithLikesDto(
     Long id,
     String name,
     Integer price,
-    boolean canShip,
+    Boolean canShip,
     CityDto city,
     String description,
     OffsetDateTime createdAt,
     ListingStatusEnum status,
     SubCategoryDto subCategory,
     UserDto user,
-    boolean isLiked) {}
+    Boolean isLiked) {}
