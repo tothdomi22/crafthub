@@ -8,6 +8,7 @@ import com.dominik.crafthub.listing.exception.ListingNotFoundException;
 import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.subcategory.exception.SubCategoryNotFoundException;
+import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -80,5 +81,11 @@ public class ListingController {
   @ExceptionHandler(CityNotFoundException.class)
   public ResponseEntity<Map<String, String>> cityNotFound() {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "City not found"));
+  }
+
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<Map<String, String>> userNotFound() {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("message", "Searched user not found"));
   }
 }

@@ -13,6 +13,9 @@ import com.dominik.crafthub.listing.exception.NotTheOwnerOfListingException;
 import com.dominik.crafthub.listing.mapper.ListingMapper;
 import com.dominik.crafthub.listing.repository.ListingRepository;
 import com.dominik.crafthub.subcategory.service.SubCategoryService;
+import com.dominik.crafthub.user.exceptions.UserNotFoundException;
+import com.dominik.crafthub.user.repository.UserRepository;
+import com.dominik.crafthub.user.service.UserService;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -30,6 +33,8 @@ public class ListingService {
   private final SubCategoryService subCategoryService;
   private final ListingRepository listingRepository;
   private final CityRepository cityRepository;
+  private final UserService userService;
+  private final UserRepository userRepository;
 
   public ListingDto createListing(ListingCreateRequest request) {
     var user = authService.getCurrentUser();
@@ -44,16 +49,17 @@ public class ListingService {
 
   public Page<ListingsWithLikesDto> listListings(Long id, int page, int size) {
     var user = authService.getCurrentUser();
+    Long userId = (user != null) ? user.getId() : null;
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     if (id == null) {
-      // FIXME: this is questionable
-      if (user != null) {
-        return listingRepository.findAllListingsWithIsLiked(user.getId(), pageable);
-      } else {
-        return listingRepository.findALlListingsWithNullLikes(pageable);
-      }
+      return listingRepository.findAllListingsWithIsLiked(userId, pageable);
     } else {
-      return listingRepository.findAllUseresListingsWithIsLiked(user.getId(), id, pageable);
+      var searchedUser = userRepository.findById(id).orElse(null);
+      if (searchedUser == null) {
+        throw new UserNotFoundException();
+      }
+      return listingRepository.findAllUseresListingsWithIsLiked(
+          userId, searchedUser.getId(), pageable);
     }
   }
 
