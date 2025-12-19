@@ -80,15 +80,28 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+                AND (:mainCategoryIds IS NULL OR l.subCategoryEntity.mainCategoryEntity.id IN :mainCategoryIds)
+                AND (:subCategoryIds IS NULL OR l.subCategoryEntity.id IN :subCategoryIds)
+                AND (:minPrice IS NULL OR l.price >= :minPrice)
+                AND (:maxPrice IS NULL OR l.price <= :maxPrice)
         """,
       countQuery =
           """
         SELECT COUNT(l)
         FROM ListingEntity l
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+                AND (:mainCategoryIds IS NULL OR l.subCategoryEntity.mainCategoryEntity.id IN :maincategoryIds)
+                AND (:subCategoryIds IS NULL OR l.subCategoryEntity.id IN :subCategoryIds)
+                AND (:minPrice IS NULL OR l.price >= :minPrice)
+                AND (:maxPrice IS NULL OR l.price <= :maxPrice)
         """)
   Page<ListingsWithLikesDto> findAllListingsWithIsLiked(
-      @Param("userId") Long userId, Pageable pageable);
+      @Param("userId") Long userId,
+      Pageable pageable,
+      @Param("mainCategoryIds") List<Long> mainCategoryIds,
+      @Param("subCategoryIds") List<Long> subCategoryIds,
+      @Param("minPrice") Double minPrice,
+      @Param("maxPrice") Double maxPrice);
 
   @Query(
       value =
