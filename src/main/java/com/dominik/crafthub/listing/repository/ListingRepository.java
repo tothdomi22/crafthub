@@ -246,13 +246,25 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
             LEFT JOIN l.cityEntity c
             LEFT JOIN FavoriteEntity f
                 ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
-            WHERE ((l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED) AND (FUNCTION('similarity', l.name, :searchTerm) > 0.2))
+            WHERE
+                l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+                AND
+                FUNCTION('word_similarity',
+                    FUNCTION('unaccent', lower(l.name)),
+                    FUNCTION('unaccent', lower(:searchTerm))
+                ) > 0.3
             """,
       countQuery =
           """
             SELECT COUNT(l)
             FROM ListingEntity l
-            WHERE ((l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED) AND (FUNCTION('similarity', l.name, :searchTerm) > 0.2))
+            WHERE
+                l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+                AND
+                FUNCTION('word_similarity',
+                    FUNCTION('unaccent', lower(l.name)),
+                    FUNCTION('unaccent', lower(:searchTerm))
+                ) > 0.3
             """)
   Page<ListingsWithLikesDto> searchListing(
       @Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);
