@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const query = searchParams.get("query");
     const page = searchParams.get("page");
 
-    if (!page || !!query) {
+    if (!page || !query) {
       return NextResponse.json(
         {message: "Missing required query parameters"},
         {status: 400},

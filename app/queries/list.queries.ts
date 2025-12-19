@@ -60,13 +60,16 @@ export const listingInfiniteUserQuery = (
 export const listingSearchQuery = (query: string) =>
   infiniteQueryOptions<ListingPagination, Error>({
     queryKey: listingKeys.search(query),
+    // THIS IS THE IMPORTANT PART:
+    // React Query provides 'pageParam'. We pass it to your fetcher.
     queryFn: ({pageParam}) =>
       useSearchListings({
-        pageParam: pageParam as number,
         query,
+        pageParam: pageParam as number,
       }),
     initialPageParam: 0,
     getNextPageParam: lastPage =>
       lastPage.last ? undefined : lastPage.number + 1,
-    enabled: !!query && query.length > 0,
+    // Only run this query if there is actual text (safety check)
+    enabled: !!query,
   });
