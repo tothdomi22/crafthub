@@ -9,11 +9,17 @@ import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; 
 import {User} from "@/app/types/user";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
-import {listingInfiniteQuery} from "@/app/queries/list.queries";
+import {
+  listingInfiniteQuery,
+  listingSearchQuery,
+} from "@/app/queries/list.queries";
 import {mainCategoryListQuery} from "@/app/queries/category.queries";
 import {profileUserQuery} from "@/app/queries/profile.queries";
+import {useSearchParams} from "next/navigation";
 
 export default function ListingsPage({user}: {user: User | null}) {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q") || "";
   const [activeCategory, setActiveCategory] = useState<MainCategory | null>(
     null,
   );
@@ -22,13 +28,17 @@ export default function ListingsPage({user}: {user: User | null}) {
 
   const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
 
+  const queryOptions = searchQuery
+    ? listingSearchQuery(searchQuery) // Use Search endpoint
+    : listingInfiniteQuery(); // Use List endpoint
+
   const {
     data: listingData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-  } = useInfiniteQuery(listingInfiniteQuery());
+  } = useInfiniteQuery(queryOptions);
 
   const {data: profileData} = useQuery(profileUserQuery(user?.id));
 
@@ -161,11 +171,7 @@ export default function ListingsPage({user}: {user: User | null}) {
       {/* Observer Trigger */}
       <div ref={observerTarget} className="py-10 flex justify-center w-full">
         {!hasNextPage && listingData?.pages[0].content.length !== 0 && (
-          <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
-            <span className="w-12 h-px bg-slate-200"></span>
-            Vége a találatoknak
-            <span className="w-12 h-px bg-slate-200"></span>
-          </div>
+          <div className="flex items-center gap-2 text-slate-300 text-sm font-medium"></div>
         )}
       </div>
 

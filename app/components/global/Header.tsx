@@ -1,9 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import SearchSVG from "/public/svgs/search.svg";
 import getCurrentUser from "@/app/utils/getCurrentUser";
 import {User} from "@/app/types/user";
 import HeaderRightActions from "@/app/components/global/HeaderRightActions";
+import SearchBar from "@/app/components/global/SearchBar";
 
 export default async function Header() {
   const user: User | null = await getCurrentUser();
@@ -25,16 +25,7 @@ export default async function Header() {
 
         {/* --- CENTER: SEARCH BAR --- */}
         <div className="flex-1 max-w-2xl relative">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
-              <SearchSVG className="w-5 h-5" />
-            </div>
-            <input
-              type="text"
-              className="block w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all shadow-sm"
-              placeholder="Keress..."
-            />
-          </div>
+          <SearchBar />
         </div>
 
         {/* --- RIGHT: ACTIONS --- */}
