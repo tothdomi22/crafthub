@@ -3,6 +3,7 @@
 import React, {useState} from "react";
 import SearchSVG from "/public/svgs/search.svg";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import CloseSVG from "/public/svgs/close.svg";
 
 export default function SearchBar() {
   const searchParams = useSearchParams();
@@ -34,6 +35,13 @@ export default function SearchBar() {
     }
   };
 
+  const handleDeleteSearch = () => {
+    const params = new URLSearchParams(searchParams);
+    setTerm("");
+    params.delete("q");
+    replace(`${pathname}?${params.toString()}`);
+  };
+
   return (
     <div className="relative">
       <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
@@ -47,6 +55,13 @@ export default function SearchBar() {
         onChange={e => setTerm(e.target.value)}
         onKeyDown={handleKeyDown}
       />
+      {term.trim() && (
+        <div className="absolute inset-y-0 right-3 flex items-center text-slate-400  ">
+          <button onClick={handleDeleteSearch} className="cursor-pointer">
+            <CloseSVG />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

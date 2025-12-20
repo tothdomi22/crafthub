@@ -8,35 +8,37 @@ import CloseSVG from "/public/svgs/close.svg";
 import CheckSVG from "/public/svgs/check.svg";
 import CityDropdown from "@/app/components/city/CityDropdown";
 import {City} from "@/app/types/city";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
 interface FilterSidebarProps {
   mainCategories: MainCategory[] | undefined;
   allSubCategories: SubCategory[] | undefined;
   citiesData: City[] | undefined;
   isCitiesDataPending: boolean;
-  filters: FilterState;
-  setFilters: React.Dispatch<React.SetStateAction<FilterState>>;
   className?: string;
+  initialFilters: FilterState;
   onClose?: () => void;
 }
 
 export default function FilterSidebar({
   mainCategories,
   allSubCategories,
-  filters,
-  setFilters,
   className = "",
   onClose,
+  initialFilters,
   citiesData,
   isCitiesDataPending,
 }: FilterSidebarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   // 1. LOCAL STATE: Tracks changes before they are applied
-  const [localFilters, setLocalFilters] = useState<FilterState>(filters);
+  const [localFilters, setLocalFilters] = useState<FilterState>(initialFilters);
 
   // 2. SYNC: If parent filters change (e.g. user clears filters from the empty state view), sync local state
   useEffect(() => {
-    setLocalFilters(filters);
-  }, [filters]);
+    setLocalFilters(initialFilters);
+  }, [initialFilters]);
 
   // --- HANDLERS (Modifying Local State Only) ---
 
@@ -81,9 +83,55 @@ export default function FilterSidebar({
     });
   };
 
+  // --- URL UPDATE LOGIC ---
+  const applyFiltersToURL = (filtersToApply: FilterState) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    // 1. Reset page
+    params.delete("page");
+
+    // 2. Categories
+    if (filtersToApply.mainCategoryIds.length > 0) {
+      params.set("mainCategoryIds", filtersToApply.mainCategoryIds.join(","));
+    } else {
+      params.delete("mainCategoryIds");
+    }
+
+    if (filtersToApply.subCategoryIds.length > 0) {
+      params.set("subCategoryIds", filtersToApply.subCategoryIds.join(","));
+    } else {
+      params.delete("subCategoryIds");
+    }
+
+    // 3. Price
+    if (filtersToApply.minPrice)
+      params.set("minPrice", filtersToApply.minPrice);
+    else params.delete("minPrice");
+
+    if (filtersToApply.maxPrice)
+      params.set("maxPrice", filtersToApply.maxPrice);
+    else params.delete("maxPrice");
+
+    // 4. Cities
+    if (filtersToApply.cities.length > 0) {
+      // Map to IDs and join with commas
+      const cityIds = filtersToApply.cities.map(c => c.id).join(",");
+      params.set("cityIds", cityIds);
+    } else {
+      params.delete("cityIds");
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handleApply = () => {
+    applyFiltersToURL(localFilters);
+    if (onClose) onClose();
+  };
+
   // Clears local inputs
   const clearLocalFilters = () => {
-    const emptyState = {
+    const emptyFilters = {
       mainCategoryIds: [],
       subCategoryIds: [],
       minPrice: "",
@@ -91,26 +139,16 @@ export default function FilterSidebar({
       cities: [],
     };
     // 2. Update local state (visuals)
-    setLocalFilters(emptyState);
-
-    // 3. Update parent state immediately (triggers API)
-    setFilters(emptyState);
-
-    // Optional: Close the mobile drawer if open
+    setLocalFilters(emptyFilters);
+    applyFiltersToURL(emptyFilters); // Updates URL immediately
     if (onClose) onClose();
   };
 
-  // 3. APPLY: The function that actually triggers the API call
-  const handleApply = () => {
-    setFilters(localFilters);
-    if (onClose) onClose(); // Close mobile drawer if open
-  };
-
   const hasActiveLocalFilters =
-    localFilters.mainCategoryIds.length > 0 ||
-    localFilters.minPrice !== "" ||
-    localFilters.maxPrice !== "" ||
-    localFilters.cities.length > 0;
+    initialFilters.mainCategoryIds.length > 0 ||
+    initialFilters.minPrice !== "" ||
+    initialFilters.maxPrice !== "" ||
+    initialFilters.cities.length > 0;
 
   return (
     <div

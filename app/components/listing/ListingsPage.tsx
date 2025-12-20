@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {useInfiniteQuery, useQuery} from "@tanstack/react-query";
 import Link from "next/link";
@@ -14,34 +14,21 @@ import {
 } from "@/app/queries/category.queries";
 import {listingInfiniteQuery} from "@/app/queries/listing.queries";
 import {profileUserQuery} from "@/app/queries/profile.queries";
+import {cityListQuery} from "@/app/queries/city.queries";
 
 // Components
 import ListingCard from "@/app/components/listing/ListingCard";
 import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton";
 import ProfileOnboardingModal from "@/app/components/profile/ProfileOnboardingModal";
 import FilterSVG from "/public/svgs/filter.svg";
+import FilterSidebar from "@/app/components/filter/FilterSidebar";
+
 // Hooks
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
-import FilterSidebar from "@/app/components/filter/FilterSidebar";
-import {cityListQuery} from "@/app/queries/city.queries";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
-
-  // --- STATE ---
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-  const observerTarget = useRef(null);
-
-  // Filter State
-  const [filters, setFilters] = useState<FilterState>({
-    mainCategoryIds: [],
-    subCategoryIds: [],
-    cities: [],
-    minPrice: "",
-    maxPrice: "",
-  });
 
   // --- QUERIES ---
   const {data: mainCategoriesData} = useQuery(mainCategoryListQuery());
@@ -50,15 +37,52 @@ export default function ListingsPage({user}: {user: User | null}) {
   const {data: citiesData, isPending: isCitiesDataPending} =
     useQuery(cityListQuery());
 
+  // --- 1. PARSE URL PARAMS (IDs) ---
+  const urlFilters = useMemo(() => {
+    const parseIds = (param: string | null) =>
+      param
+        ? param
+            .split(",")
+            .map(Number)
+            .filter(n => !isNaN(n))
+        : [];
+
+    return {
+      mainCategoryIds: parseIds(searchParams.get("mainCategoryIds")),
+      subCategoryIds: parseIds(searchParams.get("subCategoryIds")),
+      cityIds: parseIds(searchParams.get("cityIds")), // Get IDs here
+      minPrice: searchParams.get("minPrice") || "",
+      maxPrice: searchParams.get("maxPrice") || "",
+    };
+  }, [searchParams]);
+
+  // --- 2. PREPARE FILTER STATE FOR SIDEBAR (UI) ---
+  // The Sidebar expects 'cities' to be City[] objects (id + name), not just IDs.
+  // We reconstruct this array by finding the IDs in our 'citiesData'
+  const initialFilters: FilterState = useMemo(() => {
+    const selectedCities = citiesData
+      ? citiesData.filter(city => urlFilters.cityIds.includes(city.id))
+      : [];
+    // Note: If citiesData is loading, this will be empty momentarily.
+    // The Dropdown will populate once citiesData arrives.
+
+    return {
+      mainCategoryIds: urlFilters.mainCategoryIds,
+      subCategoryIds: urlFilters.subCategoryIds,
+      minPrice: urlFilters.minPrice,
+      maxPrice: urlFilters.maxPrice,
+      cities: selectedCities, // Pass full objects to UI
+    };
+  }, [urlFilters, citiesData]);
+
+  // --- 3. PASS IDs TO BACKEND QUERY ---
   const queryOptions = listingInfiniteQuery({
     query: searchQuery,
-    mainCategoryIds: filters.mainCategoryIds,
-    subCategoryIds: filters.subCategoryIds,
-    cityIds: filters.cities.map(c => {
-      return c.id;
-    }),
-    minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
-    maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+    mainCategoryIds: urlFilters.mainCategoryIds,
+    subCategoryIds: urlFilters.subCategoryIds,
+    cityIds: urlFilters.cityIds, // Pass IDs directly to backend
+    minPrice: urlFilters.minPrice ? Number(urlFilters.minPrice) : undefined,
+    maxPrice: urlFilters.maxPrice ? Number(urlFilters.maxPrice) : undefined,
   });
 
   const {
@@ -69,10 +93,14 @@ export default function ListingsPage({user}: {user: User | null}) {
     isLoading,
   } = useInfiniteQuery(queryOptions);
 
+  // --- STATE ---
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const observerTarget = useRef(null);
+
   const {mutate: manageFavoriteMutation, isPending: isManageFavoritePending} =
     useManageFavorite();
 
-  // --- HANDLERS ---
   const handleManageFavorite = (
     listingId: number,
     isCurrentlyLiked: boolean,
@@ -88,7 +116,6 @@ export default function ListingsPage({user}: {user: User | null}) {
     }
   }, [profileData]);
 
-  // Infinite Scroll Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -122,10 +149,9 @@ export default function ListingsPage({user}: {user: User | null}) {
         {/* --- LEFT SIDEBAR (Desktop) --- */}
         <aside className="hidden md:block w-64 flex-shrink-0 sticky top-24">
           <FilterSidebar
+            initialFilters={initialFilters} // Pass the hydrated objects
             mainCategories={mainCategoriesData}
             allSubCategories={subCategoriesData}
-            filters={filters}
-            setFilters={setFilters}
             citiesData={citiesData}
             isCitiesDataPending={isCitiesDataPending}
           />
@@ -159,7 +185,6 @@ export default function ListingsPage({user}: {user: User | null}) {
                 </React.Fragment>
               ))}
 
-              {/* Skeletons for Next Page */}
               {isFetchingNextPage &&
                 Array.from({length: 3}).map((_, i) => (
                   <ListingCardSkeleton key={`skel-${i}`} />
@@ -167,7 +192,6 @@ export default function ListingsPage({user}: {user: User | null}) {
             </div>
           )}
 
-          {/* Empty State */}
           {!isLoading && listingData?.pages[0].content.length === 0 && (
             <div className="py-20 text-center bg-white rounded-3xl border border-slate-100 border-dashed">
               <p className="text-slate-500 font-medium">
@@ -176,27 +200,23 @@ export default function ListingsPage({user}: {user: User | null}) {
             </div>
           )}
 
-          {/* Observer Trigger */}
           <div ref={observerTarget} className="py-10 h-10 w-full" />
         </div>
       </div>
 
-      {/* --- MOBILE FILTER DRAWER/MODAL --- */}
+      {/* --- MOBILE FILTER DRAWER --- */}
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in"
             onClick={() => setIsMobileFilterOpen(false)}
           />
-          {/* Drawer Content */}
           <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl p-0 animate-in slide-in-from-right duration-300">
             <div className="h-full overflow-y-auto">
               <FilterSidebar
+                initialFilters={initialFilters}
                 mainCategories={mainCategoriesData}
                 allSubCategories={subCategoriesData}
-                filters={filters}
-                setFilters={setFilters}
                 className="border-none shadow-none h-full rounded-none"
                 onClose={() => setIsMobileFilterOpen(false)}
                 citiesData={citiesData}
