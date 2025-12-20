@@ -123,18 +123,24 @@ export default function ListingDetails({
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumbs */}
       <div className="text-sm text-slate-500 mb-6 flex items-center gap-2 overflow-hidden whitespace-nowrap">
-        <span className="hover:text-primary cursor-pointer transition-colors">
+        <Link
+          href="/"
+          className="hover:text-primary cursor-pointer transition-colors">
           Főoldal
-        </span>{" "}
-        /
-        <span className="hover:text-primary cursor-pointer transition-colors">
+        </Link>
+        <span className="text-slate-300">/</span>
+        <Link
+          href={`/?mainCategoryIds=${listingData.subCategory.mainCategory.id}`}
+          className="hover:text-primary cursor-pointer transition-colors">
           {listingData.subCategory.mainCategory.displayName}
-        </span>{" "}
-        /{" "}
-        <span className="hover:text-primary cursor-pointer transition-colors">
+        </Link>
+        <span className="text-slate-300">/</span>
+        <Link
+          href={`/?subCategoryIds=${listingData.subCategory.id}`}
+          className="hover:text-primary cursor-pointer transition-colors">
           {listingData.subCategory.displayName}
-        </span>{" "}
-        /{" "}
+        </Link>
+        <span className="text-slate-300">/</span>
         <span className="text-slate-900 font-semibold truncate">
           {listingData.name}
         </span>
