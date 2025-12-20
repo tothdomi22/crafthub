@@ -11,7 +11,7 @@ import ShowCredentialsSVG from "/public/svgs/show-credentials.svg";
 import FavoriteSVG from "/public/svgs/favorite.svg";
 import EditSVG from "/public/svgs/edit.svg";
 import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
-import {listingMyListingsQuery} from "@/app/queries/list.queries";
+import {listingMyListingsQuery} from "@/app/queries/listing.queries";
 
 export default function MyListings() {
   const [activeTab, setActiveTab] = useState<ListingStatusEnum | "ALL">("ALL");

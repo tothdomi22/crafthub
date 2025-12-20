@@ -15,7 +15,7 @@ import useUpdateListing from "@/app/hooks/listing/useUpdateListing";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import {City} from "@/app/types/city";
 import CityDropdown from "@/app/components/city/CityDropdown";
-import {listingDetailQuery} from "@/app/queries/list.queries";
+import {listingDetailQuery} from "@/app/queries/listing.queries";
 import {cityListQuery} from "@/app/queries/city.queries";
 import {
   mainCategoryListQuery,

@@ -22,7 +22,7 @@ import EditSVG from "/public/svgs/edit.svg";
 import ShoppingBagSVG from "/public/svgs/shopping-bag.svg";
 import useCreatePurchaseRequest from "@/app/hooks/purchase-request/useCreatePurchaseRequest";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
-import {listingDetailQuery} from "@/app/queries/list.queries";
+import {listingDetailQuery} from "@/app/queries/listing.queries";
 import {profileUserQuery} from "@/app/queries/profile.queries";
 
 export default function ListingDetails({

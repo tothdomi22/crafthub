@@ -1,17 +1,39 @@
-import {ListingPagination} from "@/app/types/listing";
+import {
+  ListingInfiniteQueryParams,
+  ListingPagination,
+} from "@/app/types/listing";
 
 export async function useListListings({
   pageParam = 0,
-  categoryId,
+  filters,
 }: {
   pageParam?: number;
-  categoryId?: number | null;
+  filters: ListingInfiniteQueryParams;
 }): Promise<ListingPagination> {
-  let url = `/api/listing/list?page=${pageParam}`;
-
-  if (categoryId) {
-    url += `&categoryId=${categoryId}`;
+  const params = new URLSearchParams();
+  params.set("page", pageParam.toString());
+  if (filters?.query) {
+    params.set("query", filters.query);
   }
+
+  if (filters?.minPrice !== undefined) {
+    params.set("minPrice", filters.minPrice.toString());
+  }
+
+  if (filters?.maxPrice !== undefined) {
+    params.set("maxPrice", filters.maxPrice.toString());
+  }
+
+  filters?.mainCategoryIds?.forEach(id =>
+    params.append("mainCategoryIds", id.toString()),
+  );
+
+  filters?.subCategoryIds?.forEach(id =>
+    params.append("subCategoryIds", id.toString()),
+  );
+
+  filters?.cityIds?.forEach(id => params.append("cityIds", id.toString()));
+  const url = `/api/listing/list?${params.toString()}`;
 
   const response = await fetch(url, {
     method: "GET",

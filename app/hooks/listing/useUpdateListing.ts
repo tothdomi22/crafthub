@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ListingUpdateRequest} from "@/app/types/listing";
-import {listingKeys} from "@/app/queries/list.queries";
+import {listingKeys} from "@/app/queries/listing.queries";
 
 export default function useUpdateListing() {
   const queryClient = useQueryClient();

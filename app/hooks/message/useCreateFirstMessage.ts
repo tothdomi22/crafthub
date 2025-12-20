@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {MessageRequest} from "@/app/types/message";
-import {listingKeys} from "@/app/queries/list.queries";
+import {listingKeys} from "@/app/queries/listing.queries";
 
 export default function useCreateFirstMessage(listingId: number | string) {
   const queryClient = useQueryClient();

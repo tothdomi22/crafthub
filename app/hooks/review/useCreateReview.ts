@@ -1,6 +1,6 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ReviewCreationRequest} from "@/app/types/review";
-import {listingKeys} from "@/app/queries/list.queries";
+import {listingKeys} from "@/app/queries/listing.queries";
 import {reviewKeys} from "@/app/queries/review.queries";
 
 export default function useCreateReview() {
