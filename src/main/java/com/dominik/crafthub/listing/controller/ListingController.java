@@ -35,12 +35,14 @@ public class ListingController {
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(required = false) List<Long> mainCategoryIds,
       @RequestParam(required = false) List<Long> subCategoryIds,
+      @RequestParam(required = false) List<Short> cityIds,
       @RequestParam(required = false) Double minPrice,
-      @RequestParam(required = false) Double maxPrice) {
+      @RequestParam(required = false) Double maxPrice,
+      @RequestParam(required = false) String query) {
     int size = 12;
     var listings =
         listingService.listListings(
-            id, page, size, mainCategoryIds, subCategoryIds, minPrice, maxPrice);
+            id, page, size, mainCategoryIds, subCategoryIds, cityIds, minPrice, maxPrice, query);
     return ResponseEntity.ok(listings);
   }
 
