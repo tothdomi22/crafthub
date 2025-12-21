@@ -10,7 +10,7 @@ import ListingCard from "@/app/components/listing/ListingCard";
 import ListingCardSkeleton from "@/app/components/listing/ListingCardSkeleton"; // Import the skeleton
 import {formatDate} from "@/app/components/utils";
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
-import {listingInfiniteUserQuery} from "@/app/queries/list.queries";
+import {listingInfiniteUserQuery} from "@/app/queries/listing.queries";
 import {reviewUserQuery} from "@/app/queries/review.queries";
 import {profileUserQuery} from "@/app/queries/profile.queries";
 

@@ -80,15 +80,40 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+                AND (:mainCategoryId IS NULL OR l.subCategoryEntity.mainCategoryEntity.id = :mainCategoryId)
+                AND (:subCategoryIds IS NULL OR l.subCategoryEntity.id IN :subCategoryIds)
+                AND (:cityIds IS NULL OR l.cityEntity.id IN :cityIds)
+                AND (:query IS NULL OR FUNCTION('word_similarity',
+                    FUNCTION('unaccent', lower(l.name)),
+                    FUNCTION('unaccent', lower(CAST(:query AS string)))
+                    ) > 0.3)
+                AND (:minPrice IS NULL OR l.price >= :minPrice)
+                AND (:maxPrice IS NULL OR l.price <= :maxPrice)
         """,
       countQuery =
           """
         SELECT COUNT(l)
         FROM ListingEntity l
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
+                AND (:mainCategoryId IS NULL OR l.subCategoryEntity.mainCategoryEntity.id = :mainCategoryId)
+                AND (:subCategoryIds IS NULL OR l.subCategoryEntity.id IN :subCategoryIds)
+                AND (:cityIds IS NULL OR l.cityEntity.id IN :cityIds)
+                AND (:query IS NULL OR FUNCTION('word_similarity',
+                    FUNCTION('unaccent', lower(l.name)),
+                    FUNCTION('unaccent', lower(CAST(:query AS string)))
+                    ) > 0.3)
+                AND (:minPrice IS NULL OR l.price >= :minPrice)
+                AND (:maxPrice IS NULL OR l.price <= :maxPrice)
         """)
   Page<ListingsWithLikesDto> findAllListingsWithIsLiked(
-      @Param("userId") Long userId, Pageable pageable);
+      @Param("userId") Long userId,
+      Pageable pageable,
+      @Param("mainCategoryId") Long mainCategoryId,
+      @Param("subCategoryIds") List<Long> subCategoryIds,
+      @Param("cityIds") List<Short> cityIds,
+      @Param("minPrice") Double minPrice,
+      @Param("maxPrice") Double maxPrice,
+      @Param("query") String query);
 
   @Query(
       value =
@@ -199,73 +224,4 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         """)
   Optional<ListingSingleViewDto> findSingleViewListing(
       @Param("userId") Long userId, @Param("listingId") Long listingId);
-
-  @Query(
-      value =
-          """
-            SELECT new com.dominik.crafthub.listing.dto.ListingsWithLikesDto(
-            l.id,
-            l.name,
-            l.price,
-            l.shippable,
-              new com.dominik.crafthub.city.dto.CityDto(
-                  c.id,
-                  c.name
-              ),
-            l.description,
-            l.createdAt,
-            l.status,
-            new com.dominik.crafthub.subcategory.dto.SubCategoryDto(
-                    sc.id,
-                    sc.description,
-                    sc.uniqueName,
-                    sc.displayName,
-                    new com.dominik.crafthub.maincategory.dto.MainCategoryDto(
-                        mc.id,
-                        mc.description,
-                        mc.uniqueName,
-                        mc.displayName
-                    )
-                ),
-                new com.dominik.crafthub.user.dto.UserDto(
-                    u.id,
-                    u.name,
-                    u.email,
-                    u.role,
-                    u.createdAt),
-            CASE
-                WHEN :userId IS NULL THEN null
-                WHEN f.id IS NOT NULL THEN true
-                ELSE false
-            END
-            )
-            FROM ListingEntity l
-            LEFT JOIN l.subCategoryEntity sc
-            LEFT JOIN sc.mainCategoryEntity mc
-            LEFT JOIN l.userEntity u
-            LEFT JOIN l.cityEntity c
-            LEFT JOIN FavoriteEntity f
-                ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
-            WHERE
-                l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
-                AND
-                FUNCTION('word_similarity',
-                    FUNCTION('unaccent', lower(l.name)),
-                    FUNCTION('unaccent', lower(:searchTerm))
-                ) > 0.3
-            """,
-      countQuery =
-          """
-            SELECT COUNT(l)
-            FROM ListingEntity l
-            WHERE
-                l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
-                AND
-                FUNCTION('word_similarity',
-                    FUNCTION('unaccent', lower(l.name)),
-                    FUNCTION('unaccent', lower(:searchTerm))
-                ) > 0.3
-            """)
-  Page<ListingsWithLikesDto> searchListing(
-      @Param("userId") Long userId, @Param("searchTerm") String searchTerm, Pageable pageable);
 }

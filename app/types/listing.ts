@@ -76,3 +76,12 @@ export interface ListingPagination {
   numberOfElements: number;
   empty: boolean;
 }
+
+export interface ListingInfiniteQueryParams {
+  query?: string;
+  mainCategoryId?: number;
+  subCategoryIds?: number[];
+  cityIds?: number[];
+  minPrice?: number;
+  maxPrice?: number;
+}

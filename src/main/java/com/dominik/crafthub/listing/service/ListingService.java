@@ -47,12 +47,22 @@ public class ListingService {
     return listingMapper.toDto(listing);
   }
 
-  public Page<ListingsWithLikesDto> listListings(Long id, int page, int size) {
+  public Page<ListingsWithLikesDto> listListings(
+      Long id,
+      int page,
+      int size,
+      Long mainCategoryId,
+      List<Long> subCategoryIds,
+      List<Short> cityIds,
+      Double minPrice,
+      Double maxPrice,
+      String query) {
     var user = authService.getCurrentUser();
     Long userId = (user != null) ? user.getId() : null;
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     if (id == null) {
-      return listingRepository.findAllListingsWithIsLiked(userId, pageable);
+      return listingRepository.findAllListingsWithIsLiked(
+          userId, pageable, mainCategoryId, subCategoryIds, cityIds, minPrice, maxPrice, query);
     } else {
       var searchedUser = userRepository.findById(id).orElse(null);
       if (searchedUser == null) {

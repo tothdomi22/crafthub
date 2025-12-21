@@ -10,6 +10,7 @@ import com.dominik.crafthub.listing.service.ListingService;
 import com.dominik.crafthub.subcategory.exception.SubCategoryNotFoundException;
 import com.dominik.crafthub.user.exceptions.UserNotFoundException;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,9 +31,18 @@ public class ListingController {
 
   @GetMapping({"/list", "/list/{id}"})
   public ResponseEntity<?> listListings(
-      @PathVariable(required = false) Long id, @RequestParam(defaultValue = "0") int page) {
+      @PathVariable(required = false) Long id,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(required = false) Long mainCategoryId,
+      @RequestParam(required = false) List<Long> subCategoryIds,
+      @RequestParam(required = false) List<Short> cityIds,
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice,
+      @RequestParam(required = false) String query) {
     int size = 12;
-    var listings = listingService.listListings(id, page, size);
+    var listings =
+        listingService.listListings(
+            id, page, size, mainCategoryId, subCategoryIds, cityIds, minPrice, maxPrice, query);
     return ResponseEntity.ok(listings);
   }
 

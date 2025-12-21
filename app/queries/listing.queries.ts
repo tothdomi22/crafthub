@@ -1,6 +1,10 @@
 import {infiniteQueryOptions, queryOptions} from "@tanstack/react-query";
 import useGetListing from "@/app/hooks/listing/useGetListing";
-import {Listing, ListingPagination} from "@/app/types/listing";
+import {
+  Listing,
+  ListingInfiniteQueryParams,
+  ListingPagination,
+} from "@/app/types/listing";
 import useListMyListings from "@/app/hooks/listing/useListMyListings";
 import {useListListings} from "@/app/hooks/listing/useListListing";
 import useListListingById from "@/app/hooks/listing/useListListingById";
@@ -12,7 +16,8 @@ export const listingKeys = {
   details: () => [...listingKeys.all, "detail"] as const,
   detail: (id: number | string) =>
     [...listingKeys.details(), String(id)] as const,
-  infinite: () => [...listingKeys.all, "infinite"] as const,
+  infinite: (params?: ListingInfiniteQueryParams) =>
+    [...listingKeys.all, "infinite", params] as const,
   infiniteUser: (userId: number | string) =>
     [...listingKeys.infinite(), String(userId)] as const,
   search: (query: string) => [...listingKeys.all, "search", query] as const,
@@ -35,14 +40,21 @@ export const listingMyListingsQuery = () =>
       ),
   });
 
-export const listingInfiniteQuery = () =>
-  infiniteQueryOptions<ListingPagination, Error>({
-    queryKey: listingKeys.infinite(),
-    queryFn: ({pageParam}) => useListListings({pageParam: pageParam as number}),
+export const listingInfiniteQuery = (params: ListingInfiniteQueryParams) => {
+  const normalizedParams: ListingInfiniteQueryParams = {
+    ...params,
+    subCategoryIds: params.subCategoryIds?.slice().sort(),
+    cityIds: params.cityIds?.slice().sort(),
+  };
+  return infiniteQueryOptions<ListingPagination, Error>({
+    queryKey: listingKeys.infinite(normalizedParams),
+    queryFn: ({pageParam}) =>
+      useListListings({pageParam: pageParam as number, filters: params}),
     initialPageParam: 0,
     getNextPageParam: lastPage =>
       lastPage.last ? undefined : lastPage.number + 1,
   });
+};
 
 export const listingInfiniteUserQuery = (
   userId: string | number,
