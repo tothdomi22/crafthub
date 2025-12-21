@@ -25,6 +25,7 @@ import FilterSidebar from "@/app/components/filter/FilterSidebar";
 
 // Hooks
 import useManageFavorite from "@/app/hooks/favorite/useManageFavorite";
+import ActiveFilterBar from "@/app/components/filter/ActiveFilterBar";
 
 export default function ListingsPage({user}: {user: User | null}) {
   const searchParams = useSearchParams();
@@ -132,6 +133,14 @@ export default function ListingsPage({user}: {user: User | null}) {
     };
   }, [observerTarget, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  const activeCount = [
+    urlFilters.mainCategoryId,
+    ...urlFilters.subCategoryIds,
+    ...urlFilters.cityIds,
+    urlFilters.minPrice,
+    urlFilters.maxPrice,
+  ].filter(Boolean).length;
+
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* --- PAGE TITLE & MOBILE FILTER TOGGLE --- */}
@@ -141,8 +150,20 @@ export default function ListingsPage({user}: {user: User | null}) {
         </h1>
         <button
           onClick={() => setIsMobileFilterOpen(true)}
-          className="md:hidden flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 shadow-sm">
-          <FilterSVG className="w-4 h-4" /> Szűrés
+          className={`md:hidden flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-bold shadow-sm transition-colors
+            ${
+              activeCount > 0
+                ? "bg-primary text-white border-primary" // Highlight if active
+                : "bg-white text-slate-700 border-slate-200"
+            }
+          `}>
+          <FilterSVG className="w-4 h-4" />
+          Szűrés
+          {activeCount > 0 && (
+            <span className="ml-1 bg-white/20 px-1.5 py-0.5 rounded text-xs">
+              {activeCount}
+            </span>
+          )}
         </button>
       </div>
 
@@ -159,7 +180,12 @@ export default function ListingsPage({user}: {user: User | null}) {
         </aside>
 
         {/* --- RIGHT GRID --- */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
+          <ActiveFilterBar
+            filters={initialFilters}
+            mainCategories={mainCategoriesData}
+            subCategories={subCategoriesData}
+          />
           {/* Loading State */}
           {isLoading && (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
