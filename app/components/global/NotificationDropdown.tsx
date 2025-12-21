@@ -97,50 +97,66 @@ export default function NotificationDropdown({
 
       {/* --- DROPDOWN MENU --- */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
-          <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <h3 className="font-bold text-slate-900">Értesítések</h3>
-            {unreadCount > 0 && (
-              <button className="text-xs font-bold text-primary hover:underline">
-                Összes olvasott
-              </button>
-            )}
-          </div>
+        <>
+          {/* Mobile Backdrop: Darkens screen and handles clicks outside */}
+          <div className="  sm:hidden" onClick={() => setIsOpen(false)} />
 
-          <div className="max-h-[400px] overflow-y-auto">
-            {notificationsData.notifications.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-sm">
-                Nincs új értesítésed.
-              </div>
-            ) : (
-              notificationsData.notifications.map(notif => (
-                <div
-                  key={notif.id}
-                  className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors relative ${!notif.isRead ? "bg-indigo-50/30" : ""}`}>
-                  {/* Unread Indicator */}
-                  {!notif.isRead && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
-                  )}
-                  {notif.type === NotificationTypeEnum.PURCHASE_REQUEST && (
-                    <PurchaseRequestNotification
-                      notif={notif}
-                      isPatchMutationPending={isPatchMutationPending}
-                      handlePurchaseSelection={handlePurchaseSelection}
-                      key={notif.id}
-                    />
-                  )}
-                  {notif.type === NotificationTypeEnum.REVIEW_REQUEST && (
-                    <ReviewNotification
-                      notif={notif}
-                      openReviewModal={openReviewModal}
-                      key={notif.id}
-                    />
-                  )}
+          <div
+            className={`
+            bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200
+            
+            /* MOBILE STYLES: Fixed positioning centered on screen */
+            fixed left-4 right-4 top-[72px] w-auto max-h-[75vh] origin-top
+            
+            /* DESKTOP STYLES: Absolute positioning anchored to button */
+            sm:absolute sm:right-0 sm:top-full sm:mt-2 sm:left-auto sm:w-96 sm:max-h-[500px] sm:origin-top-right
+          `}>
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h3 className="font-bold text-slate-900">Értesítések</h3>
+              {unreadCount > 0 && (
+                <button className="text-xs font-bold text-primary hover:underline">
+                  Összes olvasott
+                </button>
+              )}
+            </div>
+
+            {/* List */}
+            <div className="overflow-y-auto sm:max-h-[400px]">
+              {notificationsData.notifications.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-sm">
+                  Nincs új értesítésed.
                 </div>
-              ))
-            )}
+              ) : (
+                notificationsData.notifications.map(notif => (
+                  <div
+                    key={notif.id}
+                    className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors relative ${!notif.isRead ? "bg-indigo-50/30" : ""}`}>
+                    {/* Unread Indicator */}
+                    {!notif.isRead && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+                    )}
+                    {notif.type === NotificationTypeEnum.PURCHASE_REQUEST && (
+                      <PurchaseRequestNotification
+                        notif={notif}
+                        isPatchMutationPending={isPatchMutationPending}
+                        handlePurchaseSelection={handlePurchaseSelection}
+                        key={notif.id}
+                      />
+                    )}
+                    {notif.type === NotificationTypeEnum.REVIEW_REQUEST && (
+                      <ReviewNotification
+                        notif={notif}
+                        openReviewModal={openReviewModal}
+                        key={notif.id}
+                      />
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
       {reviewModalData && (
         <CreateReviewModal
