@@ -44,19 +44,19 @@ export default function SearchBar() {
 
   return (
     <div className="relative">
-      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-text-muted">
         <SearchSVG className="w-5 h-5" />
       </div>
       <input
         type="text"
-        className="block w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all shadow-sm"
+        className="block w-full pl-10 pr-4 py-2.5 border border-border placeholder:text-text-muted rounded-xl text-text-muted leading-5 bg-background placehotext-text-muted focus:outline-none focus:bg-surface focus:ring-2 focus:ring-primary/20 focus:border-primary sm:text-sm transition-all shadow-sm"
         placeholder="Keress..."
         value={term}
         onChange={e => setTerm(e.target.value)}
         onKeyDown={handleKeyDown}
       />
       {term.trim() && (
-        <div className="absolute inset-y-0 right-3 flex items-center text-slate-400  ">
+        <div className="absolute inset-y-0 right-3 flex items-center text-text-muted  ">
           <button onClick={handleDeleteSearch} className="cursor-pointer">
             <CloseSVG />
           </button>

@@ -91,7 +91,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-surface">
       {/* --- LEFT SIDE: IMAGE / BRANDING --- */}
       <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
         <Image
@@ -118,13 +118,13 @@ export default function LoginPage() {
       </div>
 
       {/* --- RIGHT SIDE: FORM --- */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-[#F8F9FE] lg:bg-white">
-        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-surface">
+        <div className="w-full max-w-md bg-surface p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
           <div className="text-center lg:text-left mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-text-main mb-2">
               Üdv újra!
             </h1>
-            <p className="text-slate-500">
+            <p className="text-text-muted">
               Jelentkezz be a fiókodba a folytatáshoz.
             </p>
           </div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-5" noValidate>
             {/* Email Field */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 ml-1">
+              <label className="text-sm font-bold text-text-main ml-1">
                 Email cím
               </label>
               <input
@@ -162,10 +162,10 @@ export default function LoginPage() {
                   handleInputChange(setEmail, e.target.value, setEmailError)
                 }
                 // Removed 'required' attribute just to be safe, though noValidate overrides it
-                className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium ${
+                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
                   emailError || generalError
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-border focus:border-primary focus:ring-primary/10"
                 }`}
               />
               {emailError && (
@@ -178,7 +178,7 @@ export default function LoginPage() {
             {/* Password Field */}
             <div className="space-y-1.5 relative">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-sm font-bold text-slate-700">
+                <label className="text-sm font-bold text-text-main">
                   Jelszó
                 </label>
                 <Link
@@ -201,16 +201,16 @@ export default function LoginPage() {
                       setPasswordError,
                     )
                   }
-                  className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium pr-12 ${
+                  className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium pr-12 ${
                     passwordError || generalError
-                      ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                      : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                      ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
+                      : "border-border focus:border-primary focus:ring-primary/10"
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-main transition-colors">
                   {showPassword ? (
                     <HideCredentialsSVG />
                   ) : (
@@ -229,9 +229,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
+              className="w-full bg-primary hover:bg-[#5b4cc4] text-surface py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
               {isPending ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-border border-t-surface rounded-full animate-spin" />
               ) : (
                 "Bejelentkezés"
               )}
@@ -239,7 +239,7 @@ export default function LoginPage() {
           </form>
 
           {/* Footer / Register Link */}
-          <div className="mt-8 text-center text-sm text-slate-500 font-medium">
+          <div className="mt-8 text-center text-sm text-text-muted font-medium">
             Nincs még fiókod?{" "}
             <Link
               href="/register"

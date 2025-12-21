@@ -1,12 +1,62 @@
 @import "tailwindcss";
 
+:root {
+    /* --- PALETTE --- */
+    --primary: #9f98ff;
+    --primary-hover: #887ef5;
+    --active: #7266e3;
+    --secondary: #f5f4ff;
+    --border: #dcd9ff;
+    --primary-darker: #7B72E8;
+    --background: #F8F9FE;
+    --surface: #ffffff;
+
+    /* --- TEXT --- */
+    --text-main: #1b1b26;
+    --text-muted: #64748b;
+
+    /* --- HOVER STATES --- */
+    /* Light Mode: Matches slate-50 (#f8fafc) */
+    --bg-hover: #f8fafc;
+}
+
+.dark {
+    /* --- PALETTE RE-MAPPING --- */
+    --primary: #9f98ff;
+    --primary-hover: #b1abff;
+    --active: #887ef5;
+    --secondary: #1b1b26;
+    --border: #2f2f42;
+    --primary-darker: #645bc2;
+    --background: #0f0f13;
+    --surface: #1b1b26;
+
+    /* --- TEXT --- */
+    --text-main: #F8F9FE;
+    --text-muted: #94a3b8;
+
+    /* --- HOVER STATES --- */
+    /* Dark Mode: Lighter indigo, visible on top of Surface (#1b1b26) */
+    --bg-hover: #2A2A36;
+}
+
 @theme {
-    --color-primary: #9f98ff;
-    --color-primary-hover: #887ef5;
-    --color-active: #7266e3;
-    --color-secondary: #f5f4ff;
-    --color-border: #dcd9ff;
-    --color-primaryDarker: #7B72E8;
+    /* Colors */
+    --color-primary: var(--primary);
+    --color-primary-hover: var(--primary-hover);
+    --color-active: var(--active);
+    --color-secondary: var(--secondary);
+    --color-border: var(--border);
+    --color-primaryDarker: var(--primary-darker);
+    --color-background: var(--background);
+    --color-surface: var(--surface);
+
+    /* Text */
+    --color-text-main: var(--text-main);
+    --color-text-muted: var(--text-muted);
+
+    /* Hovers */
+    --color-bg-hover: var(--bg-hover);
 }
 
 @layer components {
@@ -20,3 +70,5 @@
         -moz-appearance: textfield;
     }
 }
+
+@custom-variant dark (&:where(.dark, .dark *));

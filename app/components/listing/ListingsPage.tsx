@@ -153,14 +153,14 @@ export default function ListingsPage({user}: {user: User | null}) {
           className={`md:hidden flex items-center gap-2 px-4 py-2 border rounded-xl text-sm font-bold shadow-sm transition-colors
             ${
               activeCount > 0
-                ? "bg-primary text-white border-primary" // Highlight if active
-                : "bg-white text-slate-700 border-slate-200"
+                ? "bg-primary text-text-main border-primary" // Highlight if active
+                : "bg-surface text-text-muted border-border"
             }
           `}>
           <FilterSVG className="w-4 h-4" />
           Szűrés
           {activeCount > 0 && (
-            <span className="ml-1 bg-white/20 px-1.5 py-0.5 rounded text-xs">
+            <span className="ml-1 bg-surface/20 px-1.5 py-0.5 rounded text-xs">
               {activeCount}
             </span>
           )}
@@ -220,8 +220,8 @@ export default function ListingsPage({user}: {user: User | null}) {
           )}
 
           {!isLoading && listingData?.pages[0].content.length === 0 && (
-            <div className="py-20 text-center bg-white rounded-3xl border border-slate-100 border-dashed">
-              <p className="text-slate-500 font-medium">
+            <div className="py-20 text-center bg-surface rounded-3xl border border-border border-dashed">
+              <p className="text-text-muted font-medium">
                 Nem találtunk a szűrésnek megfelelő terméket.
               </p>
             </div>
@@ -238,7 +238,7 @@ export default function ListingsPage({user}: {user: User | null}) {
             className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in"
             onClick={() => setIsMobileFilterOpen(false)}
           />
-          <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-white shadow-2xl p-0 animate-in slide-in-from-right duration-300">
+          <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm bg-surface shadow-2xl p-0 animate-in slide-in-from-right duration-300">
             <div className="h-full overflow-y-auto">
               <FilterSidebar
                 initialFilters={initialFilters}

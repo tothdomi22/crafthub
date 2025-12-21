@@ -35,13 +35,13 @@ export default function MyListings() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Hirdetéseim</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-text-main">Hirdetéseim</h1>
+          <p className="text-text-muted text-sm mt-1">
             {listings?.length || 0} hirdetés feltöltve
           </p>
         </div>
         <Link href="/create-listing">
-          <button className="bg-primary hover:bg-[#5b4cc4] text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+          <button className="bg-primary hover:bg-primary-hover text-surface text-surfacea px-6 py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
             + Új hirdetés
           </button>
         </Link>
@@ -60,8 +60,8 @@ export default function MyListings() {
             onClick={() => setActiveTab(tab.id as ListingStatusEnum)}
             className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all border ${
               activeTab === tab.id
-                ? "bg-slate-900 text-white border-slate-900 shadow-md"
-                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700"
+                ? "bg-text-main text-surface border-text-main shadow-md"
+                : "bg-surface text-text-muted border-border hover:bg-background hover:text-text-main"
             }`}>
             {tab.label}
           </button>
@@ -73,11 +73,11 @@ export default function MyListings() {
         {isLoading ? (
           <div className="flex flex-col items-center py-20 gap-4">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <div className="text-slate-400 font-medium">Betöltés...</div>
+            <div className="text-text-muted font-medium">Betöltés...</div>
           </div>
         ) : filteredListings?.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 border-dashed">
-            <p className="text-slate-500 font-medium">
+          <div className="text-center py-20 bg-surface rounded-3xl border border-border border-dashed">
+            <p className="text-text-muted font-medium">
               Nincs megjeleníthető hirdetés.
             </p>
           </div>
@@ -85,9 +85,9 @@ export default function MyListings() {
           filteredListings?.map(listing => (
             <div
               key={listing.id}
-              className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row gap-6 transition-all hover:border-primary/30 group">
+              className="bg-surface p-6 rounded-2xl shadow-sm border border-border flex flex-col md:flex-row gap-6 transition-all hover:border-primary/30 group">
               {/* 1. IMAGE */}
-              <div className="relative w-full md:w-48 lg:w-56 aspect-[4/3] md:aspect-square flex-shrink-0 bg-slate-100 rounded-xl overflow-hidden border border-slate-100">
+              <div className="relative w-full md:w-48 lg:w-56 aspect-[4/3] md:aspect-square flex-shrink-0 bg-background rounded-xl overflow-hidden border border-border">
                 <img
                   src={"/images/placeholder.jpg"}
                   alt={listing.name}
@@ -96,15 +96,15 @@ export default function MyListings() {
 
                 {/* Status Overlays */}
                 {listing.status === ListingStatusEnum.FROZEN && (
-                  <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] flex items-center justify-center">
-                    <span className="bg-yellow-400 text-yellow-900 px-3 py-1.5 rounded-xl font-bold text-xs shadow-lg transform -rotate-6 border-2 border-white">
+                  <div className="absolute inset-0 bg-srurface/40 backdrop-blur-[2px] flex items-center justify-center">
+                    <span className="bg-yellow-400 text-yellow-900 px-3 py-1.5 rounded-xl font-bold text-xs shadow-lg transform -rotate-6 border-2 border-border">
                       FOGLALT
                     </span>
                   </div>
                 )}
                 {listing.status === ListingStatusEnum.ARCHIVED && (
-                  <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center">
-                    <span className="bg-slate-800 text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-lg border-2 border-slate-600">
+                  <div className="absolute inset-0 bg-text-main/40 backdrop-blur-[2px] flex items-center justify-center">
+                    <span className="bg-text-main text-surface px-3 py-1.5 rounded-xl font-bold text-xs shadow-lg border-2 border-border">
                       ELADVA
                     </span>
                   </div>
@@ -116,11 +116,11 @@ export default function MyListings() {
                 {/* Title & Date */}
                 <div className="flex justify-between items-start mb-2">
                   <Link href={`/listing/${listing.id}`}>
-                    <h3 className="text-xl font-bold text-slate-900 leading-tight group-hover:text-primary transition-colors">
+                    <h3 className="text-xl font-bold text-text-main leading-tight group-hover:text-primary transition-colors">
                       {listing.name}
                     </h3>
                   </Link>
-                  <div className="hidden sm:block text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50 px-2 py-1 rounded-md">
+                  <div className="hidden sm:block text-xs font-bold text-text-muted uppercase tracking-wider bg-background px-2 py-1 rounded-md">
                     {formatDate(listing.createdAt)}
                   </div>
                 </div>
@@ -134,40 +134,40 @@ export default function MyListings() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
                   {/* Location */}
                   <div>
-                    <span className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                    <span className="block text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">
                       Helyszín
                     </span>
-                    <div className="flex items-center gap-1 font-medium text-slate-700 text-sm">
-                      <LocationSVG className="w-3.5 h-3.5 text-slate-400" />
+                    <div className="flex items-center gap-1 font-medium text-text-main text-sm">
+                      <LocationSVG className="w-3.5 h-3.5 text-text-muted" />
                       {listing.city.name}
                     </div>
                   </div>
 
                   {/* Views */}
                   <div>
-                    <span className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                    <span className="block text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">
                       Megtekintés
                     </span>
-                    <div className="flex items-center gap-1.5 font-bold text-slate-700 text-sm">
-                      <ShowCredentialsSVG className="w-4 h-4 text-slate-400" />
+                    <div className="flex items-center gap-1.5 font-bold text-text-main text-sm">
+                      <ShowCredentialsSVG className="w-4 h-4 text-text-muted" />
                       <span>0</span>
                     </div>
                   </div>
 
                   {/* Favorites */}
                   <div>
-                    <span className="block text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                    <span className="block text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">
                       Mentések
                     </span>
-                    <div className="flex items-center gap-1.5 font-bold text-slate-700 text-sm">
-                      <FavoriteSVG className="w-4 h-4 text-slate-400" />
+                    <div className="flex items-center gap-1.5 font-bold text-text-main text-sm">
+                      <FavoriteSVG className="w-4 h-4 text-text-muted" />
                       <span>0</span>
                     </div>
                   </div>
                 </div>
 
                 {/* 3. ACTIONS BAR */}
-                <div className="mt-auto pt-4 border-t border-slate-50 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                <div className="mt-auto pt-4 border-t border-border flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
                   {/* Custom Dropdown (Inline & Opens Down) */}
                   <ListingStatusDropdown
                     currentStatus={listing.status}
@@ -183,7 +183,7 @@ export default function MyListings() {
                   <Link
                     href={`/my-listings/edit/${listing.id}`}
                     className="w-full sm:w-auto">
-                    <button className="w-full bg-primary hover:bg-[#5b4cc4] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 h-full">
+                    <button className="w-full bg-primary hover:bg-primary-hover text-surface px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 h-full">
                       <EditSVG className="w-4 h-4" />
                       Szerkesztés
                     </button>

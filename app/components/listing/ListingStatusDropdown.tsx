@@ -42,9 +42,9 @@ export default function ListingStatusDropdown({
     },
     [ListingStatusEnum.ARCHIVED]: {
       label: "Eladva",
-      color: "text-slate-500",
+      color: "text-text-muted",
       bg: "bg-slate-100",
-      border: "border-slate-200",
+      border: "border-border",
       dot: "bg-slate-400",
     },
   };
@@ -85,23 +85,23 @@ export default function ListingStatusDropdown({
         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-200 
           ${
             isDisabled
-              ? "bg-slate-50 border-slate-100 cursor-not-allowed opacity-80" // Grayed out style
+              ? "bg-background border-border cursor-not-allowed opacity-80" // Grayed out style
               : isOpen
-                ? "ring-2 ring-primary/10 border-primary bg-white"
-                : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                ? "ring-2 ring-primary/10 border-primary bg-surface"
+                : "bg-surface border-border hover:border/80 hover:bg-background"
           }
         `}>
         <div className="flex items-center gap-3">
           <span
-            className={`text-xs font-bold uppercase tracking-wider ${isDisabled ? "text-slate-300" : "text-slate-400"}`}>
+            className={`text-xs font-bold uppercase tracking-wider ${isDisabled ? "text-text-muted" : "text-text-main"}`}>
             Státusz:
           </span>
 
           <div className="flex items-center gap-2">
             <span
-              className={`w-2 h-2 rounded-full ${isArchived ? "bg-slate-400" : currentConfig.dot}`}></span>
+              className={`w-2 h-2 rounded-full ${isArchived ? "bg-text-muted" : currentConfig.dot}`}></span>
             <span
-              className={`text-sm font-bold ${isArchived ? "text-slate-500" : currentConfig.color}`}>
+              className={`text-sm font-bold ${isArchived ? "text-text-muted" : currentConfig.color}`}>
               {currentConfig.label}
             </span>
           </div>
@@ -118,7 +118,7 @@ export default function ListingStatusDropdown({
 
       {/* Dropdown Menu */}
       {isOpen && !isDisabled && (
-        <div className="absolute top-full mt-2 left-0 w-full bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-200 origin-top">
+        <div className="absolute top-full mt-2 left-0 w-full bg-surface rounded-xl shadow-xl border border-border overflow-hidden z-30 animate-in fade-in zoom-in-95 duration-200 origin-top">
           <div className="p-1">
             {Object.values(ListingStatusEnum).map(status => {
               // Don't show the option if it's the current one
@@ -132,11 +132,11 @@ export default function ListingStatusDropdown({
                   key={status}
                   onClick={() => handleSelect(status)}
                   className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-colors ${
-                    isActive ? "bg-slate-50" : "hover:bg-slate-50"
+                    isActive ? "bg-background" : "hover:bg-background"
                   }`}>
                   <div className={`w-2 h-2 rounded-full ${config.dot}`}></div>
                   <span
-                    className={`text-sm font-medium ${isActive ? "text-slate-900 font-bold" : "text-slate-600"}`}>
+                    className={`text-sm font-medium ${isActive ? "text-text-main font-bold" : "text-text-muted"}`}>
                     {config.label}
                   </span>
                   {isActive && (

@@ -171,10 +171,10 @@ export default function CityDropdown(props: CityDropdownProps) {
 
   // --- RENDER CONTENT ---
   const listContent = (
-    <div className="bg-white overflow-hidden flex flex-col h-full">
-      <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+    <div className="bg-surface overflow-hidden flex flex-col h-full">
+      <div className="p-3 border-b border-border bg-surface/50">
         <div className="relative">
-          <SearchSVG className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <SearchSVG className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             ref={searchInputRef}
             type="text"
@@ -182,7 +182,7 @@ export default function CityDropdown(props: CityDropdownProps) {
             onChange={e => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Keresés..."
-            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-slate-400"
+            className="w-full pl-9 pr-4 py-2 bg-surface border border-border rounded-lg text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-text-muted"
             onClick={e => e.stopPropagation()}
           />
         </div>
@@ -195,8 +195,8 @@ export default function CityDropdown(props: CityDropdownProps) {
           <div className="space-y-1 p-1">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex items-center gap-3 px-3 py-2.5">
-                <div className="w-4 h-4 bg-slate-100 rounded-full animate-pulse"></div>
-                <div className="h-4 bg-slate-100 rounded w-24 animate-pulse"></div>
+                <div className="w-4 h-4 bg-background rounded-full animate-pulse"></div>
+                <div className="h-4 bg-background rounded w-24 animate-pulse"></div>
               </div>
             ))}
           </div>
@@ -215,8 +215,8 @@ export default function CityDropdown(props: CityDropdownProps) {
                       selected
                         ? "bg-primary/5 text-primary"
                         : isHighlighted
-                          ? "bg-slate-100 text-slate-900"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          ? "bg-background text-slate-900"
+                          : "text-text-muted hover:bg-slate-50 hover:text-slate-900"
                     }
                   `}>
                 {/* 2. CONDITIONALLY RENDER CHECKBOX */}
@@ -224,7 +224,7 @@ export default function CityDropdown(props: CityDropdownProps) {
                 {isMulti && (
                   <div
                     className={`w-4 h-4 rounded border flex items-center justify-center transition-all flex-shrink-0
-                      ${selected ? "bg-primary border-primary" : "border-slate-300 bg-white"}
+                      ${selected ? "bg-primary border-primary" : "border-slate-300 bg-surface"}
                     `}>
                     {selected && <CheckSVG className="w-3 h-3 text-white" />}
                   </div>
@@ -245,7 +245,7 @@ export default function CityDropdown(props: CityDropdownProps) {
             );
           })
         ) : (
-          <div className="py-4 text-center text-xs text-slate-400 font-medium">
+          <div className="py-4 text-center text-xs text-text-muted font-medium">
             Nincs találat: &#34;{searchTerm}&#34;
           </div>
         )}
@@ -261,34 +261,34 @@ export default function CityDropdown(props: CityDropdownProps) {
         className={`w-full flex items-center justify-between px-4 text-left relative z-20
           ${
             position === "relative" && isOpen
-              ? "py-3 rounded-t-xl rounded-b-none border border-primary bg-white border-b-0 pb-[13px]"
+              ? "py-3 rounded-t-xl rounded-b-none border border-primary bg-surface border-b-0 pb-[13px]"
               : isOpen
-                ? "py-3 rounded-xl border border-primary bg-white shadow-sm"
-                : "py-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                ? "py-3 rounded-xl border border-primary bg-surface shadow-sm"
+                : "py-3 rounded-xl bg-surface border border-border hover:border-border hover:bg-bg-hover"
           }
         `}>
         <div className="flex items-center gap-2 overflow-hidden">
           <LocationSVG
             className={`w-5 h-5 flex-shrink-0 ${
-              hasValue ? "text-primary" : "text-slate-400"
+              hasValue ? "text-primary" : "text-text-muted"
             }`}
           />
           <span
             className={`font-medium truncate ${
-              hasValue ? "text-slate-900" : "text-slate-400"
+              hasValue ? "text-slate-900" : "text-text-muted"
             }`}>
             {renderTriggerText()}
           </span>
         </div>
         <div
-          className={`text-slate-400 transition-transform duration-200 ml-2 ${isOpen ? "rotate-180" : ""}`}>
+          className={`text-text-muted transition-transform duration-200 ml-2 ${isOpen ? "rotate-180" : ""}`}>
           <KeyBoardArrowDownSVG className="w-5 h-5" />
         </div>
       </button>
 
       {position === "absolute" ? (
         isOpen && (
-          <div className="absolute top-full mt-2 left-0 w-full bg-white rounded-xl shadow-xl border border-primary overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute top-full mt-2 left-0 w-full bg-surface rounded-xl shadow-xl border border-primary overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
             {listContent}
           </div>
         )
@@ -298,7 +298,7 @@ export default function CityDropdown(props: CityDropdownProps) {
             isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           }`}>
           <div
-            className={`overflow-hidden bg-white rounded-b-xl -mt-[1px] ${isOpen ? "border border-primary border-t-0 shadow-sm" : ""}`}>
+            className={`overflow-hidden bg-surface rounded-b-xl -mt-[1px] ${isOpen ? "border border-primary border-t-0 shadow-sm" : ""}`}>
             {listContent}
           </div>
         </div>

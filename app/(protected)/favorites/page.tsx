@@ -10,7 +10,7 @@ export default async function FavoritesPage() {
     return null;
   }
   return (
-    <div className="min-h-screen bg-[#F8F9FE] pb-20">
+    <div className="min-h-screen bg-background pb-20">
       <SubHeader user={user} />
       <Favorites />
     </div>

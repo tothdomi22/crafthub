@@ -71,7 +71,7 @@ export default function NotificationDropdown({
 
   if (!notificationsData) {
     return (
-      <button className="relative p-2.5 rounded-xl text-slate-500 hover:text-primary hover:bg-slate-50 transition-all">
+      <button className="relative p-2.5 rounded-xl text-text-muted hover:text-primary hover:bg-background transition-all">
         <BellSVG className="w-6 h-6" />
       </button>
     );
@@ -84,14 +84,14 @@ export default function NotificationDropdown({
         onClick={() => setIsOpen(!isOpen)}
         className={`relative p-2.5 rounded-xl transition-all ${
           isOpen
-            ? "bg-slate-100 text-primary"
-            : "text-slate-500 hover:text-primary hover:bg-slate-50"
+            ? "bg-background text-primary"
+            : "text-text-muted hover:text-primary hover:bg-bg-hover"
         }`}>
         <BellSVG className="w-6 h-6" />
 
         {/* Unread Badge */}
         {unreadCount > 0 && (
-          <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white ring-1 ring-white"></span>
+          <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-surface ring-1 ring-surface"></span>
         )}
       </button>
 
@@ -103,7 +103,7 @@ export default function NotificationDropdown({
 
           <div
             className={`
-            bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200
+            bg-surface rounded-2xl shadow-xl border border-border overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200
             
             /* MOBILE STYLES: Fixed positioning centered on screen */
             fixed left-4 right-4 top-[72px] w-auto max-h-[75vh] origin-top
@@ -112,8 +112,8 @@ export default function NotificationDropdown({
             sm:absolute sm:right-0 sm:top-full sm:mt-2 sm:left-auto sm:w-96 sm:max-h-[500px] sm:origin-top-right
           `}>
             {/* Header */}
-            <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h3 className="font-bold text-slate-900">Értesítések</h3>
+            <div className="px-5 py-4 border-b border-border flex justify-between items-center bg-background/50">
+              <h3 className="font-bold text-text-main">Értesítések</h3>
               {unreadCount > 0 && (
                 <button className="text-xs font-bold text-primary hover:underline">
                   Összes olvasott
@@ -124,14 +124,14 @@ export default function NotificationDropdown({
             {/* List */}
             <div className="overflow-y-auto sm:max-h-[400px]">
               {notificationsData.notifications.length === 0 ? (
-                <div className="p-8 text-center text-slate-400 text-sm">
+                <div className="p-8 text-center text-text-muted text-sm">
                   Nincs új értesítésed.
                 </div>
               ) : (
                 notificationsData.notifications.map(notif => (
                   <div
                     key={notif.id}
-                    className={`p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors relative ${!notif.isRead ? "bg-indigo-50/30" : ""}`}>
+                    className={`p-4 border-b border-border hover:bg-bg-hover transition-colors relative ${!notif.isRead ? "bg-surface/30" : ""}`}>
                     {/* Unread Indicator */}
                     {!notif.isRead && (
                       <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
