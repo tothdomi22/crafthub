@@ -33,47 +33,91 @@ export default function FilterSidebar({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // 1. LOCAL STATE
+  // 1. LOCAL FILTER STATE
   const [localFilters, setLocalFilters] = useState<FilterState>(initialFilters);
 
-  // 2. SYNC
+  // 2. EXPANSION STATE
+  const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
+
+  // 3. SYNC LOCAL STATE
   useEffect(() => {
     setLocalFilters(initialFilters);
+    if (initialFilters.mainCategoryId) {
+      setExpandedCategories(prev => {
+        if (!prev.includes(initialFilters.mainCategoryId!)) {
+          return [...prev, initialFilters.mainCategoryId!];
+        }
+        return prev;
+      });
+    }
   }, [initialFilters]);
 
   // --- HANDLERS ---
 
-  // UPDATED: Only allows 1 active Main Category
   const toggleMainCategory = (catId: number) => {
     setLocalFilters(prev => {
       const isSameCategory = prev.mainCategoryId === catId;
 
       if (isSameCategory) {
-        // If clicking the currently active one -> Deselect it AND clear subcats
+        // Deselect AND Collapse
+        setExpandedCategories(prevExpanded =>
+          prevExpanded.filter(id => id !== catId),
+        );
         return {
           ...prev,
           mainCategoryId: null,
-          subCategoryIds: [], // Clear subs because they belong to this cat
+          subCategoryIds: [],
         };
       } else {
-        // If clicking a NEW one -> Set it as active AND clear previous subcats
+        // Select AND Expand
+        setExpandedCategories(prevExpanded =>
+          prevExpanded.includes(catId)
+            ? prevExpanded
+            : [...prevExpanded, catId],
+        );
         return {
           ...prev,
           mainCategoryId: catId,
-          subCategoryIds: [], // Reset subs when switching main category
+          subCategoryIds: [],
         };
       }
     });
   };
 
-  const toggleSubCategory = (subId: number) => {
+  const toggleAccordion = (e: React.MouseEvent, catId: number) => {
+    e.stopPropagation();
+    setExpandedCategories(prev =>
+      prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId],
+    );
+  };
+
+  // --- FIXED HANDLER HERE ---
+  const toggleSubCategory = (subId: number, parentId: number) => {
     setLocalFilters(prev => {
+      // Check if we are switching to a new Main Category
+      const isDifferentMainCat = prev.mainCategoryId !== parentId;
+
+      if (isDifferentMainCat) {
+        // CASE 1: Switching Main Category
+        // We must wipe out the old subCategoryIds and set the new Main ID
+        return {
+          ...prev,
+          mainCategoryId: parentId,
+          subCategoryIds: [subId], // Start fresh with just this one
+        };
+      }
+
+      // CASE 2: Same Main Category - Standard Toggle
       const isSelected = prev.subCategoryIds.includes(subId);
       const newSubIds = isSelected
         ? prev.subCategoryIds.filter(id => id !== subId)
         : [...prev.subCategoryIds, subId];
 
-      return {...prev, subCategoryIds: newSubIds};
+      return {
+        ...prev,
+        subCategoryIds: newSubIds,
+        mainCategoryId: parentId,
+      };
     });
   };
 
@@ -81,24 +125,22 @@ export default function FilterSidebar({
   const applyFiltersToURL = (filtersToApply: FilterState) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // 1. Reset page
     params.delete("page");
 
-    // 2. Main Category (Singular)
     if (filtersToApply.mainCategoryId) {
       params.set("mainCategoryId", filtersToApply.mainCategoryId.toString());
+      params.delete("mainCategoryIds");
     } else {
       params.delete("mainCategoryId");
+      params.delete("mainCategoryIds");
     }
 
-    // 3. Sub Categories (Multiple)
     if (filtersToApply.subCategoryIds.length > 0) {
       params.set("subCategoryIds", filtersToApply.subCategoryIds.join(","));
     } else {
       params.delete("subCategoryIds");
     }
 
-    // 4. Price
     if (filtersToApply.minPrice)
       params.set("minPrice", filtersToApply.minPrice);
     else params.delete("minPrice");
@@ -107,7 +149,6 @@ export default function FilterSidebar({
       params.set("maxPrice", filtersToApply.maxPrice);
     else params.delete("maxPrice");
 
-    // 5. Cities
     if (filtersToApply.cities.length > 0) {
       const cityIds = filtersToApply.cities.map(c => c.id).join(",");
       params.set("cityIds", cityIds);
@@ -125,13 +166,14 @@ export default function FilterSidebar({
 
   const clearLocalFilters = () => {
     const emptyFilters: FilterState = {
-      mainCategoryId: null, // Reset to null
+      mainCategoryId: null,
       subCategoryIds: [],
       minPrice: "",
       maxPrice: "",
       cities: [],
     };
     setLocalFilters(emptyFilters);
+    setExpandedCategories([]);
     applyFiltersToURL(emptyFilters);
     if (onClose) onClose();
   };
@@ -170,73 +212,92 @@ export default function FilterSidebar({
           </h4>
           <div className="space-y-1">
             {mainCategories?.map(cat => {
-              // Check if THIS category is the single active one
               const isMainSelected = localFilters.mainCategoryId === cat.id;
-
+              const isOpen = expandedCategories.includes(cat.id);
               const childrenSubCategories =
                 allSubCategories?.filter(
                   sub => sub.mainCategory.id === cat.id,
                 ) || [];
 
-              // Open accordion if selected
-              const isOpen = isMainSelected;
-
               return (
                 <div key={cat.id}>
-                  <button
-                    onClick={() => toggleMainCategory(cat.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  {/* MAIN CATEGORY ROW */}
+                  <div
+                    className={`w-full flex items-center justify-between rounded-lg transition-colors ${
                       isMainSelected
-                        ? "bg-primary/5 text-primaryDarker"
+                        ? "bg-primary/5 text-primary"
                         : "text-slate-900 hover:bg-slate-50"
                     }`}>
-                    <div className="flex items-center gap-2 text-start">
-                      <span title={cat.description}>{cat.displayName}</span>
-                    </div>
+                    <button
+                      onClick={() => toggleMainCategory(cat.id)}
+                      className="flex-1 flex items-center gap-2 px-3 py-2 text-sm text-left font-medium">
+                      <span
+                        title={cat.description}
+                        className={isMainSelected ? "font-bold" : ""}>
+                        {cat.displayName}
+                      </span>
+                      {isMainSelected && <CheckSVG className="w-3.5 h-3.5" />}
+                    </button>
 
                     {childrenSubCategories.length > 0 && (
-                      <KeyBoardArrowDownSVG
-                        className={`w-4 h-4 text-slate-400 transition-transform ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
+                      <button
+                        onClick={e => toggleAccordion(e, cat.id)}
+                        className={`p-2 mr-1 rounded-md transition-colors ${
+                          isMainSelected
+                            ? "text-primary hover:bg-primary/10"
+                            : "text-slate-400 hover:bg-black/5"
+                        }`}>
+                        <KeyBoardArrowDownSVG
+                          className={`w-4 h-4 transition-transform duration-300 ${
+                            isOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
                     )}
-                  </button>
+                  </div>
 
-                  {/* Subcategories - Only show if parent is selected/open */}
-                  {isOpen && childrenSubCategories.length > 0 && (
-                    <div className="ml-4 mt-1 border-l-2 border-slate-100 pl-2 space-y-1 animate-in slide-in-from-top-2 duration-200">
-                      {childrenSubCategories.map(sub => {
-                        const isSubSelected =
-                          localFilters.subCategoryIds.includes(sub.id);
-                        return (
-                          <button
-                            key={sub.id}
-                            onClick={() => toggleSubCategory(sub.id)}
-                            className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors text-left ${
-                              isSubSelected
-                                ? "text-primaryDarker font-bold bg-slate-50"
-                                : "text-slate-700 hover:text-slate-800"
-                            }`}>
-                            {/* Square checkbox for multiple subcats */}
-                            <div
-                              className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
-                                isSubSelected
-                                  ? "bg-primary border-primary"
-                                  : "border-slate-300 bg-white"
-                              }`}>
-                              {isSubSelected && (
-                                <CheckSVG className="w-2.5 h-2.5 text-white" />
-                              )}
-                            </div>
-                            <span title={sub.description}>
-                              {sub.displayName}
-                            </span>
-                          </button>
-                        );
-                      })}
+                  {/* SUB CATEGORIES - ANIMATED CONTAINER */}
+                  <div
+                    className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+                      isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                    }`}>
+                    <div className="overflow-hidden">
+                      {childrenSubCategories.length > 0 && (
+                        <div className="ml-3 mt-1 border-l-2 border-slate-100 pl-2 space-y-1 pb-1">
+                          {childrenSubCategories.map(sub => {
+                            const isSubSelected =
+                              localFilters.subCategoryIds.includes(sub.id);
+                            return (
+                              <button
+                                key={sub.id}
+                                onClick={() =>
+                                  toggleSubCategory(sub.id, cat.id)
+                                }
+                                className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors text-left ${
+                                  isSubSelected
+                                    ? "text-primary font-bold bg-slate-50"
+                                    : "text-slate-700 hover:text-slate-800"
+                                }`}>
+                                <div
+                                  className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors flex-shrink-0 ${
+                                    isSubSelected
+                                      ? "bg-primary border-primary"
+                                      : "border-slate-300 bg-white"
+                                  }`}>
+                                  {isSubSelected && (
+                                    <CheckSVG className="w-2.5 h-2.5 text-white" />
+                                  )}
+                                </div>
+                                <span title={sub.description}>
+                                  {sub.displayName}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
