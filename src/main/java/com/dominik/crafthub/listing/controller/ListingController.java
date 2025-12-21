@@ -33,7 +33,7 @@ public class ListingController {
   public ResponseEntity<?> listListings(
       @PathVariable(required = false) Long id,
       @RequestParam(defaultValue = "0") int page,
-      @RequestParam(required = false) List<Long> mainCategoryIds,
+      @RequestParam(required = false) Long mainCategoryId,
       @RequestParam(required = false) List<Long> subCategoryIds,
       @RequestParam(required = false) List<Short> cityIds,
       @RequestParam(required = false) Double minPrice,
@@ -42,7 +42,7 @@ public class ListingController {
     int size = 12;
     var listings =
         listingService.listListings(
-            id, page, size, mainCategoryIds, subCategoryIds, cityIds, minPrice, maxPrice, query);
+            id, page, size, mainCategoryId, subCategoryIds, cityIds, minPrice, maxPrice, query);
     return ResponseEntity.ok(listings);
   }
 

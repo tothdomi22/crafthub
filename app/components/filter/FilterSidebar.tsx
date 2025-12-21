@@ -32,42 +32,36 @@ export default function FilterSidebar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  // 1. LOCAL STATE: Tracks changes before they are applied
+
+  // 1. LOCAL STATE
   const [localFilters, setLocalFilters] = useState<FilterState>(initialFilters);
 
-  // 2. SYNC: If parent filters change (e.g. user clears filters from the empty state view), sync local state
+  // 2. SYNC
   useEffect(() => {
     setLocalFilters(initialFilters);
   }, [initialFilters]);
 
-  // --- HANDLERS (Modifying Local State Only) ---
+  // --- HANDLERS ---
 
+  // UPDATED: Only allows 1 active Main Category
   const toggleMainCategory = (catId: number) => {
     setLocalFilters(prev => {
-      const isSelected = prev.mainCategoryIds.includes(catId);
-      let newMainIds;
+      const isSameCategory = prev.mainCategoryId === catId;
 
-      if (isSelected) {
-        newMainIds = prev.mainCategoryIds.filter(id => id !== catId);
-
-        // Remove child subcategories to avoid stale state
-        const childSubIds =
-          allSubCategories
-            ?.filter(sub => sub.mainCategory.id === catId)
-            .map(sub => sub.id) || [];
-
-        const newSubIds = prev.subCategoryIds.filter(
-          id => !childSubIds.includes(id),
-        );
-
+      if (isSameCategory) {
+        // If clicking the currently active one -> Deselect it AND clear subcats
         return {
           ...prev,
-          mainCategoryIds: newMainIds,
-          subCategoryIds: newSubIds,
+          mainCategoryId: null,
+          subCategoryIds: [], // Clear subs because they belong to this cat
         };
       } else {
-        newMainIds = [...prev.mainCategoryIds, catId];
-        return {...prev, mainCategoryIds: newMainIds};
+        // If clicking a NEW one -> Set it as active AND clear previous subcats
+        return {
+          ...prev,
+          mainCategoryId: catId,
+          subCategoryIds: [], // Reset subs when switching main category
+        };
       }
     });
   };
@@ -90,20 +84,21 @@ export default function FilterSidebar({
     // 1. Reset page
     params.delete("page");
 
-    // 2. Categories
-    if (filtersToApply.mainCategoryIds.length > 0) {
-      params.set("mainCategoryIds", filtersToApply.mainCategoryIds.join(","));
+    // 2. Main Category (Singular)
+    if (filtersToApply.mainCategoryId) {
+      params.set("mainCategoryId", filtersToApply.mainCategoryId.toString());
     } else {
-      params.delete("mainCategoryIds");
+      params.delete("mainCategoryId");
     }
 
+    // 3. Sub Categories (Multiple)
     if (filtersToApply.subCategoryIds.length > 0) {
       params.set("subCategoryIds", filtersToApply.subCategoryIds.join(","));
     } else {
       params.delete("subCategoryIds");
     }
 
-    // 3. Price
+    // 4. Price
     if (filtersToApply.minPrice)
       params.set("minPrice", filtersToApply.minPrice);
     else params.delete("minPrice");
@@ -112,9 +107,8 @@ export default function FilterSidebar({
       params.set("maxPrice", filtersToApply.maxPrice);
     else params.delete("maxPrice");
 
-    // 4. Cities
+    // 5. Cities
     if (filtersToApply.cities.length > 0) {
-      // Map to IDs and join with commas
       const cityIds = filtersToApply.cities.map(c => c.id).join(",");
       params.set("cityIds", cityIds);
     } else {
@@ -129,26 +123,24 @@ export default function FilterSidebar({
     if (onClose) onClose();
   };
 
-  // Clears local inputs
   const clearLocalFilters = () => {
-    const emptyFilters = {
-      mainCategoryIds: [],
+    const emptyFilters: FilterState = {
+      mainCategoryId: null, // Reset to null
       subCategoryIds: [],
       minPrice: "",
       maxPrice: "",
       cities: [],
     };
-    // 2. Update local state (visuals)
     setLocalFilters(emptyFilters);
-    applyFiltersToURL(emptyFilters); // Updates URL immediately
+    applyFiltersToURL(emptyFilters);
     if (onClose) onClose();
   };
 
   const hasActiveLocalFilters =
-    initialFilters.mainCategoryIds.length > 0 ||
-    initialFilters.minPrice !== "" ||
-    initialFilters.maxPrice !== "" ||
-    initialFilters.cities.length > 0;
+    localFilters.mainCategoryId !== null ||
+    localFilters.minPrice !== "" ||
+    localFilters.maxPrice !== "" ||
+    localFilters.cities.length > 0;
 
   return (
     <div
@@ -170,7 +162,7 @@ export default function FilterSidebar({
         )}
       </div>
 
-      <div className="flex-1  pr-1 pb-4 space-y-8">
+      <div className="flex-1 pr-1 pb-4 space-y-8">
         {/* --- CATEGORIES --- */}
         <div>
           <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
@@ -178,20 +170,16 @@ export default function FilterSidebar({
           </h4>
           <div className="space-y-1">
             {mainCategories?.map(cat => {
-              const isMainSelected = localFilters.mainCategoryIds.includes(
-                cat.id,
-              );
+              // Check if THIS category is the single active one
+              const isMainSelected = localFilters.mainCategoryId === cat.id;
 
               const childrenSubCategories =
                 allSubCategories?.filter(
                   sub => sub.mainCategory.id === cat.id,
                 ) || [];
 
-              const hasSelectedChildren = childrenSubCategories.some(sub =>
-                localFilters.subCategoryIds.includes(sub.id),
-              );
-
-              const isOpen = isMainSelected || hasSelectedChildren;
+              // Open accordion if selected
+              const isOpen = isMainSelected;
 
               return (
                 <div key={cat.id}>
@@ -202,18 +190,8 @@ export default function FilterSidebar({
                         ? "bg-primary/5 text-primaryDarker"
                         : "text-slate-900 hover:bg-slate-50"
                     }`}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                          isMainSelected
-                            ? "bg-primary border-primary"
-                            : "border-slate-300 bg-white"
-                        }`}>
-                        {isMainSelected && (
-                          <CheckSVG className="w-3 h-3 text-white" />
-                        )}
-                      </div>
-                      <span>{cat.displayName}</span>
+                    <div className="flex items-center gap-2 text-start">
+                      <span title={cat.description}>{cat.displayName}</span>
                     </div>
 
                     {childrenSubCategories.length > 0 && (
@@ -225,7 +203,7 @@ export default function FilterSidebar({
                     )}
                   </button>
 
-                  {/* Subcategories */}
+                  {/* Subcategories - Only show if parent is selected/open */}
                   {isOpen && childrenSubCategories.length > 0 && (
                     <div className="ml-4 mt-1 border-l-2 border-slate-100 pl-2 space-y-1 animate-in slide-in-from-top-2 duration-200">
                       {childrenSubCategories.map(sub => {
@@ -240,6 +218,7 @@ export default function FilterSidebar({
                                 ? "text-primaryDarker font-bold bg-slate-50"
                                 : "text-slate-700 hover:text-slate-800"
                             }`}>
+                            {/* Square checkbox for multiple subcats */}
                             <div
                               className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
                                 isSubSelected
@@ -250,7 +229,9 @@ export default function FilterSidebar({
                                 <CheckSVG className="w-2.5 h-2.5 text-white" />
                               )}
                             </div>
-                            {sub.displayName}
+                            <span title={sub.description}>
+                              {sub.displayName}
+                            </span>
                           </button>
                         );
                       })}

@@ -23,10 +23,9 @@ export async function useListListings({
   if (filters?.maxPrice !== undefined) {
     params.set("maxPrice", filters.maxPrice.toString());
   }
-
-  filters?.mainCategoryIds?.forEach(id =>
-    params.append("mainCategoryIds", id.toString()),
-  );
+  if (filters?.mainCategoryId) {
+    params.set("mainCategoryId", filters.mainCategoryId.toString());
+  }
 
   filters?.subCategoryIds?.forEach(id =>
     params.append("subCategoryIds", id.toString()),

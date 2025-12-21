@@ -47,8 +47,9 @@ export default function ListingsPage({user}: {user: User | null}) {
             .filter(n => !isNaN(n))
         : [];
 
+    const mainId = searchParams.get("mainCategoryId");
     return {
-      mainCategoryIds: parseIds(searchParams.get("mainCategoryIds")),
+      mainCategoryId: mainId ? Number(mainId) : null,
       subCategoryIds: parseIds(searchParams.get("subCategoryIds")),
       cityIds: parseIds(searchParams.get("cityIds")), // Get IDs here
       minPrice: searchParams.get("minPrice") || "",
@@ -67,7 +68,7 @@ export default function ListingsPage({user}: {user: User | null}) {
     // The Dropdown will populate once citiesData arrives.
 
     return {
-      mainCategoryIds: urlFilters.mainCategoryIds,
+      mainCategoryId: urlFilters.mainCategoryId,
       subCategoryIds: urlFilters.subCategoryIds,
       minPrice: urlFilters.minPrice,
       maxPrice: urlFilters.maxPrice,
@@ -78,7 +79,7 @@ export default function ListingsPage({user}: {user: User | null}) {
   // --- 3. PASS IDs TO BACKEND QUERY ---
   const queryOptions = listingInfiniteQuery({
     query: searchQuery,
-    mainCategoryIds: urlFilters.mainCategoryIds,
+    mainCategoryId: urlFilters.mainCategoryId ?? undefined,
     subCategoryIds: urlFilters.subCategoryIds,
     cityIds: urlFilters.cityIds, // Pass IDs directly to backend
     minPrice: urlFilters.minPrice ? Number(urlFilters.minPrice) : undefined,

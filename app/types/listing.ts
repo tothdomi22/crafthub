@@ -79,7 +79,7 @@ export interface ListingPagination {
 
 export interface ListingInfiniteQueryParams {
   query?: string;
-  mainCategoryIds?: number[];
+  mainCategoryId?: number;
   subCategoryIds?: number[];
   cityIds?: number[];
   minPrice?: number;

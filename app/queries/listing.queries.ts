@@ -43,7 +43,6 @@ export const listingMyListingsQuery = () =>
 export const listingInfiniteQuery = (params: ListingInfiniteQueryParams) => {
   const normalizedParams: ListingInfiniteQueryParams = {
     ...params,
-    mainCategoryIds: params.mainCategoryIds?.slice().sort(),
     subCategoryIds: params.subCategoryIds?.slice().sort(),
     cityIds: params.cityIds?.slice().sort(),
   };

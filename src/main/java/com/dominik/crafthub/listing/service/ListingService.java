@@ -51,7 +51,7 @@ public class ListingService {
       Long id,
       int page,
       int size,
-      List<Long> mainCategoryIds,
+      Long mainCategoryId,
       List<Long> subCategoryIds,
       List<Short> cityIds,
       Double minPrice,
@@ -62,7 +62,7 @@ public class ListingService {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
     if (id == null) {
       return listingRepository.findAllListingsWithIsLiked(
-          userId, pageable, mainCategoryIds, subCategoryIds, cityIds, minPrice, maxPrice, query);
+          userId, pageable, mainCategoryId, subCategoryIds, cityIds, minPrice, maxPrice, query);
     } else {
       var searchedUser = userRepository.findById(id).orElse(null);
       if (searchedUser == null) {

@@ -80,7 +80,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         LEFT JOIN FavoriteEntity f
             ON f.listingEntity.id = l.id AND f.userEntity.id = :userId
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
-                AND (:mainCategoryIds IS NULL OR l.subCategoryEntity.mainCategoryEntity.id IN :mainCategoryIds)
+                AND (:mainCategoryId IS NULL OR l.subCategoryEntity.mainCategoryEntity.id = :mainCategoryId)
                 AND (:subCategoryIds IS NULL OR l.subCategoryEntity.id IN :subCategoryIds)
                 AND (:cityIds IS NULL OR l.cityEntity.id IN :cityIds)
                 AND (:query IS NULL OR FUNCTION('word_similarity',
@@ -95,7 +95,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
         SELECT COUNT(l)
         FROM ListingEntity l
         WHERE l.status <> com.dominik.crafthub.listing.entity.ListingStatusEnum.ARCHIVED
-                AND (:mainCategoryIds IS NULL OR l.subCategoryEntity.mainCategoryEntity.id IN :mainCategoryIds)
+                AND (:mainCategoryId IS NULL OR l.subCategoryEntity.mainCategoryEntity.id = :mainCategoryId)
                 AND (:subCategoryIds IS NULL OR l.subCategoryEntity.id IN :subCategoryIds)
                 AND (:cityIds IS NULL OR l.cityEntity.id IN :cityIds)
                 AND (:query IS NULL OR FUNCTION('word_similarity',
@@ -108,7 +108,7 @@ public interface ListingRepository extends JpaRepository<ListingEntity, Long> {
   Page<ListingsWithLikesDto> findAllListingsWithIsLiked(
       @Param("userId") Long userId,
       Pageable pageable,
-      @Param("mainCategoryIds") List<Long> mainCategoryIds,
+      @Param("mainCategoryId") Long mainCategoryId,
       @Param("subCategoryIds") List<Long> subCategoryIds,
       @Param("cityIds") List<Short> cityIds,
       @Param("minPrice") Double minPrice,

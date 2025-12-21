@@ -1,7 +1,7 @@
 import {City} from "@/app/types/city";
 
 export interface FilterState {
-  mainCategoryIds: number[];
+  mainCategoryId: number | null;
   subCategoryIds: number[];
   minPrice: string;
   maxPrice: string;
