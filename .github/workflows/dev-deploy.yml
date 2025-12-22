@@ -1,0 +1,17 @@
+name: Dev/staging deployment
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  dev-build:
+    uses: ./.github/workflows/build-workflow.yml
+    with:
+      ENVIRONMENT: dev
+
+  dev-deploy:
+    needs: dev-build
+    uses: ./.github/workflows/deploy-workflow.yml
+    with:
+      ENVIRONMENT: dev

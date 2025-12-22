@@ -2,7 +2,7 @@ spring:
   application:
     name: crafthub
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    url: ${DATABASE_URL}
     username: ${DB_USER}
     password: ${DB_PASS}
     driver-class-name: org.postgresql.Driver
