@@ -116,57 +116,58 @@ resource "google_compute_address" "cloud_run_egress_ip" {
   region = var.region
 }
 
+# Removed for cost saving reasons
 # Create SQL Second Generation Instance
-resource "google_sql_database_instance" "postgres_instance" {
-  name             = "madebyme-postgres-${var.environment}"
-  database_version = "POSTGRES_17"
-  region           = var.region
-
-  settings {
-    tier    = "db-f1-micro"
-    edition = "ENTERPRISE"
-    ip_configuration {
-      ipv4_enabled = true
-      # TODO: restrict this to specific IPs or VPC
-      authorized_networks {
-        name  = "internal"
-        value = "0.0.0.0/0"
-      }
-    }
-  }
-}
-
-resource "google_sql_database" "default" {
-  name     = "madebyme-db-${var.environment}"
-  instance = google_sql_database_instance.postgres_instance.name
-}
-
-variable "password_length" {
-  default = 15
-}
-
-resource "google_sql_user" "default" {
-  name     = "gcp-postgres-user-${var.environment}"
-  instance = google_sql_database_instance.postgres_instance.name
-  password = random_password.default.result
-}
-
-resource "random_password" "default" {
-  length  = var.password_length
-  special = false
-}
+# resource "google_sql_database_instance" "postgres_instance" {
+#   name             = "madebyme-postgres-${var.environment}"
+#   database_version = "POSTGRES_17"
+#   region           = var.region
+#
+#   settings {
+#     tier    = "db-f1-micro"
+#     edition = "ENTERPRISE"
+#     ip_configuration {
+#       ipv4_enabled = true
+#       # TODO: restrict this to specific IPs or VPC
+#       authorized_networks {
+#         name  = "internal"
+#         value = "0.0.0.0/0"
+#       }
+#     }
+#   }
+# }
+#
+# resource "google_sql_database" "default" {
+#   name     = "madebyme-db-${var.environment}"
+#   instance = google_sql_database_instance.postgres_instance.name
+# }
+#
+# variable "password_length" {
+#   default = 15
+# }
+#
+# resource "google_sql_user" "default" {
+#   name     = "gcp-postgres-user-${var.environment}"
+#   instance = google_sql_database_instance.postgres_instance.name
+#   password = random_password.default.result
+# }
+#
+# resource "random_password" "default" {
+#   length  = var.password_length
+#   special = false
+# }
 
 #####
 # OUTPUT
 #####
 
-locals {
-  postgres_user     = google_sql_user.default.name
-  postgres_password = google_sql_user.default.password
-  postgres_db       = google_sql_database.default.name
-  postgres_host     = google_sql_database_instance.postgres_instance.public_ip_address
-  postgres_port     = 5432
-}
+# locals {
+#   postgres_user     = google_sql_user.default.name
+#   postgres_password = google_sql_user.default.password
+#   postgres_db       = google_sql_database.default.name
+#   postgres_host     = google_sql_database_instance.postgres_instance.public_ip_address
+#   postgres_port     = 5432
+# }
 
 output "project_id" {
   value = var.project_id
@@ -184,20 +185,20 @@ output "artifacts_repo_url" {
   value = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.madebyme_artifacts.repository_id}"
 }
 
-output "postgres_user" {
-  value     = local.postgres_user
-  sensitive = true
-}
+# output "postgres_user" {
+#   value     = local.postgres_user
+#   sensitive = true
+# }
+#
+# output "postgres_password" {
+#   value     = local.postgres_password
+#   sensitive = true
+# }
 
-output "postgres_password" {
-  value     = local.postgres_password
-  sensitive = true
-}
-
-output "postgres_connection_string" {
-  value     = "jdbc:postgresql://${local.postgres_host}:${local.postgres_port}/${local.postgres_db}"
-  sensitive = true
-}
+# output "postgres_connection_string" {
+#   value     = "jdbc:postgresql://${local.postgres_host}:${local.postgres_port}/${local.postgres_db}"
+#   sensitive = true
+# }
 
 output "allocated_ip_uri" {
   value = local.is_prod ? google_compute_address.cloud_run_egress_ip[0].self_link : ""
