@@ -215,8 +215,8 @@ export default function CityDropdown(props: CityDropdownProps) {
                       selected
                         ? "bg-primary/5 text-primary"
                         : isHighlighted
-                          ? "bg-background text-slate-900"
-                          : "text-text-muted hover:bg-slate-50 hover:text-slate-900"
+                          ? "bg-background text-text-main"
+                          : "text-text-muted hover:bg-slate-50 hover:text-text-main"
                     }
                   `}>
                 {/* 2. CONDITIONALLY RENDER CHECKBOX */}
@@ -275,7 +275,7 @@ export default function CityDropdown(props: CityDropdownProps) {
           />
           <span
             className={`font-medium truncate ${
-              hasValue ? "text-slate-900" : "text-text-muted"
+              hasValue ? "text-text-main" : "text-text-muted"
             }`}>
             {renderTriggerText()}
           </span>

@@ -16,7 +16,7 @@ export default async function ChatRoomPage({
   }
 
   return (
-    <div className="h-screen bg-[#F8F9FE] font-sans text-slate-800 flex flex-col overflow-hidden">
+    <div className="h-screen bg-background font-sans text-text-main flex flex-col overflow-hidden">
       <SubHeader user={user} />
       <ChatRoom messageId={id} user={user} />
     </div>

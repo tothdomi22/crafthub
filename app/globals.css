@@ -1,43 +1,66 @@
 @import "tailwindcss";
 
 :root {
-    /* --- PALETTE --- */
-    --primary: #9f98ff;
-    --primary-hover: #887ef5;
+    /* --- LIGHT MODE PALETTE --- */
+    --primary: #9f98ff; /* Pastel Purple */
+    --primary-hover: #887ef5; /* Slightly darker for hover */
     --active: #7266e3;
+
     --secondary: #f5f4ff;
-    --border: #dcd9ff;
+    --border: rgba(244, 243, 255, 0.71);
+    --border-subtle: #f1f4f9;
     --primary-darker: #7B72E8;
     --background: #F8F9FE;
     --surface: #ffffff;
 
-    /* --- TEXT --- */
+    /* Text */
     --text-main: #1b1b26;
     --text-muted: #64748b;
 
-    /* --- HOVER STATES --- */
-    /* Light Mode: Matches slate-50 (#f8fafc) */
+    /* States */
     --bg-hover: #f8fafc;
+    --bg-disabled: #cbd5e1;
+
+    /* Danger */
+    --danger-bg: #fef2f2;
+    --danger-border: #fecaca;
+    --danger-text: #991b1b;
+    --danger-muted: #b91c1c;
+    --danger-solid: #dc2626;
 }
 
 .dark {
-    /* --- PALETTE RE-MAPPING --- */
-    --primary: #9f98ff;
-    --primary-hover: #b1abff;
-    --active: #887ef5;
+    /* --- DARK MODE PALETTE --- */
+
+    /* CHANGED: Deeper, richer purple. Less "neon" glare. */
+    --primary: #8176f2;
+
+    /* CHANGED: Hover becomes your original light color (creates a nice glow) */
+    --primary-hover: #9f98ff;
+
+    --active: #6f64d6; /* A bit deeper for active press */
+
     --secondary: #1b1b26;
     --border: #2f2f42;
+    --border-subtle: #262636;
     --primary-darker: #645bc2;
     --background: #0f0f13;
     --surface: #1b1b26;
 
-    /* --- TEXT --- */
+    /* Text */
     --text-main: #F8F9FE;
     --text-muted: #94a3b8;
 
-    /* --- HOVER STATES --- */
-    /* Dark Mode: Lighter indigo, visible on top of Surface (#1b1b26) */
+    /* States */
     --bg-hover: #2A2A36;
+    --bg-disabled: #2b2b36;
+
+    /* Danger */
+    --danger-bg: #2a1515;
+    --danger-border: #7f1d1d;
+    --danger-text: #fecaca;
+    --danger-muted: #fca5a5;
+    --danger-solid: #ef4444;
 }
 
 @theme {
@@ -47,6 +70,7 @@
     --color-active: var(--active);
     --color-secondary: var(--secondary);
     --color-border: var(--border);
+    --color-border-subtle: var(--border-subtle);
     --color-primaryDarker: var(--primary-darker);
     --color-background: var(--background);
     --color-surface: var(--surface);
@@ -55,8 +79,16 @@
     --color-text-main: var(--text-main);
     --color-text-muted: var(--text-muted);
 
-    /* Hovers */
+    /* States */
     --color-bg-hover: var(--bg-hover);
+    --color-bg-disabled: var(--bg-disabled);
+
+    /* Danger */
+    --color-danger-bg: var(--danger-bg);
+    --color-danger-border: var(--danger-border);
+    --color-danger-text: var(--danger-text);
+    --color-danger-muted: var(--danger-muted);
+    --color-danger-solid: var(--danger-solid);
 }
 
 @layer components {
@@ -68,6 +100,17 @@
 
     input[type="number"] {
         -moz-appearance: textfield;
+    }
+
+    /* Toastify Close Button */
+    .Toastify__close-button {
+        color: var(--text-muted) !important;
+        opacity: 0.7;
+    }
+
+    .Toastify__close-button:hover {
+        color: var(--text-main) !important;
+        opacity: 1;
     }
 }
 

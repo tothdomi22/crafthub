@@ -9,7 +9,7 @@ export default async function Header() {
   const user: User | null = await getCurrentUser();
 
   return (
-    <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border transition-all ">
+    <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-slate-200 dark:border-border-subtle dark transition-all ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* --- LEFT: LOGO --- */}
         <Link

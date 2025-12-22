@@ -134,32 +134,32 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
 
   // Shared Styles
   const inputClass =
-    "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none placeholder-slate-400 text-slate-800";
-  const labelClass = "block text-sm font-bold text-slate-700 mb-2";
+    "w-full px-4 py-3 bg-background border border-border-subtle rounded-xl focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none placehotext-text-muted text-text-main";
+  const labelClass = "block text-sm font-bold text-text-main mb-2";
 
   if (isFetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FE] font-sans text-slate-800 pb-32">
+    <div className="min-h-screen bg-background font-sans text-text-main pb-32">
       {/* --- UNIFIED HEADER --- */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 h-16 transition-all">
+      <nav className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border-subtle h-16 transition-all">
         <div className="max-w-3xl mx-auto px-4 h-full flex items-center justify-between relative">
           <button
             onClick={router.back}
-            className="group flex items-center gap-2 text-slate-500 hover:text-primary transition-colors px-3 py-2 rounded-xl hover:bg-slate-50">
+            className="group flex items-center gap-2 text-text-muted hover:text-primary transition-colors px-3 py-2 rounded-xl hover:bg-background">
             <ArrowBackSVG className="transition-transform group-hover:-translate-x-1" />
             <span className="hidden sm:inline font-semibold text-sm">
               Mégse
             </span>
           </button>
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-lg text-slate-900">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-lg text-text-main">
             Hirdetés szerkesztése
           </div>
           <div className="w-16" />
@@ -172,10 +172,10 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
           className="flex flex-col gap-6"
           onSubmit={e => e.preventDefault()}>
           {/* 1. PHOTOS */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <section className="bg-surface p-6 rounded-2xl shadow-sm border border-border">
             <div className="flex justify-between items-end mb-4">
-              <h2 className="text-xl font-bold text-slate-900">Képek</h2>
-              <span className="text-xs font-medium text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+              <h2 className="text-xl font-bold text-text-main">Képek</h2>
+              <span className="text-xs font-medium text-text-muted bg-background px-2 py-1 rounded-md border border-border">
                 {images.length} / 10
               </span>
             </div>
@@ -184,7 +184,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-slate-100">
+                  className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-border">
                   <img
                     src={img}
                     alt="Upload"
@@ -193,15 +193,15 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
-                    className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur rounded-full text-slate-400 hover:text-red-500 hover:bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-all">
+                    className="absolute top-2 right-2 p-2 bg-surface/90 backdrop-blur rounded-full text-text-muted hover:text-red-500 hover:bg-surface shadow-sm opacity-0 group-hover:opacity-100 transition-all">
                     <BinSVG />
                   </button>
                 </div>
               ))}
               <button
                 type="button"
-                className="aspect-square rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-primary/50 text-slate-400 flex flex-col items-center justify-center gap-3 transition-all group">
-                <div className="p-3 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                className="aspect-square rounded-xl border-2 border-dashed border-border bg-background hover:bg-border hover:border-primary/50 text-text-muted flex flex-col items-center justify-center gap-3 transition-all group">
+                <div className="p-3 bg-surface rounded-full shadow-sm group-hover:scale-110 transition-transform">
                   <AddPhotoSVG />
                 </div>
               </button>
@@ -209,8 +209,8 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
           </section>
 
           {/* 2. DETAILS */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-6">
-            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-50 pb-4">
+          <section className="bg-surface p-6 rounded-2xl shadow-sm border border-border flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-text-main border-b border-border pb-4">
               Adatok
             </h2>
 
@@ -248,7 +248,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
                       </option>
                     ))}
                   </select>
-                  <KeyBoardArrowDownSVG className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <KeyBoardArrowDownSVG className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 </div>
               </div>
 
@@ -259,7 +259,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
                     disabled={!selectedMainCategory}
                     value={selectedSubCategory?.id || ""}
                     onChange={e => handleSubCategoryChange(e.target.value)}
-                    className={`${inputClass} appearance-none cursor-pointer disabled:bg-slate-100`}>
+                    className={`${inputClass} appearance-none cursor-pointer disabled:bg-border-subtle`}>
                     <option value="">Válassz</option>
                     {subCategoriesData
                       ?.filter(
@@ -271,15 +271,15 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
                         </option>
                       ))}
                   </select>
-                  <KeyBoardArrowDownSVG className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <KeyBoardArrowDownSVG className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
                 </div>
               </div>
             </div>
           </section>
 
           {/* 3. PRICE & LOGISTICS */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-6">
-            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-50 pb-4">
+          <section className="bg-surface p-6 rounded-2xl shadow-sm border border-border flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-text-main border-b border-border pb-4">
               Ár & Szállítás
             </h2>
 
@@ -296,7 +296,7 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
                   type="number"
                   className={`${inputClass} pr-12`}
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted font-bold">
                   Ft
                 </span>
               </div>
@@ -315,22 +315,22 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
 
             <div
               onClick={() => setCanShip(!canShip)}
-              className={`group flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${canShip ? "border-primary bg-primary/5" : "border-slate-200 hover:bg-slate-50"}`}>
+              className={`group flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all ${canShip ? "border-primary bg-primary/5" : "border-border-subtle hover:bg-background"}`}>
               <div className="flex items-center gap-4">
                 <div
-                  className={`p-3 rounded-full ${canShip ? "bg-primary text-white" : "bg-slate-100 text-slate-400"}`}>
+                  className={`p-3 rounded-full ${canShip ? "bg-primary text-surface" : "bg-border-subtle text-text-muted"}`}>
                   <TruckSVG />
                 </div>
                 <div>
                   <div
-                    className={`font-bold ${canShip ? "text-primary" : "text-slate-900"}`}>
+                    className={`font-bold ${canShip ? "text-primary" : "text-text-main"}`}>
                     Csomagküldéssel is
                   </div>
                 </div>
               </div>
               <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${canShip ? "bg-primary border-primary" : "border-slate-300 bg-white"}`}>
-                {canShip && <CheckSVG className="text-white w-3.5 h-3.5" />}
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${canShip ? "bg-primary border-primary" : "border-border bg-surface"}`}>
+                {canShip && <CheckSVG className="text-surface w-3.5 h-3.5" />}
               </div>
             </div>
           </section>
@@ -338,14 +338,14 @@ export default function EditListing({params}: {params: Promise<{id: string}>}) {
       </main>
 
       {/* --- FOOTER --- */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-200 p-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-border-subtle p-4 z-40">
         <div className="max-w-3xl mx-auto">
           <button
             onClick={handleUpdateListing}
             disabled={isUpdating}
-            className="w-full bg-primary hover:bg-[#5b4cc4] text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
+            className="w-full bg-primary hover:bg-primary-hover text-surface font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed">
             {isUpdating && (
-              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              <span className="w-5 h-5 border-2 border-surface/30 border-t-surface rounded-full animate-spin"></span>
             )}
             Mentés
           </button>

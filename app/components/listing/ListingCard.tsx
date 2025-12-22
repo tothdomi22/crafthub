@@ -21,7 +21,7 @@ export default function ListingCard({
     return diffInDays <= 7;
   };
   return (
-    <div className="group bg-surface rounded-2xl border border-border shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full hover:-translate-y-1">
+    <div className="group bg-surface rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full hover:-translate-y-1">
       {/* Image Container */}
       <div className="relative aspect-[4/5] bg-surface overflow-hidden">
         <img
@@ -52,7 +52,7 @@ export default function ListingCard({
             ${
               listing.isLiked || isFavoritesPage
                 ? "bg-surface text-red-500 opacity-100"
-                : "bg-surface/80 text-text-muted opacity-0 group-hover:opacity-100 hover:bg-bg-hover hover:text-text-muted"
+                : "bg-surface/80 text-text-muted lg:opacity-0 group-hover:opacity-100 hover:bg-bg-hover hover:text-text-muted"
             }
           `}>
           <FavoriteSVG className={`w-5 h-5 transition-colors`} />

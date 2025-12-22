@@ -145,7 +145,7 @@ export default function ListingsPage({user}: {user: User | null}) {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* --- PAGE TITLE & MOBILE FILTER TOGGLE --- */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-slate-900">
+        <h1 className="text-xl font-bold text-text-main">
           {searchQuery ? `Találatok erre: "${searchQuery}"` : ""}
         </h1>
         <button
@@ -222,7 +222,9 @@ export default function ListingsPage({user}: {user: User | null}) {
           {!isLoading && listingData?.pages[0].content.length === 0 && (
             <div className="py-20 text-center bg-surface rounded-3xl border border-border border-dashed">
               <p className="text-text-muted font-medium">
-                Nem találtunk a szűrésnek megfelelő terméket.
+                {activeCount > 0
+                  ? "Nem találtunk a szűrésnek megfelelő terméket."
+                  : "Nincs megjeleníthető termék."}
               </p>
             </div>
           )}

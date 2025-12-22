@@ -100,23 +100,23 @@ export default function CreateListing() {
   };
 
   const inputClass =
-    "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none placeholder-slate-400 text-slate-800";
-  const labelClass = "block text-sm font-bold text-slate-700 mb-2";
+    "w-full px-4 py-3 bg-background border border-border rounded-xl focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none placeholder-text-muted text-text-main";
+  const labelClass = "block text-sm font-bold text-text-main mb-2";
 
   return (
-    <div className="min-h-screen bg-[#F8F9FE] font-sans text-slate-800 pb-32">
+    <div className="min-h-screen bg-background font-sans text-text-main pb-32">
       {/* --- HEADER --- */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 h-16 transition-all">
+      <nav className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border h-16 transition-all">
         <div className="max-w-3xl mx-auto px-4 h-full flex items-center justify-between relative">
           <button
             onClick={router.back}
-            className="group flex items-center gap-2 text-slate-500 hover:text-primary transition-colors px-3 py-2 rounded-xl hover:bg-slate-50">
+            className="group flex items-center gap-2 text-text-muted hover:text-primary transition-colors px-3 py-2 rounded-xl hover:bg-background">
             <ArrowBackSVG className="transition-transform group-hover:-translate-x-1" />
             <span className="hidden sm:inline font-semibold text-sm">
               Vissza
             </span>
           </button>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-lg text-slate-900">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-lg text-text-main">
             Új hirdetés
           </div>
           <div className="w-16" />
@@ -129,14 +129,14 @@ export default function CreateListing() {
           className="flex flex-col gap-6"
           onSubmit={e => e.preventDefault()}>
           {/* 1. PHOTOS (Placeholder) */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <section className="bg-surface p-6 rounded-2xl shadow-sm border border-border-subtle">
             <div className="flex justify-between items-end mb-4">
-              <h2 className="text-xl font-bold text-slate-900">Képek</h2>
-              <span className="text-xs font-medium text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+              <h2 className="text-xl font-bold text-text-main">Képek</h2>
+              <span className="text-xs font-medium text-text-muted bg-background px-2 py-1 rounded-md border border-border-subtle">
                 {images.length} / 10
               </span>
             </div>
-            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+            <p className="text-sm text-text-muted mb-6 leading-relaxed">
               Tölts fel jó minőségű képeket a termékedről. (A funkció jelenleg
               fejlesztés alatt).
             </p>
@@ -144,7 +144,7 @@ export default function CreateListing() {
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-slate-100">
+                  className="relative aspect-square rounded-xl overflow-hidden group shadow-sm border border-border-subtle">
                   <img
                     src={img}
                     alt="Upload"
@@ -153,15 +153,15 @@ export default function CreateListing() {
                   <button
                     type="button"
                     onClick={() => removeImage(idx)}
-                    className="absolute top-2 right-2 p-2 bg-white/90 rounded-full text-slate-400 hover:text-red-500">
+                    className="absolute top-2 right-2 p-2 bg-surface/90 rounded-full text-text-muted hover:text-red-500">
                     <BinSVG />
                   </button>
                 </div>
               ))}
               <button
                 type="button"
-                className="aspect-square rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 flex flex-col items-center justify-center gap-3 cursor-not-allowed opacity-60">
-                <div className="p-3 bg-white rounded-full shadow-sm text-current">
+                className="aspect-square rounded-xl border-2 border-dashed border-border bg-background text-text-muted flex flex-col items-center justify-center gap-3 cursor-not-allowed opacity-60">
+                <div className="p-3 bg-surface rounded-full shadow-sm text-current">
                   <AddPhotoSVG />
                 </div>
                 <span className="text-xs font-bold">Fotó hozzáadása</span>
@@ -170,8 +170,8 @@ export default function CreateListing() {
           </section>
 
           {/* 2. DETAILS */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-6">
-            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-50 pb-4">
+          <section className="bg-surface p-6 rounded-2xl shadow-sm border border-border-subtle flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-text-main border-b border-border-subtle pb-4">
               Termék részletei
             </h2>
 
@@ -232,8 +232,8 @@ export default function CreateListing() {
           </section>
 
           {/* 3. PRICE & LOCATION */}
-          <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-6">
-            <h2 className="text-xl font-bold text-slate-900 border-b border-slate-50 pb-4">
+          <section className="bg-surface p-6 rounded-2xl shadow-sm border border-border-subtle flex flex-col gap-6">
+            <h2 className="text-xl font-bold text-text-main border-b border-border-subtle pb-4">
               Ár & Szállítás
             </h2>
 
@@ -252,7 +252,7 @@ export default function CreateListing() {
                   min={0}
                   className={`${inputClass} pr-12 text-lg font-semibold`}
                 />
-                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-400 font-bold bg-slate-50 pl-2">
+                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-text-muted font-bold pl-2 bg-transparent">
                   Ft
                 </div>
               </div>
@@ -276,26 +276,26 @@ export default function CreateListing() {
               className={`group flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
                 canShip
                   ? "border-primary bg-primary/5 shadow-inner"
-                  : "border-slate-200 hover:border-primary/50 hover:bg-slate-50"
+                  : "border-border hover:border-primary/50 hover:bg-background"
               }`}>
               <div className="flex items-center gap-4">
                 <div
-                  className={`p-3 rounded-full transition-colors ${canShip ? "bg-primary text-white" : "bg-slate-100 text-slate-400"}`}>
+                  className={`p-3 rounded-full transition-colors ${canShip ? "bg-primary text-surface" : "bg-border-subtle text-text-muted"}`}>
                   <TruckSVG />
                 </div>
                 <div>
                   <div
-                    className={`font-bold transition-colors ${canShip ? "text-primary" : "text-slate-900"}`}>
+                    className={`font-bold transition-colors ${canShip ? "text-primary" : "text-text-main"}`}>
                     Csomagküldéssel is
                   </div>
-                  <div className="text-xs text-slate-500 mt-0.5">
+                  <div className="text-xs text-text-muted mt-0.5">
                     Ezt a terméket tudom postán/futárral küldeni
                   </div>
                 </div>
               </div>
               <div
-                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${canShip ? "bg-primary border-primary scale-110" : "border-slate-300 bg-white"}`}>
-                {canShip && <CheckSVG className="text-white w-3.5 h-3.5" />}
+                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${canShip ? "bg-primary border-primary scale-110" : "border-slate-300 bg-surface"}`}>
+                {canShip && <CheckSVG className="text-surface w-3.5 h-3.5" />}
               </div>
             </div>
           </section>
@@ -303,7 +303,7 @@ export default function CreateListing() {
       </main>
 
       {/* --- STICKY FOOTER --- */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-200 p-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-border p-4 z-40">
         <div className="max-w-3xl mx-auto flex gap-4">
           <button
             onClick={handleCreateListing}
@@ -312,12 +312,12 @@ export default function CreateListing() {
                 w-full font-bold py-4 rounded-xl shadow-lg transition-all text-lg flex justify-center items-center gap-2
                 ${
                   !isFormValid || isCreateListingMutationPending
-                    ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
-                    : "bg-primary hover:bg-[#5b4cc4] active:bg-active text-white shadow-primary/25 active:scale-[0.98]"
+                    ? "bg-bg-disabled text-text-muted cursor-not-allowed shadow-none"
+                    : "bg-primary hover:bg-primary-hover active:bg-active text-surface shadow-primary/25 active:scale-[0.98]"
                 }
             `}>
             {isCreateListingMutationPending && (
-              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              <span className="w-5 h-5 border-2 border-surface/30 border-t-surface rounded-full animate-spin"></span>
             )}
             Hirdetés létrehozása
           </button>

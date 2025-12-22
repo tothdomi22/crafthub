@@ -375,15 +375,16 @@ export default function Settings({user}: {user: User}) {
       </section>
 
       {/* 4. DANGER ZONE */}
-      <section className="bg-red-50 dark:bg-red-950 p-6 sm:p-8 rounded-3xl border border-red-100 dark:border-red-700">
+      <section className="bg-danger-bg p-6 sm:p-8 rounded-3xl border border-danger-border">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-surface text-red-500 rounded-full shadow-sm">
+          {/* Icon Box */}
+          <div className="p-2 bg-surface text-danger-solid rounded-full shadow-sm">
             <TrashSVG className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-bold text-red-900">Veszélyzóna</h2>
+          <h2 className="text-xl font-bold text-danger-text">Veszélyzóna</h2>
         </div>
 
-        <p className="text-red-700/80 mb-6 text-sm leading-relaxed">
+        <p className="text-danger-muted mb-6 text-sm leading-relaxed">
           A fiókod törlése végleges és nem visszavonható. Minden hirdetésed,
           üzeneted és értékelésed elvész.
         </p>
@@ -391,7 +392,13 @@ export default function Settings({user}: {user: User}) {
         <div className="flex justify-end">
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="bg-surface text-red-600 border border-red-200 hover:bg-red-600 hover:text-surface hover:border-red-600 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]">
+            className="
+        bg-surface
+        text-danger-solid
+        border border-danger-border
+        hover:bg-danger-solid hover:text-surface hover:border-danger-solid
+        px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]
+      ">
             Fiók végleges törlése
           </button>
         </div>

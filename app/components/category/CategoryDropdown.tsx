@@ -101,18 +101,18 @@ export default function CategoryDropdown<T extends CategoryItem>({
 
   // Reusable List Content
   const listContent = (
-    <div className="bg-white overflow-hidden flex flex-col h-full">
+    <div className="bg-surface overflow-hidden flex flex-col h-full">
       {/* Search Bar */}
-      <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+      <div className="p-3 border-b border-border-subtle bg-border-subtle/50">
         <div className="relative">
-          <SearchSVG className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <SearchSVG className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             ref={searchInputRef}
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Keresés..."
-            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-slate-400"
+            className="w-full pl-9 pr-4 py-2 bg-surface border border-border rounded-lg text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-text-muted"
           />
         </div>
       </div>
@@ -120,7 +120,7 @@ export default function CategoryDropdown<T extends CategoryItem>({
       {/* List */}
       <div className="max-h-[250px] overflow-y-auto p-1 scroll-smooth">
         {isLoading ? (
-          <div className="p-4 text-center text-slate-400 text-sm">
+          <div className="p-4 text-center text-text-muted text-sm">
             Betöltés...
           </div>
         ) : filteredData.length > 0 ? (
@@ -135,7 +135,7 @@ export default function CategoryDropdown<T extends CategoryItem>({
                     ${
                       isSelected
                         ? "bg-primary/5 text-primary"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        : "text-text-main hover:bg-border hover:text-text-main"
                     }
                 `}>
                 <span>{item.displayName}</span>
@@ -144,7 +144,7 @@ export default function CategoryDropdown<T extends CategoryItem>({
             );
           })
         ) : (
-          <div className="p-4 text-center text-slate-400 text-sm">
+          <div className="p-4 text-center text-text-muted text-sm">
             Nincs találat.
           </div>
         )}
@@ -162,20 +162,20 @@ export default function CategoryDropdown<T extends CategoryItem>({
         className={`w-full flex items-center justify-between px-4 text-left outline-none transition-all relative z-20
           ${
             disabled
-              ? "py-3 bg-slate-100 text-slate-400 border border-slate-200 rounded-xl cursor-not-allowed"
+              ? "py-3 bg-border-subtle text-text-muted border border-border rounded-xl cursor-not-allowed"
               : isOpen
-                ? `py-3 bg-white border border-primary ${position === "relative" ? "rounded-t-xl rounded-b-none border-b-0 pb-[13px]" : "rounded-xl shadow-sm"}`
-                : "py-3 bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-white text-slate-800 rounded-xl"
+                ? `py-3 bg-surface border border-primary ${position === "relative" ? "rounded-t-xl rounded-b-none border-b-0 pb-[13px]" : "rounded-xl shadow-sm"}`
+                : "py-3 bg-background border border-border hover:border-border hover:bg-surface text-text-main rounded-xl"
           }
         `}>
         <span
           className={`font-medium truncate ${
-            value ? "text-slate-800" : "text-slate-400"
+            value ? "text-text-main" : "text-text-muted"
           }`}>
           {value ? value.displayName : placeholder}
         </span>
         <KeyBoardArrowDownSVG
-          className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          className={`w-5 h-5 text-text-muted transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -183,7 +183,7 @@ export default function CategoryDropdown<T extends CategoryItem>({
       {position === "absolute" ? (
         // OPTION A: Floating Overlay
         isOpen && (
-          <div className="absolute top-full mt-2 left-0 w-full bg-white rounded-xl shadow-xl border border-primary overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute top-full mt-2 left-0 w-full bg-surface rounded-xl shadow-xl border border-primary overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
             {listContent}
           </div>
         )
@@ -194,7 +194,7 @@ export default function CategoryDropdown<T extends CategoryItem>({
             isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           }`}>
           <div
-            className={`overflow-hidden bg-white rounded-b-xl -mt-[1px] ${
+            className={`overflow-hidden bg-surface rounded-b-xl -mt-[1px] ${
               isOpen ? "border border-primary border-t-0 shadow-sm" : ""
             }`}>
             {listContent}

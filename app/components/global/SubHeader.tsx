@@ -26,7 +26,7 @@ export default function SubHeader({user}: {user: User}) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-surface/90 backdrop-blur-lg border-b border-border h-14 sm:h-16 transition-all supports-[backdrop-filter]:bg-surface/60">
+    <nav className="sticky top-0 z-50 bg-surface/90 backdrop-blur-lg border-b border-slate-200 dark:border-border-subtle h-14 sm:h-16 transition-all supports-[backdrop-filter]:bg-surface/60">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-full flex items-center justify-between relative">
         {/* --- LEFT: BACK BUTTON --- */}
         <div className="flex-shrink-0 z-10">
