@@ -2,6 +2,7 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {ReviewCreationRequest} from "@/app/types/review";
 import {listingKeys} from "@/app/queries/listing.queries";
 import {reviewKeys} from "@/app/queries/review.queries";
+import {notificationKeys} from "@/app/queries/notification.queries";
 
 export default function useCreateReview() {
   const queryClient = useQueryClient();
@@ -35,6 +36,7 @@ export default function useCreateReview() {
     onSuccess: async () => {
       await queryClient.invalidateQueries({queryKey: listingKeys.all});
       await queryClient.invalidateQueries({queryKey: reviewKeys.all});
+      await queryClient.invalidateQueries({queryKey: notificationKeys.all});
     },
   });
 }

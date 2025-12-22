@@ -1,28 +1,31 @@
 import React from "react";
 import Link from "next/link";
 
+interface BrandLogoProps {
+  variant?: "full" | "mobile-short";
+  colorMode?: "default" | "white"; // New prop
+}
+
 export default function BrandLogo({
   variant = "full",
-}: {
-  variant?: "full" | "mobile-short";
-}) {
+  colorMode = "default",
+}: BrandLogoProps) {
+  const textColor = colorMode === "white" ? "text-white" : "text-text-main";
+  const mutedColor =
+    colorMode === "white" ? "text-white/80" : "text-text-muted";
+
   return (
     <Link href="/" className="flex items-baseline gap-1 group select-none">
-      {/* LOGIC:
-         If variant is 'mobile-short', hide 'made' and 'by' on small screens (hidden sm:block).
-         If variant is 'full', always show them.
-      */}
       <span
-        className={`font-bold text-text-main tracking-tight group-hover:text-primary transition-colors duration-300 ${variant === "mobile-short" ? "hidden sm:block text-xl" : "text-2xl"}`}>
+        className={`font-bold tracking-tight transition-colors duration-300 ${textColor} ${variant === "mobile-short" ? "hidden sm:block text-xl" : "text-2xl"}`}>
         made
       </span>
 
       <span
-        className={`font-serif italic text-text-muted font-medium ${variant === "mobile-short" ? "hidden sm:block text-xl" : "text-2xl"}`}>
+        className={`font-serif italic font-medium ${mutedColor} ${variant === "mobile-short" ? "hidden sm:block text-xl" : "text-2xl"}`}>
         by
       </span>
 
-      {/* 'me' is always visible */}
       <div className="relative">
         <span
           className={`font-extrabold text-primary tracking-tight ${variant === "mobile-short" ? "text-xl sm:text-2xl" : "text-2xl"}`}>

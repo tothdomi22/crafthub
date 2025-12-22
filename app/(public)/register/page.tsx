@@ -6,6 +6,7 @@ import {useRouter} from "next/navigation";
 import Image from "next/image";
 import useRegister from "@/app/hooks/auth/useRegister";
 import {notifyError} from "@/app/utils/toastHelper";
+import BrandLogo from "@/app/components/global/BrandLogo"; // Import BrandLogo
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function RegisterPage() {
   ) => {
     setter(value);
     if (errorSetter) errorSetter("");
-    setGeneralError(""); // from component scope
+    setGeneralError("");
   };
 
   const handleRegister = async (e: FormEvent) => {
@@ -95,7 +96,6 @@ export default function RegisterPage() {
 
     registerMutation(data, {
       onSuccess: async () => {
-        // Give browser time to process Set-Cookie header
         await new Promise(resolve => setTimeout(resolve, 100));
         router.refresh();
         router.push("/");
@@ -105,7 +105,6 @@ export default function RegisterPage() {
         const backendMessage = error?.message;
 
         if (backendMessage) {
-          // Handle specific backend errors (e.g. "Email already exists")
           setGeneralError(backendMessage);
           notifyError("Regisztrációs hiba történt.");
         } else {
@@ -117,8 +116,8 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex bg-surface">
-      {/* --- LEFT SIDE: IMAGE --- */}
-      <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
+      {/* --- LEFT SIDE: IMAGE / BRANDING --- */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#0f0f13] relative overflow-hidden">
         <Image
           src={"/images/auth-image.webp"}
           alt={"Register image"}
@@ -127,20 +126,29 @@ export default function RegisterPage() {
           unoptimized
           className="object-cover opacity-60"
         />
-        <div className="relative z-10 flex flex-col justify-end p-12 w-full text-text-main h-full">
-          <div className="bg-surface/10 backdrop-blur-md border border-border/20 p-6 rounded-2xl max-w-md">
+        {/* Updated layout to space-between: Logo at top, Testimonial at bottom */}
+        <div className="relative z-10 flex flex-col justify-between p-12 w-full text-white h-full">
+          {/* Logo White Variant */}
+          <div>
+            <BrandLogo colorMode="white" />
+          </div>
+
+          {/* Testimonial Card */}
+          <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl max-w-md">
             <div className="flex gap-1 mb-2 text-yellow-400">
               {[1, 2, 3, 4, 5].map(i => (
                 <span key={i}>★</span>
               ))}
             </div>
-            <p className="text-lg font-medium italic mb-4">
+            <p className="text-lg font-medium italic mb-4 text-white/90">
               &#34;Végre egy hely, ahol értékelik a kézimunkát. Az eladások
               gyorsak, a közösség pedig támogató.&#34;
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-surface/20"></div>
-              <span className="font-bold text-sm">Anna, Keramikus</span>
+              <div className="w-8 h-8 rounded-full bg-white/20"></div>
+              <span className="font-bold text-sm text-white">
+                Anna, Keramikus
+              </span>
             </div>
           </div>
         </div>
@@ -148,7 +156,7 @@ export default function RegisterPage() {
 
       {/* --- RIGHT SIDE: FORM --- */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-surface">
-        <div className="w-full max-w-md bg-surface p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
+        <div className="w-full max-w-md bg-surface p-8 sm:p-10 rounded-3xl shadow-xl shadow-primary/5 lg:shadow-none lg:p-0 lg:bg-transparent">
           <div className="text-center lg:text-left mb-8">
             <h1 className="text-3xl font-bold text-text-main mb-2">
               Fiók létrehozása
@@ -160,19 +168,21 @@ export default function RegisterPage() {
 
           {/* --- GENERAL ERROR ALERT --- */}
           {generalError && (
-            <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <div className="mb-6 bg-danger-bg border border-danger-border text-danger-text px-4 py-3 rounded-xl text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="w-5 h-5 flex-shrink-0">
+                className="w-5 h-5 flex-shrink-0 text-danger-solid">
                 <path
                   fillRule="evenodd"
                   d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="font-medium">{generalError}</span>
+              <span className="font-medium text-danger-solid">
+                {generalError}
+              </span>
             </div>
           )}
 
@@ -190,14 +200,18 @@ export default function RegisterPage() {
                 onChange={e =>
                   handleInputChange(setName, e.target.value, setNameError)
                 }
-                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
-                  nameError
-                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-border focus:border-primary focus:ring-primary/10"
-                }`}
+                className={`
+                  w-full px-4 py-3.5 rounded-xl font-medium transition-all outline-none
+                  bg-bg-hover text-text-main placeholder:text-text-muted
+                  ${
+                    nameError
+                      ? "border border-danger-border focus:border-danger-solid focus:ring-4 focus:ring-danger-solid/10"
+                      : "border border-border focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  }
+                `}
               />
               {nameError && (
-                <p className="text-red-500 text-[13px] font-medium ml-1">
+                <p className="text-danger-solid text-[13px] font-medium ml-1">
                   {nameError}
                 </p>
               )}
@@ -216,14 +230,18 @@ export default function RegisterPage() {
                 onChange={e =>
                   handleInputChange(setEmail, e.target.value, setEmailError)
                 }
-                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
-                  emailError || generalError
-                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-border focus:border-primary focus:ring-primary/10"
-                }`}
+                className={`
+                  w-full px-4 py-3.5 rounded-xl font-medium transition-all outline-none
+                  bg-bg-hover text-text-main placeholder:text-text-muted
+                  ${
+                    emailError || generalError
+                      ? "border border-danger-border focus:border-danger-solid focus:ring-4 focus:ring-danger-solid/10"
+                      : "border border-border focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  }
+                `}
               />
               {emailError && (
-                <p className="text-red-500 text-[13px] font-medium ml-1">
+                <p className="text-danger-solid text-[13px] font-medium ml-1">
                   {emailError}
                 </p>
               )}
@@ -246,14 +264,18 @@ export default function RegisterPage() {
                     setPasswordError,
                   )
                 }
-                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
-                  passwordError
-                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-border focus:border-primary focus:ring-primary/10"
-                }`}
+                className={`
+                  w-full px-4 py-3.5 rounded-xl font-medium transition-all outline-none
+                  bg-bg-hover text-text-main placeholder:text-text-muted
+                  ${
+                    passwordError
+                      ? "border border-danger-border focus:border-danger-solid focus:ring-4 focus:ring-danger-solid/10"
+                      : "border border-border focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  }
+                `}
               />
               {passwordError && (
-                <p className="text-red-500 text-[13px] font-medium ml-1">
+                <p className="text-danger-solid text-[13px] font-medium ml-1">
                   {passwordError}
                 </p>
               )}
@@ -276,14 +298,18 @@ export default function RegisterPage() {
                     setConfirmPasswordError,
                   )
                 }
-                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
-                  confirmPasswordError
-                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-border focus:border-primary focus:ring-primary/10"
-                }`}
+                className={`
+                  w-full px-4 py-3.5 rounded-xl font-medium transition-all outline-none
+                  bg-bg-hover text-text-main placeholder:text-text-muted
+                  ${
+                    confirmPasswordError
+                      ? "border border-danger-border focus:border-danger-solid focus:ring-4 focus:ring-danger-solid/10"
+                      : "border border-border focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  }
+                `}
               />
               {confirmPasswordError && (
-                <p className="text-red-500 text-[13px] font-medium ml-1">
+                <p className="text-danger-solid text-[13px] font-medium ml-1">
                   {confirmPasswordError}
                 </p>
               )}
@@ -303,15 +329,19 @@ export default function RegisterPage() {
                       setTermsError,
                     )
                   }
-                  className={`mt-1 w-4 h-4 text-primary border-border rounded focus:ring-primary accent-primary cursor-pointer ${
-                    termsError
-                      ? "outline-2 outline-red-500 outline-offset-1"
-                      : ""
-                  }`}
+                  className={`
+                    mt-1 w-4 h-4 rounded cursor-pointer accent-primary
+                    text-primary border-border focus:ring-primary
+                    ${
+                      termsError
+                        ? "outline-2 outline-danger-solid outline-offset-1"
+                        : ""
+                    }
+                  `}
                 />
                 <label
                   htmlFor="terms"
-                  className={`text-xs cursor-pointer select-none ${termsError ? "text-red-500" : "text-text-muted"}`}>
+                  className={`text-xs cursor-pointer select-none ${termsError ? "text-danger-solid" : "text-text-muted"}`}>
                   Elolvastam és elfogadom az{" "}
                   <span className="text-primary font-bold hover:underline">
                     Adatkezelési Tájékoztatót
@@ -323,9 +353,8 @@ export default function RegisterPage() {
                   .
                 </label>
               </div>
-              {/* Optional: explicit error text for terms */}
               {termsError && (
-                <p className="text-red-500 text-[11px] font-medium mt-1 ml-7">
+                <p className="text-danger-solid text-[11px] font-medium mt-1 ml-7">
                   {termsError}
                 </p>
               )}
@@ -335,9 +364,9 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-primary hover:bg-primary-hover text-surface py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
+              className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:bg-bg-disabled disabled:text-text-muted disabled:shadow-none disabled:cursor-not-allowed mt-4">
               {isPending ? (
-                <div className="w-5 h-5 border-2 border-border/30 border-t-surface rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 "Regisztráció"
               )}
@@ -349,7 +378,7 @@ export default function RegisterPage() {
             Már van fiókod?{" "}
             <Link
               href="/login"
-              className="text-primary font-bold hover:underline">
+              className="text-primary font-bold hover:underline decoration-2 underline-offset-4">
               Jelentkezz be
             </Link>
           </div>
