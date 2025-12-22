@@ -1,19 +1,17 @@
 name: Build and push to GCP Artifact Registry
 on:
   workflow_call:
-    secrets:
-      GCP_KEY:
-        required: true
-      GCP_PROJECT_ID:
+    inputs:
+      ENVIRONMENT:
+        type: string
         required: true
 
 env:
-  GCP_KEY: ${{ secrets.GCP_KEY }}
   REGION: europe-west6
-  IMG_URL: europe-west6-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts
 
 jobs:
   build:
+    environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,9 +44,9 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.IMG_URL }}/${{ matrix.end }}:${{ github.sha }}
-            ${{ env.IMG_URL }}/${{ matrix.end }}:latest
-          cache-from: type=registry,ref=${{ env.IMG_URL }}/${{ matrix.end }}:buildcache
-          cache-to: type=registry,ref=${{ env.IMG_URL }}/${{ matrix.end }}:buildcache,mode=max
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:${{ github.sha }}
+            ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:latest
+          cache-from: type=registry,ref=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:buildcache,mode=max
           secrets: |
-            google_credentials=${{ env.GCP_KEY }}
+            google_credentials=${{ secrets.GCP_KEY }}
