@@ -30,11 +30,12 @@ export default function useManageFavorite() {
       }
       return responseJson;
     },
-    onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({queryKey: listingKeys.infinite()});
-      await queryClient.invalidateQueries({
-        queryKey: listingKeys.detail(variables.listingId),
-      });
+    onSuccess: async () => {
+      // await queryClient.invalidateQueries({queryKey: listingKeys.infinite()});
+      // await queryClient.invalidateQueries({
+      //   queryKey: listingKeys.detail(variables.listingId),
+      // });
+      await queryClient.invalidateQueries({queryKey: listingKeys.all});
       await queryClient.invalidateQueries({queryKey: favoriteKeys.all});
     },
   });

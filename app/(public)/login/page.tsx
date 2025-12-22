@@ -7,6 +7,7 @@ import Image from "next/image";
 import useLogin from "@/app/hooks/auth/useLogin";
 import HideCredentialsSVG from "/public/svgs/hide-credentials.svg";
 import ShowCredentialsSVG from "/public/svgs/show-credentials.svg";
+import BrandLogo from "@/app/components/global/BrandLogo"; // Import Logo
 
 export default function LoginPage() {
   const router = useRouter();
@@ -73,7 +74,6 @@ export default function LoginPage() {
 
     loginMutation(data, {
       onSuccess: async () => {
-        // Give browser time to process Set-Cookie header
         await new Promise(resolve => setTimeout(resolve, 50));
         router.refresh();
         router.push("/");
@@ -93,7 +93,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex bg-surface">
       {/* --- LEFT SIDE: IMAGE / BRANDING --- */}
-      <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
+      {/* Updated bg-slate-900 -> bg-background (Dark Mode will handle contrast) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#0f0f13] relative overflow-hidden">
         <Image
           src="/images/auth-image.webp"
           alt={"Register image"}
@@ -103,7 +104,11 @@ export default function LoginPage() {
           className="object-cover opacity-60"
         />
         <div className="relative z-10 flex flex-col justify-between p-12 w-full text-white">
-          <div className="font-bold text-2xl tracking-wider">ARTISAN</div>
+          {/* REPLACED: Hardcoded text -> BrandLogo White Variant */}
+          <div>
+            <BrandLogo colorMode="white" />
+          </div>
+
           <div className="mb-12">
             <h2 className="text-4xl font-bold mb-4 leading-tight">
               Találd meg az egyedi
@@ -119,7 +124,7 @@ export default function LoginPage() {
 
       {/* --- RIGHT SIDE: FORM --- */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-surface">
-        <div className="w-full max-w-md bg-surface p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
+        <div className="w-full max-w-md bg-surface p-8 sm:p-10 rounded-3xl shadow-xl shadow-primary/5 lg:shadow-none lg:p-0 lg:bg-transparent">
           <div className="text-center lg:text-left mb-8">
             <h1 className="text-3xl font-bold text-text-main mb-2">
               Üdv újra!
@@ -131,19 +136,21 @@ export default function LoginPage() {
 
           {/* --- GENERAL ERROR ALERT --- */}
           {generalError && (
-            <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <div className="mb-6 bg-danger-bg border border-danger-border text-danger-text px-4 py-3 rounded-xl text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="w-5 h-5 flex-shrink-0">
+                className="w-5 h-5 flex-shrink-0 text-danger-solid">
                 <path
                   fillRule="evenodd"
                   d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="font-medium">{generalError}</span>
+              <span className="font-medium text-danger-solid">
+                {generalError}
+              </span>
             </div>
           )}
 
@@ -154,22 +161,25 @@ export default function LoginPage() {
                 Email cím
               </label>
               <input
-                type="email" // Keep this! It ensures mobile keyboards show the "@" symbol
+                type="email"
                 name="email"
                 placeholder="pelda@email.hu"
                 value={email}
                 onChange={e =>
                   handleInputChange(setEmail, e.target.value, setEmailError)
                 }
-                // Removed 'required' attribute just to be safe, though noValidate overrides it
-                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
-                  emailError || generalError
-                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-border focus:border-primary focus:ring-primary/10"
-                }`}
+                className={`
+                  w-full px-4 py-3.5 rounded-xl font-medium transition-all outline-none
+                  bg-bg-hover text-text-main placeholder:text-text-muted
+                  ${
+                    emailError || generalError
+                      ? "border border-danger-border focus:border-danger-solid focus:ring-4 focus:ring-danger-solid/10"
+                      : "border border-border focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  }
+                `}
               />
               {emailError && (
-                <p className="text-red-500 text-[13px] font-medium ml-1">
+                <p className="text-danger-solid text-[13px] font-medium ml-1">
                   {emailError}
                 </p>
               )}
@@ -184,7 +194,7 @@ export default function LoginPage() {
                 <Link
                   href="/forgot-password"
                   tabIndex={-1}
-                  className="text-xs font-bold text-primary hover:text-[#5b4cc4] transition-colors">
+                  className="text-xs font-bold text-primary hover:text-primary-hover transition-colors">
                   Elfelejtetted?
                 </Link>
               </div>
@@ -201,11 +211,15 @@ export default function LoginPage() {
                       setPasswordError,
                     )
                   }
-                  className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium pr-12 ${
-                    passwordError || generalError
-                      ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
-                      : "border-border focus:border-primary focus:ring-primary/10"
-                  }`}
+                  className={`
+                    w-full px-4 py-3.5 rounded-xl font-medium transition-all outline-none pr-12
+                    bg-bg-hover text-text-main placeholder:text-text-muted
+                    ${
+                      passwordError || generalError
+                        ? "border border-danger-border focus:border-danger-solid focus:ring-4 focus:ring-danger-solid/10"
+                        : "border border-border focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10"
+                    }
+                  `}
                 />
                 <button
                   type="button"
@@ -219,7 +233,7 @@ export default function LoginPage() {
                 </button>
               </div>
               {passwordError && (
-                <p className="text-red-500 text-[13px] font-medium ml-1">
+                <p className="text-danger-solid text-[13px] font-medium ml-1">
                   {passwordError}
                 </p>
               )}
@@ -229,9 +243,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-primary hover:bg-[#5b4cc4] text-surface py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
+              className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:bg-bg-disabled disabled:text-text-muted disabled:shadow-none disabled:cursor-not-allowed mt-4">
               {isPending ? (
-                <div className="w-5 h-5 border-2 border-border border-t-surface rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 "Bejelentkezés"
               )}
@@ -243,7 +257,7 @@ export default function LoginPage() {
             Nincs még fiókod?{" "}
             <Link
               href="/register"
-              className="text-primary font-bold hover:underline">
+              className="text-primary font-bold hover:underline decoration-2 underline-offset-4">
               Regisztrálj ingyen
             </Link>
           </div>

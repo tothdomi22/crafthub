@@ -45,12 +45,12 @@ export default function MessagesInbox({user}: {user: User}) {
                     href={`/messages/${conv.conversation.id}`}
                     className={`group flex gap-4 p-4 rounded-xl border transition-all hover:shadow-md ${
                       !conv.isRead
-                        ? "bg-bg-hover/50 border-primary/10"
+                        ? "bg-primary/5 border-primary/20" // UPDATED: Soft purple tint for unread
                         : "bg-surface border-border-subtle hover:border-primary/30"
                     }`}>
                     {/* Avatar */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold text-lg border border-primary/30 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold text-lg border border-primary/10 group-hover:scale-105 transition-transform">
                         {otherUser.name.charAt(0)}
                       </div>
                     </div>
@@ -118,11 +118,11 @@ export default function MessagesInbox({user}: {user: User}) {
         </div>
 
         {/* --- RIGHT COLUMN: WELCOME / STATS (4/12) --- */}
-        {/* Matches the layout of the Chat Page's Sidebar */}
         <div className="hidden lg:flex lg:col-span-4 flex-col gap-4">
           {/* Info Card */}
           <div className="bg-surface rounded-2xl shadow-sm border border-border-subtle p-6 flex flex-col items-center text-center h-full max-h-[400px] justify-center">
-            <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center text-primary mb-4">
+            {/* UPDATED: Matches Avatar style (bg-primary/10) */}
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
               <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
               </svg>
