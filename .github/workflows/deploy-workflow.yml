@@ -1,0 +1,58 @@
+name: Deploy to GCP Cloud Run
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        type: string
+        required: true
+      VERSION:
+        type: string
+        required: false
+
+env:
+  REGION: europe-west6
+  GCP_KEY: ${{ secrets.GCP_KEY }}
+
+jobs:
+  deploy:
+    environment: ${{inputs.ENVIRONMENT}}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "hashicorp/setup-terraform@v3"
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_KEY }}"
+          export_environment_variables: true
+          create_credentials_file: true
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v2"
+
+      - name: Terraform initialise cloud_run
+        id: init
+        run: |
+          terraform -chdir=terraform/deploy init -reconfigure \
+          -backend-config="bucket=madebyme-tf-state-${{inputs.ENVIRONMENT}}" \
+          -backend-config="prefix=deploy"
+
+      - name: Select workspace
+        id: workspace
+        run: |
+          terraform -chdir=terraform/deploy workspace \
+          select -or-create ${{inputs.ENVIRONMENT}}
+
+      - name: Terraform apply deploy
+        id: apply
+        run: |-
+          terraform -chdir=terraform/deploy apply \
+          -var="git_sha=${{ github.sha }}" \
+          -var="DATABASE_URL=${{secrets.DATABASE_URL}}" \
+          -var="DB_USER=${{secrets.DB_USER}}" \
+          -var="DB_PASS=${{secrets.DB_PASS}}" \
+          -var="CUSTOM_DOMAIN=${{ secrets.CUSTOM_DOMAIN }}" \
+          -var="JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+          -auto-approve

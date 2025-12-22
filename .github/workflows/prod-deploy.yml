@@ -1,0 +1,21 @@
+name: Production deployment
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  prod-build:
+    uses: ./.github/workflows/build-workflow.yml
+    secrets: inherit
+    with:
+      ENVIRONMENT: prod
+
+  prod-deploy:
+    needs: prod-build
+    uses: ./.github/workflows/deploy-workflow.yml
+    secrets: inherit
+    with:
+      VERSION: ${{ github.ref_name }}
+      ENVIRONMENT: prod
