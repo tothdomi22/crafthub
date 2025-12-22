@@ -1,0 +1,19 @@
+name: Dev/staging deployment
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  dev-build:
+    uses: ./.github/workflows/build-workflow.yml
+    secrets:
+      GCP_KEY: ${{ secrets.GCP_KEY_DEV }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID_DEV }}
+
+  dev-deploy:
+    needs: dev-build
+    uses: ./.github/workflows/deploy-workflow.yml
+    secrets: inherit
+    with:
+      ENVIRONMENT: dev
