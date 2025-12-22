@@ -208,6 +208,10 @@ resource "google_cloud_run_v2_service" "frontend" {
         name  = "API_BASE_URL"
         value = google_cloud_run_v2_service.backend.urls[0]
       }
+      env {
+        name  = "JWT_SECRET"
+        value = var.JWT_SECRET
+      }
       startup_probe {
         initial_delay_seconds = 10
         timeout_seconds       = 1
