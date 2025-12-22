@@ -89,6 +89,7 @@
     --color-danger-text: var(--danger-text);
     --color-danger-muted: var(--danger-muted);
     --color-danger-solid: var(--danger-solid);
+    --font-brand: var(--font-brand);
 }
 
 @layer components {

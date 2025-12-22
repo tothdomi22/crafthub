@@ -4,10 +4,10 @@ import React from "react";
 import ArrowBackSVG from "/public/svgs/arrow-back.svg";
 import ShareSVG from "/public/svgs/share.svg";
 import {useRouter} from "next/navigation";
-import Link from "next/link";
 import {User} from "@/app/types/user";
 import {notifyError, notifySuccess} from "@/app/utils/toastHelper";
 import HeaderRightActions from "@/app/components/global/HeaderRightActions";
+import BrandLogo from "@/app/components/global/BrandLogo";
 
 export default function SubHeader({user}: {user: User}) {
   const router = useRouter();
@@ -26,38 +26,35 @@ export default function SubHeader({user}: {user: User}) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-surface/90 backdrop-blur-lg border-b border-slate-200 dark:border-border-subtle h-14 sm:h-16 transition-all supports-[backdrop-filter]:bg-surface/60">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-full flex items-center justify-between relative">
-        {/* --- LEFT: BACK BUTTON --- */}
-        <div className="flex-shrink-0 z-10">
+    <nav className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border-subtle h-14 sm:h-16 transition-all">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+        {/* --- LEFT SIDE: BACK + LOGO --- */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 z-10">
+          {/* 1. Back Button */}
           <button
             onClick={() => router.back()}
-            className="group flex items-center justify-center sm:justify-start gap-1.5 text-text-muted hover:text-primary transition-colors p-2 sm:px-3 sm:py-2 rounded-xl hover:bg-bg-hover active:bg-secondary"
+            className="group flex items-center justify-center sm:justify-start gap-1.5 text-text-muted hover:text-text-main transition-colors p-2 -ml-2 rounded-xl hover:bg-bg-hover active:bg-surface"
             aria-label="Vissza">
-            <ArrowBackSVG className="w-6 h-6 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
-            <span className="hidden sm:inline font-semibold text-sm">
-              Vissza
-            </span>
+            <ArrowBackSVG className="w-6 h-6 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span className="hidden sm:inline font-bold text-sm">Vissza</span>
           </button>
+
+          {/* Divider (Visual separation) */}
+          <div className="h-5 w-px bg-border-subtle hidden sm:block"></div>
+
+          {/* 2. Brand Logo (Left Aligned) */}
+          {/* We keep 'mobile-short' here so on tiny phones it's just 'me.' next to the arrow */}
+          <div className="pb-1">
+            <BrandLogo variant="mobile-short" />
+          </div>
         </div>
 
-        {/* --- CENTER: BRAND (Absolute) --- */}
-        {/* HIDDEN ON MOBILE: explicit 'hidden sm:flex' to prevent overlap */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden sm:flex items-center justify-center pointer-events-none">
-          <Link
-            href="/"
-            className="flex items-center gap-2 group pointer-events-auto">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary rounded-xl flex items-center justify-center shadow-sm group-hover:bg-primary-hover transition-colors">
-              <span className="text-surface font-serif font-bold text-lg sm:text-xl">
-                A
-              </span>
-            </div>
-          </Link>
-        </div>
+        {/* --- CENTER: EMPTY --- */}
+        {/* You can put a Page Title here later if you want */}
+        <div className="flex-1"></div>
 
-        {/* --- RIGHT: ACTIONS --- */}
-        {/* Increased gap from 1 to 3 for breathing room */}
-        <div className="flex items-center gap-3 flex-shrink-0 z-10">
+        {/* --- RIGHT SIDE: ACTIONS --- */}
+        <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0 z-10">
           <button
             onClick={copyURL}
             className="text-text-muted hover:text-primary p-2 rounded-xl hover:bg-bg-hover transition-colors active:scale-95"
@@ -65,10 +62,7 @@ export default function SubHeader({user}: {user: User}) {
             <ShareSVG className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          {/* Divider - Hidden on mobile to save space */}
-          <div className="hidden sm:block h-5 w-px bg-text-muted mx-1"></div>
-
-          {/* User Actions */}
+          <div className="hidden sm:block h-5 w-px bg-border-subtle mx-1"></div>
           <HeaderRightActions user={user} />
         </div>
       </div>

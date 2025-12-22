@@ -1,24 +1,28 @@
 import type {Metadata} from "next";
-import {Geist, Geist_Mono} from "next/font/google";
+import {Inter, Outfit} from "next/font/google";
 import "./globals.css";
 import React from "react";
 import QueryProvider from "@/app/providers/QueryProvider";
 import {ToastContainer} from "react-toastify";
 import {ThemeProvider} from "next-themes";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({subsets: ["latin"], variable: "--font-inter"});
+const outfit = Outfit({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-brand",
+  weight: ["700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Crafthub",
-  description: "Buy and sell for artisans",
+  title: {
+    template: "%s | madebyme",
+    default: "madebyme - Egyedi kézműves piactér",
+  },
+  description:
+    "Fedezd fel a legkülönlegesebb kézműves termékeket, közvetlenül az alkotóktól.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -27,9 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="light ">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="hu" suppressHydrationWarning className="light ">
+      <body className={`${inter.variable} ${outfit.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <QueryProvider>{children}</QueryProvider>
           <ToastContainer />
