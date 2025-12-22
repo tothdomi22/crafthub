@@ -118,7 +118,7 @@ jq -c . madebyme-$ENVIRONMENT-key.json > madebyme-$ENVIRONMENT-key-flat.json
 Save them to GitHub secrets for the respective environments as in this table:
 
 | Env Variable   | dev                                  | prod                                  |
-|----------------|--------------------------------------|---------------------------------------|
+| -------------- | ------------------------------------ | ------------------------------------- |
 | GCP_KEY(\*)    | madebyme-dev-key-flat.json (content) | madebyme-prod-key-flat.json (content) |
 | GCP_PROJECT_ID | madebyme-project-dev                 | madebyme-project-prod                 |
 | DATABASE_URL   | \*\*\*                               | \*\*\*                                |
