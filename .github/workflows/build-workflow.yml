@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        end: [be, fe]
+        end: [ be, fe ]
 
     steps:
       - uses: "actions/checkout@v4"
@@ -46,6 +46,8 @@ jobs:
           tags: |
             ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:${{ github.sha }}
             ${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:latest
+          build-args: |
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
           cache-from: type=registry,ref=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:buildcache
           cache-to: type=registry,ref=${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/madebyme-artifacts/${{ matrix.end }}:buildcache,mode=max
           secrets: |
