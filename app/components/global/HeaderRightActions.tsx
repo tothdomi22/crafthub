@@ -17,17 +17,17 @@ export default function HeaderRightActions({user}: {user: User | null}) {
         <>
           {/* Create Listing CTA (Desktop) */}
           <Link href={"/create-listing"} className="hidden lg:block mr-2">
-            <button className="bg-primary hover:bg-[#5b4cc4] text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
+            <button className="bg-primary hover:bg-primary-hover text-surface px-5 py-2.5 rounded-xl text-sm font-semibold shadow-sm hover:shadow-md transition-all active:scale-[0.98]">
               Termék eladása
             </button>
           </Link>
 
           {/* Messages Button */}
           <Link href="/messages">
-            <button className="relative p-2.5 text-slate-500 hover:text-primary hover:bg-slate-50 rounded-xl transition-all">
+            <button className="relative p-2.5 text-text-muted hover:text-primary hover:bg-bg-hover rounded-xl transition-all">
               <ChatSVG className="w-6 h-6" />
               {notificationsData?.unreadMessage && (
-                <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white ring-1 ring-white"></span>
+                <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-border ring-1 ring-border"></span>
               )}
             </button>
           </Link>
@@ -42,12 +42,12 @@ export default function HeaderRightActions({user}: {user: User | null}) {
         /* Logged Out State */
         <div className="flex items-center gap-2">
           <Link href="/login">
-            <button className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:text-primary transition-colors">
+            <button className="px-4 py-2.5 text-sm font-bold text-text-muted hover:text-primary transition-colors">
               Belépés
             </button>
           </Link>
           <Link href="/register">
-            <button className="hidden sm:block px-4 py-2.5 text-sm font-bold bg-primary hover:bg-[#5b4cc4] text-white rounded-xl transition-colors shadow-sm">
+            <button className="hidden sm:block px-4 py-2.5 text-sm font-bold bg-primary hover:bg-primary-hover text-surface rounded-xl transition-colors shadow-sm">
               Regisztráció
             </button>
           </Link>

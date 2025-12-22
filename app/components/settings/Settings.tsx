@@ -24,9 +24,9 @@ import useDeleteUser from "@/app/hooks/user/useDeleteUser";
 import {profileUserQuery} from "@/app/queries/profile.queries";
 import CityDropdown from "@/app/components/city/CityDropdown";
 import {cityListQuery} from "@/app/queries/city.queries";
+import DarkModeToggle from "@/app/components/global/ToggleDarkMode";
 
 export default function Settings({user}: {user: User}) {
-  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -158,43 +158,43 @@ export default function Settings({user}: {user: User}) {
 
   // Styles
   const labelClass =
-    "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1";
+    "block text-xs font-bold text-text-muted uppercase tracking-wider mb-2 ml-1";
   const inputClass =
-    "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-slate-800 font-medium placeholder-slate-400";
+    "w-full px-4 py-3 bg-background border border-border rounded-xl focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-text-main font-medium placeholder-text-muted";
   const sectionClass =
-    "bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 mb-8";
+    "bg-surface p-6 sm:p-8 rounded-3xl shadow-sm border border-border mb-8";
 
   if (!profileData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 bg-slate-200 rounded-full mb-4"></div>
-          <div className="h-4 w-32 bg-slate-200 rounded"></div>
+          <div className="h-12 w-12 bg-secondary rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-secondary rounded"></div>
         </div>
       </div>
     );
   }
   return (
     <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-3xl font-bold text-slate-900 mb-2">Beállítások</h1>
-      <p className="text-slate-500 mb-8">
+      <h1 className="text-3xl font-bold text-text-main mb-2">Beállítások</h1>
+      <p className="text-text-muted mb-8">
         Kezeld a profilodat és a biztonsági beállításaidat.
       </p>
 
       {/* 1. PROFILE SETTINGS */}
       <section className={sectionClass}>
-        <div className="flex items-center gap-3 mb-6 border-b border-slate-50 pb-4">
-          <div className="p-2 bg-indigo-50 text-primary rounded-full">
+        <div className="flex items-center gap-3 mb-6 border-b border-border pb-4">
+          <div className="p-2 bg-secondary text-primary rounded-full">
             <UserSVG className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Profil adatok</h2>
+          <h2 className="text-xl font-bold text-text-main">Profil adatok</h2>
         </div>
 
         <form onSubmit={handleUpdateProfile}>
           {/* Avatar Upload */}
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
             <div className="relative group cursor-pointer">
-              <div className="w-24 h-24 rounded-full bg-slate-200 border-4 border-white shadow-sm overflow-hidden relative">
+              <div className="w-24 h-24 rounded-full bg-slate-200 border-4 border-surface shadow-sm overflow-hidden relative">
                 {/* Replace with actual User Image */}
                 <Image
                   src="/images/placeholder.jpg"
@@ -205,18 +205,18 @@ export default function Settings({user}: {user: User}) {
                 />
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <CameraSVG className="w-8 h-8 text-white" />
+                  <CameraSVG className="w-8 h-8 text-surface" />
                 </div>
               </div>
               <button
                 type="button"
-                className="absolute bottom-0 right-0 p-1.5 bg-primary text-white rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform">
+                className="absolute bottom-0 right-0 p-1.5 bg-primary text-surface rounded-full border-2 border-surface shadow-sm hover:scale-110 transition-transform">
                 <EditSVG className="w-3 h-3" />
               </button>
             </div>
             <div className="text-center sm:text-left">
-              <h3 className="font-bold text-slate-900">Profilkép módosítása</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-xs">
+              <h3 className="font-bold text-text-main">Profilkép módosítása</h3>
+              <p className="text-xs text-text-muted mt-1 max-w-xs">
                 Megengedett formátumok: JPG, PNG. Maximum méret: 2MB.
               </p>
             </div>
@@ -264,9 +264,9 @@ export default function Settings({user}: {user: User}) {
               type="email"
               value={profile.email}
               disabled
-              className={`${inputClass} bg-slate-100 text-slate-500 cursor-not-allowed`}
+              className={`${inputClass} bg-background text-text-muted cursor-not-allowed`}
             />
-            <p className="text-[11px] text-slate-400 mt-1.5 ml-1">
+            <p className="text-[11px] text-text-muted mt-1.5 ml-1">
               Az email cím megváltoztatásához vedd fel a kapcsolatot az
               ügyfélszolgálattal.
             </p>
@@ -285,7 +285,7 @@ export default function Settings({user}: {user: User}) {
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all active:scale-[0.98] disabled:opacity-70 flex items-center gap-2">
+              className="bg-primary hover:bg-primary-hover text-surface px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-all active:scale-[0.98] disabled:opacity-70 flex items-center gap-2">
               {isLoading ? "Mentés..." : "Változtatások mentése"}
             </button>
           </div>
@@ -294,44 +294,33 @@ export default function Settings({user}: {user: User}) {
 
       {/* 2. PREFERENCES (Dark Mode) */}
       <section className={sectionClass}>
-        <div className="flex items-center gap-3 mb-6 border-b border-slate-50 pb-4">
+        <div className="flex items-center gap-3 mb-6 border-b border-border pb-4">
           <div className="p-2 bg-indigo-50 text-primary rounded-full">
             <MoonSVG className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Megjelenés</h2>
+          <h2 className="text-xl font-bold text-text-main">Megjelenés</h2>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-slate-900">Sötét mód</h3>
-            <p className="text-sm text-slate-500 mt-1">
+            <h3 className="font-bold text-text-main">Sötét mód</h3>
+            <p className="text-sm text-text-muted mt-1">
               Kíméld a szemed gyenge fényviszonyok mellett.
             </p>
           </div>
 
           {/* Custom Toggle Switch */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`relative w-14 h-8 rounded-full transition-colors duration-300 ${darkMode ? "bg-primary" : "bg-slate-200"}`}>
-            <div
-              className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-300 flex items-center justify-center ${darkMode ? "translate-x-6" : "translate-x-0"}`}>
-              {darkMode ? (
-                <MoonSVG className="w-3 h-3 text-primary" />
-              ) : (
-                <div className="w-3 h-3 bg-slate-300 rounded-full" />
-              )}
-            </div>
-          </button>
+          <DarkModeToggle />
         </div>
       </section>
 
       {/* 3. SECURITY (Password) */}
       <section className={sectionClass}>
-        <div className="flex items-center gap-3 mb-6 border-b border-slate-50 pb-4">
+        <div className="flex items-center gap-3 mb-6 border-b border-border pb-4">
           <div className="p-2 bg-indigo-50 text-primary rounded-full">
             <LockSVG className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Biztonság</h2>
+          <h2 className="text-xl font-bold text-text-main">Biztonság</h2>
         </div>
 
         <form onSubmit={handleChangePassword}>
@@ -378,7 +367,7 @@ export default function Settings({user}: {user: User}) {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="bg-white border border-slate-200 text-slate-700 hover:text-primary hover:border-primary px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]">
+              className="bg-surface border border-border text-slate-700 hover:text-primary hover:border-primary px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]">
               Jelszó módosítása
             </button>
           </div>
@@ -386,15 +375,16 @@ export default function Settings({user}: {user: User}) {
       </section>
 
       {/* 4. DANGER ZONE */}
-      <section className="bg-red-50 p-6 sm:p-8 rounded-3xl border border-red-100">
+      <section className="bg-danger-bg p-6 sm:p-8 rounded-3xl border border-danger-border">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-white text-red-500 rounded-full shadow-sm">
+          {/* Icon Box */}
+          <div className="p-2 bg-surface text-danger-solid rounded-full shadow-sm">
             <TrashSVG className="w-5 h-5" />
           </div>
-          <h2 className="text-xl font-bold text-red-900">Veszélyzóna</h2>
+          <h2 className="text-xl font-bold text-danger-text">Veszélyzóna</h2>
         </div>
 
-        <p className="text-red-700/80 mb-6 text-sm leading-relaxed">
+        <p className="text-danger-muted mb-6 text-sm leading-relaxed">
           A fiókod törlése végleges és nem visszavonható. Minden hirdetésed,
           üzeneted és értékelésed elvész.
         </p>
@@ -402,7 +392,13 @@ export default function Settings({user}: {user: User}) {
         <div className="flex justify-end">
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="bg-white text-red-600 border border-red-200 hover:bg-red-600 hover:text-white hover:border-red-600 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]">
+            className="
+        bg-surface
+        text-danger-solid
+        border border-danger-border
+        hover:bg-danger-solid hover:text-surface hover:border-danger-solid
+        px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]
+      ">
             Fiók végleges törlése
           </button>
         </div>

@@ -10,7 +10,7 @@ export default async function MyListingsPage() {
     return null;
   }
   return (
-    <div className="min-h-screen bg-[#F8F9FE] font-sans text-slate-800 pb-20">
+    <div className="min-h-screen bg-background font-sans text-text-main pb-20">
       <SubHeader user={user} />
       <MyListings />
     </div>

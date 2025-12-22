@@ -16,7 +16,7 @@ export default async function ListingDetailsPage({
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FE] text-slate-800 font-sans pb-20">
+    <div className="min-h-screen bg-background text-text-main font-sans pb-20">
       <SubHeader user={user} />
       <ListingDetails listingId={id} user={user} />
     </div>

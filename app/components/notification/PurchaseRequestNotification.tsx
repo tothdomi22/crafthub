@@ -19,7 +19,7 @@ export default function PurchaseRequestNotification({
   return (
     <div className="flex gap-4">
       {/* Placeholder Image - Ideally get from API */}
-      <div className="w-12 h-12 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden border border-slate-100">
+      <div className="w-12 h-12 bg-secondary rounded-lg flex-shrink-0 overflow-hidden border border-border">
         <img
           src={"/images/placeholder.jpg"}
           alt=""
@@ -28,12 +28,12 @@ export default function PurchaseRequestNotification({
       </div>
 
       <div className="flex-1">
-        <p className="text-sm text-slate-600 leading-snug mb-2">
-          <span className="font-bold text-slate-900">
+        <p className="text-sm text-text-muted leading-snug mb-2">
+          <span className="font-bold text-text-main">
             {notif.data.requesterName}
           </span>{" "}
           jelezte, hogy megvásárolta a(z){" "}
-          <span className="font-bold text-slate-900">
+          <span className="font-bold text-text-main">
             {notif.data.listingTitle}
           </span>{" "}
           termékedet.
@@ -49,7 +49,7 @@ export default function PurchaseRequestNotification({
               )
             }
             disabled={isPatchMutationPending}
-            className="flex-1 bg-primary hover:bg-[#5b4cc4] text-white text-xs font-bold py-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition-all">
+            className="flex-1 bg-primary hover:bg-primary-hover text-surface text-xs font-bold py-2 rounded-lg shadow-sm flex items-center justify-center gap-1 transition-all">
             <CheckSVG className="w-3.5 h-3.5" /> Elfogadás
           </button>
           <button
@@ -61,7 +61,7 @@ export default function PurchaseRequestNotification({
               )
             }
             disabled={isPatchMutationPending}
-            className="flex-1 bg-white border border-slate-200 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-slate-600 text-xs font-bold py-2 rounded-lg transition-all">
+            className="flex-1 bg-surface border border-border hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-600 hover:border-red-200 dark:hover:border-red-800 text-text-muted text-xs font-bold py-2 rounded-lg transition-all">
             Elutasítás
           </button>
         </div>

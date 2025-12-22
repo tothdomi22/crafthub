@@ -11,7 +11,7 @@ export default async function MessagesInboxPage() {
   }
 
   return (
-    <div className="h-screen bg-[#F8F9FE] font-sans text-slate-800 flex flex-col overflow-hidden">
+    <div className="h-screen bg-background font-sans text-text-main flex flex-col overflow-hidden">
       <SubHeader user={user} />
       <MessagesInbox user={user} />
     </div>

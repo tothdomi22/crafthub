@@ -67,10 +67,10 @@ export default function UserProfile({id}: {id: string}) {
 
   if (!profileData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FE]">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="h-12 w-12 bg-slate-200 rounded-full mb-4"></div>
-          <div className="h-4 w-32 bg-slate-200 rounded"></div>
+          <div className="h-12 w-12 bg-secondary rounded-full mb-4"></div>
+          <div className="h-4 w-32 bg-secondary rounded"></div>
         </div>
       </div>
     );
@@ -79,14 +79,14 @@ export default function UserProfile({id}: {id: string}) {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* --- HERO PROFILE CARD --- */}
-      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 mb-8 relative overflow-hidden">
+      <div className="bg-surface rounded-2xl p-6 md:p-8 shadow-sm border border-border mb-8 relative overflow-hidden">
         <div className="relative flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left mt-4">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
             <img
               src={"/images/placeholder.jpg"}
               alt={"alt"}
-              className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-white shadow-md bg-slate-200"
+              className="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-4 border-border shadow-md bg-bg-hover"
             />
           </div>
 
@@ -94,12 +94,12 @@ export default function UserProfile({id}: {id: string}) {
           <div className="flex-1 w-full">
             <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-5">
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 mb-1">
+                <h1 className="text-3xl font-bold text-text-main mb-1">
                   {profileData.user.name}
                 </h1>
 
                 {/* Rating Badge */}
-                <div className="inline-flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100">
+                <div className="inline-flex items-center gap-2 bg-background px-4 py-1.5 rounded-full border border-border">
                   <div className="flex text-[#00B894]">
                     {[1, 2, 3, 4, 5].map(i => (
                       <StarSvg
@@ -107,15 +107,15 @@ export default function UserProfile({id}: {id: string}) {
                         className={
                           i <= Math.round(profileData.review)
                             ? "fill-current"
-                            : "text-slate-200"
+                            : "text-text-muted"
                         }
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-bold text-slate-700">
+                  <span className="text-sm font-bold text-text-main">
                     {profileData.review.toFixed(1)}
                   </span>
-                  <span className="text-xs text-slate-400 font-medium border-l border-slate-200 pl-2 ml-1">
+                  <span className="text-xs text-text-muted font-medium border-l border-border pl-2 ml-1">
                     {profileData.reviewCount} értékelés
                   </span>
                 </div>
@@ -123,11 +123,11 @@ export default function UserProfile({id}: {id: string}) {
             </div>
 
             {/* Bio & Stats */}
-            <p className="mt-5 text-slate-600 leading-relaxed max-w-3xl">
+            <p className="mt-5 text-text-muted leading-relaxed max-w-3xl">
               {profileData.bio}
             </p>
 
-            <div className="flex flex-wrap justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-slate-50 text-sm text-slate-500 font-medium">
+            <div className="flex flex-wrap justify-center md:justify-start gap-6 mt-6 pt-6 border-t border-border text-sm text-text-muted font-medium">
               {profileData.city && (
                 <div className="flex items-center gap-2">
                   <LocationSVG />
@@ -145,13 +145,13 @@ export default function UserProfile({id}: {id: string}) {
       </div>
 
       {/* --- TABS --- */}
-      <div className="flex items-center gap-8 border-b border-slate-200 mb-8">
+      <div className="flex items-center gap-8 border-b border-border mb-8">
         <button
           onClick={() => setActiveTab("shop")}
           className={`pb-3 text-sm font-bold transition-all relative px-1 ${
             activeTab === "shop"
               ? "text-primary"
-              : "text-slate-500 hover:text-slate-800"
+              : "text-text-muted hover:text-text-main"
           }`}>
           Hirdetései ({listingData?.pages[0]?.totalElements || 0})
           {activeTab === "shop" && (
@@ -164,7 +164,7 @@ export default function UserProfile({id}: {id: string}) {
           className={`pb-3 text-sm font-bold transition-all relative px-1 ${
             activeTab === "reviews"
               ? "text-primary"
-              : "text-slate-500 hover:text-slate-800"
+              : "text-text-muted hover:text-text-main"
           }`}>
           Értékelések ({profileData.reviewCount})
           {activeTab === "reviews" && (
@@ -220,7 +220,7 @@ export default function UserProfile({id}: {id: string}) {
             {!hasNextPage &&
               listingData?.pages[0]?.content.length !== 0 &&
               !isListingsLoading && (
-                <div className="flex items-center gap-2 text-slate-300 text-sm font-medium"></div>
+                <div className="flex items-center gap-2 text-text-main text-sm font-medium"></div>
               )}
           </div>
         </>
@@ -231,10 +231,10 @@ export default function UserProfile({id}: {id: string}) {
             reviewData.map(review => (
               <div
                 key={review.id}
-                className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-6 transition-colors hover:border-primary/30">
+                className="bg-surface p-5 rounded-2xl shadow-sm border border-border flex flex-col sm:flex-row gap-6 transition-colors hover:border-primary/30">
                 {/* 1. THE SOLD ITEM (Visual Context) */}
                 <div className="w-full sm:w-28 flex-shrink-0">
-                  <div className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 border border-slate-100">
+                  <div className="relative aspect-square rounded-xl overflow-hidden bg-background border border-border">
                     <img
                       src={"/images/placeholder.jpg"}
                       alt={review.listing.name}
@@ -252,11 +252,11 @@ export default function UserProfile({id}: {id: string}) {
                 <div className="flex-1 flex flex-col justify-center">
                   <div className="flex justify-between items-start mb-2">
                     <Link href={`/listing/${review.listing.id}`}>
-                      <h3 className="text-sm font-bold text-slate-900 hover:text-primary cursor-pointer truncate pr-4">
+                      <h3 className="text-sm font-bold text-text-main hover:text-primary cursor-pointer truncate pr-4">
                         {review.listing.name}
                       </h3>
                     </Link>
-                    <span className="text-xs text-slate-400 whitespace-nowrap">
+                    <span className="text-xs text-text-muted whitespace-nowrap">
                       {formatDate(review.createdAt)}
                     </span>
                   </div>
@@ -278,24 +278,24 @@ export default function UserProfile({id}: {id: string}) {
                   </div>
 
                   {/* Comment */}
-                  <p className="text-sm text-slate-600 italic leading-relaxed">
+                  <p className="text-sm text-text-muted italic leading-relaxed">
                     &#34;{review.reviewText}&#34;
                   </p>
                 </div>
 
                 {/* 3. THE BUYER (Social Proof) */}
-                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-50 sm:pl-6 sm:w-32 gap-3 min-w-max">
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-border sm:pl-6 sm:w-32 gap-3 min-w-max">
                   <div className="flex items-center gap-3 sm:flex-col sm:text-right">
                     <img
                       src={"/images/placeholder.jpg"}
                       alt={review.reviewerUser.name}
-                      className="w-8 h-8 rounded-full object-cover border border-white shadow-sm"
+                      className="w-8 h-8 rounded-full object-cover border border-border shadow-sm"
                     />
                     <div className="text-xs">
-                      <span className="block font-bold text-slate-900">
+                      <span className="block font-bold text-text-main">
                         {review.reviewerUser.name}
                       </span>
-                      <span className="text-slate-400">
+                      <span className="text-text-muted">
                         {review.reviewType == ReviewTypeEnum.PURCHASER
                           ? "Vásárló"
                           : "Eladó"}

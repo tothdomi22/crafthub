@@ -59,20 +59,20 @@ export default function CreateReviewModal({
 
   // 3. The Modal Content
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 text-slate-800 font-sans">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 text-text-main font-sans">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={!isCreatReviewPending ? onClose : undefined}></div>
 
       {/* Modal Box */}
-      <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="relative bg-surface rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="bg-slate-50 p-6 text-center border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900">Értékelés írása</h2>
-          <p className="text-sm text-slate-500 mt-1">
+        <div className="bg-background p-6 text-center border-b border-border">
+          <h2 className="text-xl font-bold text-text-main">Értékelés írása</h2>
+          <p className="text-sm text-text-muted mt-1">
             Hogyan zajlott az adásvétel vele:{" "}
-            <span className="font-bold text-slate-800">
+            <span className="font-bold text-text-main">
               {notif.data.recipientName}
             </span>
             ?
@@ -98,13 +98,13 @@ export default function CreateReviewModal({
                     className={`w-10 h-10 ${
                       star <= (hoverRating || rating)
                         ? "fill-yellow-400 text-yellow-400"
-                        : "fill-slate-100 text-slate-200"
+                        : "fill-text-muted text-text-muted"
                     }`}
                   />
                 </button>
               ))}
             </div>
-            <div className="h-4 text-sm font-bold text-slate-500">
+            <div className="h-4 text-sm font-bold text-text-muted">
               {hoverRating === 1 && "Nagyon rossz"}
               {hoverRating === 2 && "Rossz"}
               {hoverRating === 3 && "Közepes"}
@@ -120,7 +120,7 @@ export default function CreateReviewModal({
               onChange={e => setReviewText(e.target.value)}
               placeholder="Írd le a tapasztalataidat..."
               rows={4}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-slate-800 placeholder-slate-400 resize-none"></textarea>
+              className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-text-main placeholder-slate-400 resize-none"></textarea>
           </div>
 
           {/* Actions */}
@@ -128,15 +128,15 @@ export default function CreateReviewModal({
             <button
               onClick={onClose}
               disabled={isCreatReviewPending}
-              className="flex-1 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50">
+              className="flex-1 py-3 rounded-xl font-bold text-text-muted hover:bg-background transition-colors disabled:opacity-50">
               Mégse
             </button>
             <button
               onClick={handleSubmit}
               disabled={isCreatReviewPending || rating === 0 || !reviewText}
-              className="flex-[2] bg-primary hover:bg-[#5b4cc4] text-white py-3 rounded-xl shadow-lg shadow-primary/20 font-bold transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              className="flex-[2] bg-primary hover:bg-primary-hover text-surface py-3 rounded-xl shadow-lg shadow-primary/20 font-bold transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {isCreatReviewPending ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-surface/30 border-t-surface rounded-full animate-spin"></div>
               ) : (
                 "Értékelés küldése"
               )}

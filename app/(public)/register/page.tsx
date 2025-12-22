@@ -116,7 +116,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen flex bg-surface">
       {/* --- LEFT SIDE: IMAGE --- */}
       <div className="hidden lg:flex lg:w-1/2 bg-slate-900 relative overflow-hidden">
         <Image
@@ -127,8 +127,8 @@ export default function RegisterPage() {
           unoptimized
           className="object-cover opacity-60"
         />
-        <div className="relative z-10 flex flex-col justify-end p-12 w-full text-white h-full">
-          <div className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-2xl max-w-md">
+        <div className="relative z-10 flex flex-col justify-end p-12 w-full text-text-main h-full">
+          <div className="bg-surface/10 backdrop-blur-md border border-border/20 p-6 rounded-2xl max-w-md">
             <div className="flex gap-1 mb-2 text-yellow-400">
               {[1, 2, 3, 4, 5].map(i => (
                 <span key={i}>★</span>
@@ -139,7 +139,7 @@ export default function RegisterPage() {
               gyorsak, a közösség pedig támogató.&#34;
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/20"></div>
+              <div className="w-8 h-8 rounded-full bg-surface/20"></div>
               <span className="font-bold text-sm">Anna, Keramikus</span>
             </div>
           </div>
@@ -147,13 +147,13 @@ export default function RegisterPage() {
       </div>
 
       {/* --- RIGHT SIDE: FORM --- */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-[#F8F9FE] lg:bg-white">
-        <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-surface">
+        <div className="w-full max-w-md bg-surface p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 lg:shadow-none lg:p-0 lg:bg-transparent">
           <div className="text-center lg:text-left mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-text-main mb-2">
               Fiók létrehozása
             </h1>
-            <p className="text-slate-500">
+            <p className="text-text-muted">
               Csatlakozz a kézműves közösséghez még ma.
             </p>
           </div>
@@ -179,7 +179,7 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4" noValidate>
             {/* Name Field */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 ml-1">
+              <label className="text-sm font-bold text-text-main ml-1">
                 Teljes név
               </label>
               <input
@@ -190,10 +190,10 @@ export default function RegisterPage() {
                 onChange={e =>
                   handleInputChange(setName, e.target.value, setNameError)
                 }
-                className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium ${
+                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
                   nameError
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-border focus:border-primary focus:ring-primary/10"
                 }`}
               />
               {nameError && (
@@ -205,7 +205,7 @@ export default function RegisterPage() {
 
             {/* Email Field */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 ml-1">
+              <label className="text-sm font-bold text-text-main ml-1">
                 Email cím
               </label>
               <input
@@ -216,10 +216,10 @@ export default function RegisterPage() {
                 onChange={e =>
                   handleInputChange(setEmail, e.target.value, setEmailError)
                 }
-                className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium ${
+                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
                   emailError || generalError
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-border focus:border-primary focus:ring-primary/10"
                 }`}
               />
               {emailError && (
@@ -231,7 +231,7 @@ export default function RegisterPage() {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 ml-1">
+              <label className="text-sm font-bold text-text-main ml-1">
                 Jelszó
               </label>
               <input
@@ -246,10 +246,10 @@ export default function RegisterPage() {
                     setPasswordError,
                   )
                 }
-                className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium ${
+                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
                   passwordError
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-border focus:border-primary focus:ring-primary/10"
                 }`}
               />
               {passwordError && (
@@ -261,7 +261,7 @@ export default function RegisterPage() {
 
             {/* Confirm Password Field */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-700 ml-1">
+              <label className="text-sm font-bold text-text-main ml-1">
                 Jelszó megerősítése
               </label>
               <input
@@ -276,10 +276,10 @@ export default function RegisterPage() {
                     setConfirmPasswordError,
                   )
                 }
-                className={`w-full bg-slate-50 border rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-4 transition-all text-slate-900 placeholder:text-slate-400 font-medium ${
+                className={`w-full bg-background border rounded-xl px-4 py-3.5 outline-none focus:bg-surface focus:ring-4 transition-all text-text-main placeholder:text-text-muted font-medium ${
                   confirmPasswordError
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500/10"
-                    : "border-slate-200 focus:border-primary focus:ring-primary/10"
+                    ? "border-red-300 dark:border-red-800 focus:border-red-500 focus:ring-red-500/10"
+                    : "border-border focus:border-primary focus:ring-primary/10"
                 }`}
               />
               {confirmPasswordError && (
@@ -303,7 +303,7 @@ export default function RegisterPage() {
                       setTermsError,
                     )
                   }
-                  className={`mt-1 w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary accent-primary cursor-pointer ${
+                  className={`mt-1 w-4 h-4 text-primary border-border rounded focus:ring-primary accent-primary cursor-pointer ${
                     termsError
                       ? "outline-2 outline-red-500 outline-offset-1"
                       : ""
@@ -311,7 +311,7 @@ export default function RegisterPage() {
                 />
                 <label
                   htmlFor="terms"
-                  className={`text-xs cursor-pointer select-none ${termsError ? "text-red-500" : "text-slate-500"}`}>
+                  className={`text-xs cursor-pointer select-none ${termsError ? "text-red-500" : "text-text-muted"}`}>
                   Elolvastam és elfogadom az{" "}
                   <span className="text-primary font-bold hover:underline">
                     Adatkezelési Tájékoztatót
@@ -335,9 +335,9 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
+              className="w-full bg-primary hover:bg-primary-hover text-surface py-4 rounded-xl shadow-lg shadow-primary/20 font-bold text-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4">
               {isPending ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-border/30 border-t-surface rounded-full animate-spin" />
               ) : (
                 "Regisztráció"
               )}
@@ -345,7 +345,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Footer / Login Link */}
-          <div className="mt-8 text-center text-sm text-slate-500 font-medium">
+          <div className="mt-8 text-center text-sm text-text-muted font-medium">
             Már van fiókod?{" "}
             <Link
               href="/login"

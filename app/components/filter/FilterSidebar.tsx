@@ -181,10 +181,10 @@ export default function FilterSidebar({
 
   return (
     <div
-      className={`bg-white rounded-2xl border border-slate-100 flex flex-col h-full md:max-h-[calc(100vh-10rem)] ${className}`}>
+      className={`bg-surface rounded-2xl border border-border flex flex-col h-full md:max-h-[calc(100vh-10rem)] ${className}`}>
       {/* 1. HEADER (Fixed) */}
       <div className="flex-none flex items-center justify-between p-5 pb-2">
-        <h3 className="font-bold text-slate-900 text-lg">Szűrés</h3>
+        <h3 className="font-bold text-text-main text-lg">Szűrés</h3>
         {hasActiveLocalFilters && (
           <button
             onClick={clearLocalFilters}
@@ -193,7 +193,7 @@ export default function FilterSidebar({
           </button>
         )}
         {onClose && (
-          <button onClick={onClose} className="md:hidden p-1 text-slate-400">
+          <button onClick={onClose} className="md:hidden p-1 text-text-muted">
             <CloseSVG className="w-5 h-5" />
           </button>
         )}
@@ -201,7 +201,7 @@ export default function FilterSidebar({
 
       {/* 2. CATEGORY LABEL (Fixed, prevents scrolling behind) */}
       <div className="flex-none px-5 pt-2 pb-2">
-        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+        <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider">
           Kategóriák
         </h4>
       </div>
@@ -224,7 +224,7 @@ export default function FilterSidebar({
                 className={`w-full flex items-center justify-between rounded-lg transition-colors ${
                   isMainSelected
                     ? "bg-primary/5 text-primary"
-                    : "text-slate-900 hover:bg-slate-50"
+                    : "text-text-main hover:bg-bg-hover"
                 }`}>
                 <button
                   onClick={() => toggleMainCategory(cat.id)}
@@ -243,7 +243,7 @@ export default function FilterSidebar({
                     className={`p-2 mr-1 rounded-md transition-colors ${
                       isMainSelected
                         ? "text-primary hover:bg-primary/10"
-                        : "text-slate-400 hover:bg-black/5"
+                        : "text-text-muted hover:bg-black/5"
                     }`}>
                     <KeyBoardArrowDownSVG
                       className={`w-4 h-4 transition-transform duration-300 ${
@@ -261,7 +261,7 @@ export default function FilterSidebar({
                 }`}>
                 <div className="overflow-hidden">
                   {childrenSubCategories.length > 0 && (
-                    <div className="ml-3 mt-1 border-l-2 border-slate-100 pl-2 space-y-1 pb-1">
+                    <div className="ml-3 mt-1 border-l-2 border-border pl-2 space-y-1 pb-1">
                       {childrenSubCategories.map(sub => {
                         const isSubSelected =
                           localFilters.subCategoryIds.includes(sub.id);
@@ -271,17 +271,17 @@ export default function FilterSidebar({
                             onClick={() => toggleSubCategory(sub.id, cat.id)}
                             className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors text-left ${
                               isSubSelected
-                                ? "text-primary font-bold bg-slate-50"
-                                : "text-slate-700 hover:text-slate-800"
+                                ? "text-primary font-bold bg-bg-hover"
+                                : "text-text-main hover:bg-hover"
                             }`}>
                             <div
                               className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors flex-shrink-0 ${
                                 isSubSelected
                                   ? "bg-primary border-primary"
-                                  : "border-slate-300 bg-white"
+                                  : "border-bordetext-surface"
                               }`}>
                               {isSubSelected && (
-                                <CheckSVG className="w-2.5 h-2.5 text-white" />
+                                <CheckSVG className="w-2.5 h-2.5 text-surface" />
                               )}
                             </div>
                             <span title={sub.description}>
@@ -303,10 +303,10 @@ export default function FilterSidebar({
          Added z-20 and background color to ensure it sits on top of scrolling content.
          Added shadow for visual separation.
       */}
-      <div className="flex-none p-5 space-y-5 border-t border-slate-100 bg-white z-20 rounded-b-2xl ">
+      <div className="flex-none p-5 space-y-5 border-t border-border bg-surface z-20 rounded-b-2xl ">
         {/* CITY */}
         <div>
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">
             Város
           </h4>
           <CityDropdown
@@ -324,7 +324,7 @@ export default function FilterSidebar({
 
         {/* PRICE */}
         <div>
-          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+          <h4 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">
             Ár (Ft)
           </h4>
           <div className="flex items-center gap-2">
@@ -335,9 +335,9 @@ export default function FilterSidebar({
               onChange={e =>
                 setLocalFilters({...localFilters, minPrice: e.target.value})
               }
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary transition-all"
+              className="w-full bg-bg-hover placeholder:text-text-muted text-text-muted border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary transition-all"
             />
-            <span className="text-slate-300">-</span>
+            <span className="text-text-muted">-</span>
             <input
               type="number"
               placeholder="Max"
@@ -345,7 +345,7 @@ export default function FilterSidebar({
               onChange={e =>
                 setLocalFilters({...localFilters, maxPrice: e.target.value})
               }
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary transition-all"
+              className="w-full bg-bg-hover placeholder:text-text-muted text-text-muted border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary transition-all"
             />
           </div>
         </div>
@@ -353,7 +353,7 @@ export default function FilterSidebar({
         {/* CTA BUTTON */}
         <button
           onClick={handleApply}
-          className="w-full bg-primary hover:bg-[#5b4cc4] text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+          className="w-full bg-primary hover:bg-primary-hover text-surface py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
           Szűrés
         </button>
       </div>

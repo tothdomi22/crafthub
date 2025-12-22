@@ -21,9 +21,9 @@ export default function ListingCard({
     return diffInDays <= 7;
   };
   return (
-    <div className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full hover:-translate-y-1">
+    <div className="group bg-surface rounded-2xl border border-border-subtle shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col h-full hover:-translate-y-1">
       {/* Image Container */}
-      <div className="relative aspect-[4/5] bg-slate-100 overflow-hidden">
+      <div className="relative aspect-[4/5] bg-surface overflow-hidden">
         <img
           src={"/images/placeholder.jpg"}
           alt={listing.name}
@@ -32,7 +32,7 @@ export default function ListingCard({
 
         {/* 'New' Badge */}
         {isNew(listing.createdAt) && (
-          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
+          <span className="absolute top-3 left-3 bg-surface/90 backdrop-blur-sm text-primary text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase tracking-wide shadow-sm">
             Új
           </span>
         )}
@@ -51,8 +51,8 @@ export default function ListingCard({
             transition-all duration-200 hover:scale-110 active:scale-95 flex items-center justify-center
             ${
               listing.isLiked || isFavoritesPage
-                ? "bg-white text-red-500 opacity-100"
-                : "bg-white/80 text-slate-400 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-slate-400"
+                ? "bg-surface text-red-500 opacity-100"
+                : "bg-surface/80 text-text-muted lg:opacity-0 group-hover:opacity-100 hover:bg-bg-hover hover:text-text-muted"
             }
           `}>
           <FavoriteSVG className={`w-5 h-5 transition-colors`} />
@@ -63,27 +63,27 @@ export default function ListingCard({
       <div className="p-4 flex flex-col flex-1">
         <div className="mb-2">
           <div className="flex justify-between items-start gap-2">
-            <p className="text-sm font-medium text-slate-900 line-clamp-1 group-hover:text-primary transition-colors">
+            <p className="text-sm font-medium text-text-main line-clamp-1 group-hover:text-primary transition-colors">
               {listing.name}
             </p>
           </div>
-          <h3 className="text-lg font-bold text-slate-900">
+          <h3 className="text-lg font-bold text-text-main">
             {listing.price} Ft
           </h3>
         </div>
 
         {/* Seller Info Footer */}
         {showFooter && (
-          <div className="mt-auto pt-3 border-t border-slate-50 flex items-center justify-between">
+          <div className="mt-auto pt-3 border-t border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
+              <div className="w-5 h-5 rounded-full bg-border flex items-center justify-center text-[10px] font-bold text-text-muted">
                 {listing.user.name.charAt(0)}
               </div>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-text-muted">
                 {listing.user.name}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 font-medium">
+            <span className="text-[10px] text-text-muted font-medium">
               {listing.city.name}
             </span>
           </div>

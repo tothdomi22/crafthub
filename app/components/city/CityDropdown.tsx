@@ -7,7 +7,7 @@ import LocationSVG from "/public/svgs/location.svg";
 import CheckSVG from "/public/svgs/check.svg";
 import {City} from "@/app/types/city";
 
-// --- Types ---
+// --- 1. RESTORED TYPES FOR MULTI/SINGLE SUPPORT ---
 interface CommonProps {
   citiesData: City[] | undefined;
   isLoading?: boolean;
@@ -69,7 +69,6 @@ export default function CityDropdown(props: CityDropdownProps) {
     })
     .slice(0, 25);
 
-  // Close when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -84,7 +83,6 @@ export default function CityDropdown(props: CityDropdownProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Autofocus
   useEffect(() => {
     if (isOpen && searchInputRef.current) {
       setTimeout(() => searchInputRef.current?.focus(), 50);
@@ -94,6 +92,24 @@ export default function CityDropdown(props: CityDropdownProps) {
   useEffect(() => {
     setHighlightedIndex(0);
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (isOpen && dropdownRef.current) {
+      setTimeout(() => {
+        const element = dropdownRef.current;
+        if (!element) return;
+        const rect = element.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const footerOffset = 110;
+        const visibleBottom = windowHeight - footerOffset;
+        const isCovered = rect.bottom > visibleBottom;
+        if (isCovered) {
+          const scrollAmount = rect.bottom - visibleBottom;
+          window.scrollBy({top: scrollAmount, behavior: "smooth"});
+        }
+      }, 300);
+    }
+  }, [isOpen]);
 
   const handleSelect = (city: City) => {
     if (isMulti) {
@@ -155,11 +171,10 @@ export default function CityDropdown(props: CityDropdownProps) {
 
   // --- RENDER CONTENT ---
   const listContent = (
-    <div className="bg-white overflow-hidden flex flex-col h-full">
-      {/* Search */}
-      <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+    <div className="bg-surface overflow-hidden flex flex-col h-full">
+      <div className="p-3 border-b border-border bg-surface/50">
         <div className="relative">
-          <SearchSVG className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <SearchSVG className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             ref={searchInputRef}
             type="text"
@@ -167,13 +182,12 @@ export default function CityDropdown(props: CityDropdownProps) {
             onChange={e => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Keresés..."
-            className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-slate-400"
+            className="w-full pl-9 pr-4 py-2 bg-surface border border-border rounded-lg text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all placeholder:text-text-muted"
             onClick={e => e.stopPropagation()}
           />
         </div>
       </div>
 
-      {/* List */}
       <div
         ref={listRef}
         className="max-h-[200px] overflow-y-auto p-1 scroll-smooth">
@@ -181,8 +195,8 @@ export default function CityDropdown(props: CityDropdownProps) {
           <div className="space-y-1 p-1">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex items-center gap-3 px-3 py-2.5">
-                <div className="w-4 h-4 bg-slate-100 rounded-full animate-pulse"></div>
-                <div className="h-4 bg-slate-100 rounded w-24 animate-pulse"></div>
+                <div className="w-4 h-4 bg-background rounded-full animate-pulse"></div>
+                <div className="h-4 bg-background rounded w-24 animate-pulse"></div>
               </div>
             ))}
           </div>
@@ -201,22 +215,37 @@ export default function CityDropdown(props: CityDropdownProps) {
                       selected
                         ? "bg-primary/5 text-primary"
                         : isHighlighted
-                          ? "bg-slate-100 text-slate-900"
-                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          ? "bg-background text-text-main"
+                          : "text-text-muted hover:bg-slate-50 hover:text-text-main"
                     }
                   `}>
-                <div
-                  className={`w-4 h-4 rounded border flex items-center justify-center transition-all flex-shrink-0
-                      ${selected ? "bg-primary border-primary" : "border-slate-300 bg-white"}
+                {/* 2. CONDITIONALLY RENDER CHECKBOX */}
+                {/* Only render this div if isMulti is TRUE */}
+                {isMulti && (
+                  <div
+                    className={`w-4 h-4 rounded border flex items-center justify-center transition-all flex-shrink-0
+                      ${selected ? "bg-primary border-primary" : "border-slate-300 bg-surface"}
                     `}>
-                  {selected && <CheckSVG className="w-3 h-3 text-white" />}
-                </div>
+                    {selected && <CheckSVG className="w-3 h-3 text-white" />}
+                  </div>
+                )}
+
+                {/* Optional: If it is Single Select, you might want the Check icon
+                    (without the box) to appear, or just rely on the text color (bg-primary/5)
+                    defined in the button className above.
+                    I've left it as text-only for single-select based on your request. */}
+
                 <span className="truncate">{city.name}</span>
+
+                {/* Optional: Add a checkmark on the right for Single Select?
+                    If you want that, uncomment this:
+                    {!isMulti && selected && <CheckSVG className="w-4 h-4 ml-auto text-primary" />}
+                */}
               </button>
             );
           })
         ) : (
-          <div className="py-4 text-center text-xs text-slate-400 font-medium">
+          <div className="py-4 text-center text-xs text-text-muted font-medium">
             Nincs találat: &#34;{searchTerm}&#34;
           </div>
         )}
@@ -226,59 +255,50 @@ export default function CityDropdown(props: CityDropdownProps) {
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
-      {/* Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        // REMOVED 'transition-all' to prevent border color flickering during open/close
         className={`w-full flex items-center justify-between px-4 text-left relative z-20
           ${
             position === "relative" && isOpen
-              ? "py-3 rounded-t-xl rounded-b-none border border-primary bg-white border-b-0 pb-[13px]" // border-b-0 removes line, pb-[13px] restores height
+              ? "py-3 rounded-t-xl rounded-b-none border border-primary bg-surface border-b-0 pb-[13px]"
               : isOpen
-                ? "py-3 rounded-xl border border-primary bg-white shadow-sm"
-                : "py-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                ? "py-3 rounded-xl border border-primary bg-surface shadow-sm"
+                : "py-3 rounded-xl bg-surface border border-border hover:border-border hover:bg-bg-hover"
           }
         `}>
         <div className="flex items-center gap-2 overflow-hidden">
           <LocationSVG
             className={`w-5 h-5 flex-shrink-0 ${
-              hasValue ? "text-primary" : "text-slate-400"
+              hasValue ? "text-primary" : "text-text-muted"
             }`}
           />
           <span
             className={`font-medium truncate ${
-              hasValue ? "text-slate-900" : "text-slate-400"
+              hasValue ? "text-text-main" : "text-text-muted"
             }`}>
             {renderTriggerText()}
           </span>
         </div>
         <div
-          className={`text-slate-400 transition-transform duration-200 ml-2 ${isOpen ? "rotate-180" : ""}`}>
+          className={`text-text-muted transition-transform duration-200 ml-2 ${isOpen ? "rotate-180" : ""}`}>
           <KeyBoardArrowDownSVG className="w-5 h-5" />
         </div>
       </button>
 
-      {/* --- RENDER LOGIC --- */}
       {position === "absolute" ? (
-        // OPTION A: Absolute (Overlay)
         isOpen && (
-          <div className="absolute top-full mt-2 left-0 w-full bg-white rounded-xl shadow-xl border border-primary overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+          <div className="absolute top-full mt-2 left-0 w-full bg-surface rounded-xl shadow-xl border border-primary overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
             {listContent}
           </div>
         )
       ) : (
-        // OPTION B: Relative (Push/Accordion style)
         <div
           className={`grid transition-[grid-template-rows] duration-300 ease-in-out relative z-10 ${
             isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
           }`}>
-          {/* -mt-[1px]: Pulls the list up 1px to tuck under the trigger
-             border-t-0: Removes top border so it merges with trigger
-             border-primary: Matches the trigger color
-          */}
           <div
-            className={`overflow-hidden bg-white rounded-b-xl -mt-[1px] ${isOpen ? "border border-primary border-t-0 shadow-sm" : ""}`}>
+            className={`overflow-hidden bg-surface rounded-b-xl -mt-[1px] ${isOpen ? "border border-primary border-t-0 shadow-sm" : ""}`}>
             {listContent}
           </div>
         </div>
