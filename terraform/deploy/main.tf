@@ -44,7 +44,15 @@ variable "JWT_SECRET" {
   type = string
 }
 
-variable "POSTGRES_URL" {
+variable "DATABASE_URL" {
+  type = string
+}
+
+variable "DB_USER" {
+  type = string
+}
+
+variable "DB_PASS" {
   type = string
 }
 
@@ -85,8 +93,16 @@ resource "google_cloud_run_v2_service" "backend" {
         value = local.project_id
       }
       env {
-        name  = "POSTGRES_URL"
-        value = var.POSTGRES_URL
+        name  = "DATABASE_URL"
+        value = var.DATABASE_URL
+      }
+      env {
+        name  = "DB_USER"
+        value = var.DB_USER
+      }
+      env {
+        name  = "DB_PASS"
+        value = var.DB_PASS
       }
       env {
         name  = "JWT_SECRET"
@@ -96,7 +112,7 @@ resource "google_cloud_run_v2_service" "backend" {
         container_port = 8080
       }
       startup_probe {
-        initial_delay_seconds = 10
+        initial_delay_seconds = 40
         timeout_seconds       = 1
         period_seconds        = 5
         failure_threshold     = 5

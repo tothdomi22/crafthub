@@ -184,8 +184,18 @@ output "artifacts_repo_url" {
   value = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.madebyme_artifacts.repository_id}"
 }
 
+output "postgres_user" {
+  value     = local.postgres_user
+  sensitive = true
+}
+
+output "postgres_password" {
+  value     = local.postgres_password
+  sensitive = true
+}
+
 output "postgres_connection_string" {
-  value     = "postgresql+asyncpg://${local.postgres_user}:${local.postgres_password}@${local.postgres_host}:${local.postgres_port}/${local.postgres_db}"
+  value     = "jdbc:postgresql://${local.postgres_host}:${local.postgres_port}/${local.postgres_db}"
   sensitive = true
 }
 
